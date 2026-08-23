@@ -13083,5 +13083,5173 @@ register(
   </button>
 </div>` }
     ]
-  }
+  },
+{
+  id: 'timeline', name: 'Timeline', category: 'data',
+  description: 'What happened to one record, in order — the history strip on a purchase order, the audit trail on a vendor master, the QC events on a batch. Each entry is an actor, a verb, a time, and where it matters what the value was before.',
+  when: 'A reader has one record open and is about to decide something about it, and the last thing they need is how it got here — who approved it, when the promised date moved, why the hold was released. This is that strip, and it is the region record-page/activity places: record-page owns the screen and this owns the entries inside it, so the two agree rather than compete — the day bands, the diff well and the rail here are the same shapes that page draws, and the "See the full trail" link at the foot of the strip is what opens audit-page/record. Reach for audit-page instead the moment the question stops being about this record: the system trail is queried across records, actors, fields and dates, an auditor starts from a question rather than from a record, and the filter apparatus that makes that possible is a whole screen rather than a strip. Reach for table when the events are records the reader sorts, filters and works from — a GRN register, a rejection log — because a trail has exactly one order and it is time, descending, and a sortable header on it is a promise nothing keeps. Reach for schedule-page when the axis is what is going to happen rather than what did: position there carries meaning and a block twice as wide takes twice as long, where every entry here is the same height whether it took a minute or a fortnight. And reach for progress when the thing being drawn is one linear process with a known total — three of eight steps done — because the rail here is deliberately not a progress bar and colouring the part above the current entry turns it into one with its total written nowhere.',
+  notes: [
+    'The old value is the entry. "Ritu Deshpande amended PO-2026-0418" is a receipt for a history rather than one, and the strip that shipped with only that line was rebuilt within a fortnight of a buyer asking what the rate had been before. Every entry that changed a field renders both values in the recessed well — was ₹4,20,000, now ₹4,55,000 — and an event that cannot produce the old value is a defect in what was written to the table, not a case to design around by drawing a blank.',
+    'The absolute time is the record and the relative one is a gloss written after it, never instead of it. A strip that says "2 hours ago" is wrong the moment the tab is left open over lunch, and it is evidence of nothing at all once it has been screenshotted into a ticket or pasted into an email to the vendor — which is the single most common thing anybody does with this region. The <time datetime> carries the offset as well, because a plant in Silvassa and a head office reading the same trail have to agree on 08:55.',
+    'Colour appears in the dot and nowhere else, and this component is where that rule is hardest to hold. Tinting the approval entry green and the rejection entry red is the first thing everybody reaches for, and by the twelfth entry the column reads as a barcode: the eye stops separating the red one from the pattern, which is the exact opposite of what the tint was added to do. Most entries take zinc-500. The palette is spent on the two or three that are worth stopping at.',
+    'A system event is separated by shape and by type, never by a colour of its own. The first attempt tinted automated entries blue, which burned a colour that means nothing in this system and taught readers that the palette is decorative; the second greyed the whole row out, which said the event mattered less than a person\'s when a failed reminder job is often the reason the order is late. What separates them now is the mark — a size-4 icon instead of a 6px disc — an 11px uppercase System tag, and the source written in mono. All three survive being printed.',
+    'When dots and icons share one column, the column takes a fixed w-4 and both are centred in it. Without that the 6px disc sits at the auto width of its own span and the 16px icon sits at sixteen, so the rail kinks twice in a strip that mixes people and jobs, and the kink is the thing a reviewer notices instead of the content. The rail itself is a flex child of that column rather than an absolutely positioned line, so nothing has a left offset to keep in step by hand.',
+    'The rail stays zinc-200 the whole way down, above the newest entry and below the oldest one alike. Colouring the part above the current entry turns the history into a progress bar with no total written anywhere, and a history has no total — more will happen to this order tomorrow. It also stops at the last entry rather than running past it, which is why it is per-item with group-last:hidden and not one full-height line on the list: the overshoot is the height of the last entry\'s text, and that height is whatever the wrapping does at 390px.',
+    'A comment is the one entry with a body somebody wrote, and it is the only one that can be changed after the fact. If the application lets a note be edited, the entry has to say so and when — otherwise the strip is append-only in appearance and not in fact, which is worse than a strip that never claimed to be. The attachment on a comment is a link to the document that already exists on the record, not an upload control: a drop target inside a history row competes with the page scroll and a file dropped an inch wide of it navigates the browser away from the record.',
+    'Entries that have not happened yet sit above the present with a hollow dot, and they are never counted in the total. The strip that shipped saying "12 events" while two of them were the next two approvers in the route was quoted in a dispute, and the two that had not happened were read as two that had. The word "Not yet" goes in the entry as sr-only text as well, because the difference between a filled disc and a hollow one is six pixels of ring and nothing at all to a screen reader.',
+    'Day headings say Today and Yesterday and then the date, and they say the date in both cases. "Today" alone is a heading that changes meaning while the page is open, and a trail whose headings depend on when it was read is not something anyone can cite. The heading is a real h3 outside the list, never an li — written as a list item it is announced as item 1 of 6 and every count under it is off by one.',
+    'Truncation states what is hidden as a figure. "Load more" on its own hides whether the next press brings three entries or three hundred, and on a vendor master with four years of amendments behind it the difference decides whether the reader presses at all. The control says "18 older entries", the count line beside it is a role="status" so each batch is announced, and focus moves to that line when the last batch lands — the button that was pressed has been replaced by a sentence, and a removed element drops focus to the body.',
+    'Older entries append downwards and a polled entry arrives at the top; those are two different movements and only the second one moves the page under the reader. It is allowed here and refused on audit-page for one reason: a record strip is a dozen entries under a heading the reader can still see, so a prepend shifts the content by one row, while an audit page can be forty entries deep into a scroll where the entry somebody is mid-way through is the evidence they are quoting. Take the prepend only where the strip is short.',
+    'The filter strip narrows event kinds and never sorts. Adding a sortable header to a history is a promise that some other order exists, and there is none — the strip is descending time and a reader who reverses it is reading a different component. Where events genuinely are records to be sorted, filtered and worked from, the answer is table and not a rearranged version of this.',
+    'The dense form is a smaller type step, not a tighter one. Dropping to text-[12px]/4 moves the marker box to h-4 with it, because the box height is the leading of the text beside it and the two are written in the same class name so they cannot drift; squeezing the padding while leaving the 20px box behind is how a drawer ends up with its dots a pixel high of every line they belong to.',
+    'Nothing in the marker column is a click target. A 6px disc is 6px of hit area and announces as nothing, so a strip where the dot opens the event and the sentence does not cannot be operated from a keyboard at all. What is a target is the record named inside the sentence — GRN-4821, DN-26-0117 — and those are real links to real screens.'
+  ],
+  anatomy: [
+    ['Panel', 'The white rounded-xl card the strip lives in, with the h2 naming the record and the entry count beside it. On a record page it is one section among several and takes that page\'s gutter; it never draws a border of its own inside another card.'],
+    ['List', 'A real <ol> carrying role="list", because the order is the record and not the layout, and because preflight has already removed list-style — WebKit reads that as "not a list" and drops the count.'],
+    ['Entry', 'group flex gap-3 pb-4 last:pb-0. The bottom padding is what the rail bridges, so the gap between two marks and the gap after the last one are the same measurement written once.'],
+    ['Marker column', 'flex shrink-0 flex-col items-center, aria-hidden end to end. It takes a fixed w-4 the moment icons and dots share it, so the rail runs one straight edge.'],
+    ['Dot', 'The 6px disc from marker, centred in a box one line tall — h-5 for text-[13px]/5, h-4 for the dense 12px form. zinc-500 unless the entry has a state, and then one of the five locked colours and never a sixth.'],
+    ['Hollow dot', 'What an entry that has not happened yet takes: a size-2 circle with a zinc-400 border and no fill. The words say the same thing, because the ring is six pixels of information.'],
+    ['Rail', 'w-px flex-1 bg-zinc-200 below the mark, hidden on the last entry with group-last:hidden. One colour the whole way down — it says these entries are one sequence and nothing else.'],
+    ['Timestamp', 'A <time datetime> carrying the local date, time and offset, with the relative gloss written after it and never in place of it. tabular-nums, so a column of times reads down the day.'],
+    ['Actor', 'The person\'s name in font-medium at the head of the sentence, or avatar\'s circle in the marker column where the note is something they wrote. The circle is aria-hidden when the name is written beside it.'],
+    ['Diff well', 'A <dl> in a rounded-lg bg-zinc-50 band: the field as the <dt>, the old value struck through and the new one as two <dd>s, with an sr-only "changed to" between them and the arrow decorative.'],
+    ['System tag', 'An 11px uppercase chip — bg-zinc-200 with its ring — beside an automated event, with the job or the mailbox that caused it written in mono underneath. No colour of its own.'],
+    ['Footer', 'The count line and the Load more control, or the link to the full trail. The count is a role="status" with tabindex="-1", so it both reports the new figure and is somewhere to stand.'],
+    ['Filter strip', 'button-group\'s latched strip above the list, one member per event kind, with aria-pressed bound and the result count as a role="status" underneath.']
+  ],
+  behaviour: [
+    'Time is the only order and it is descending. There is no sortable header, no column to reverse and no secondary sort — an entry that arrived later is drawn higher, and that is the whole model.',
+    'Older entries append below the last one and never above it. Load more extends the strip downwards, a batch that begins on a day already drawn joins that day\'s list rather than opening a second band for it, and nothing already on screen is renumbered or reordered.',
+    'A polled entry is prepended and the count line announces it. That is the one insertion above what is on screen this library allows, and it is allowed because a record strip is short enough that the heading is still visible; the audit screen refuses the same swap for the opposite reason.',
+    'Grouping by day is a heading and a list per day, not a card per day. A record strip draws a handful of days, so the bands stay a recessed strip inside one panel and the column of marks runs unbroken through every one of them.',
+    'A field change renders both values, and the two empties are words. A value that was never set is "not set" and a value that was removed is the old value struck through against "cleared" — a blank on either side is indistinguishable from an export that dropped the column.',
+    'A state transition names both states and the dot takes the colour of the one the record is in now. Nothing else on the entry is tinted, so the strip stays graphite with two or three marks in it.',
+    'The filter strip narrows which kinds of event are drawn and rewrites the count in place. Filters latch rather than replace each other, because "approvals and receipts, nothing else" is the ordinary question, and the count line says what the current set adds up to.',
+    'Pending entries sit above the present, take no hover and no target, and are excluded from every count on the panel. They disappear from that position and reappear in sequence once they have actually happened.',
+    'Nothing in the strip edits anything. There is no row menu, no delete and no inline edit, and no control is drawn disabled to stand in for one — an event happened, and the only thing that can be done to it is to read it.',
+    'At 390px the timestamp moves above the sentence rather than beside it, the diff well stacks its field and its two values, and a change touching more than three fields collapses to a count with a disclosure. Nothing scrolls sideways.',
+    'The skeleton draws the same rail, the same dot positions and the same two lines per entry, so the strip does not move when the entries land. The dots are zinc-300 rather than a status colour, because the state is not known yet and guessing one is a claim.'
+  ],
+  a11y: [
+    'The list is an <ol> with role="list". The order is the record rather than a presentation choice, so it belongs in the markup; role="list" is put back because Tailwind preflight sets list-style to none and WebKit then stops treating it as a list at all, which deletes the item count.',
+    'Every part of the marker column is aria-hidden — the dot, the hollow dot, the icon and the rail. The rail is a picture of the entries being one sequence and the dates already say that in words; a dot is a summary of a sentence written beside it.',
+    'A state carried by a dot is repeated in the entry as text. Where the only thing separating "Failed inspection" from "Passed" is the colour of a disc, the entry opens with an sr-only word, because colour is never the sole carrier of anything in this system.',
+    'The timestamp is a real <time> whose datetime attribute carries the full local date, time and UTC offset, so what is read out of the markup is unambiguous even when the visible text is shortened to 08:55 under a day heading that says the rest.',
+    'A relative time never appears without its absolute one. "2 hours ago" is a convenience for a reader glancing at the strip and it is written after the date rather than in place of it, so a screen reader and a printout both still carry the fact.',
+    'The diff is a <dl>: the field name is the <dt> and the two values are two <dd>s under it, which is what keeps them one unit. An sr-only "changed to" closes the old value and the arrow is aria-hidden, so the pair is announced as "Order value, four lakh twenty thousand, changed to four lakh fifty-five thousand" rather than as two figures and no direction.',
+    'line-through is decoration. Some screen readers announce it as deleted text and most announce nothing, so the strike is never the only thing saying which value is the old one.',
+    'Day headings are real headings — h3 under the panel\'s h2 — sitting outside the lists, and each day\'s list points back at its heading with aria-labelledby. A heading written as an li is counted as an entry; one dropped between two lis without an li round it is lifted out of the list by the parser.',
+    'The count line is role="status" with tabindex="-1". It reports each appended batch, and it is where focus goes when the last batch lands and the Load more button is replaced by a sentence, so the keyboard user is not dropped back at the top of the document.',
+    'A polled entry announces itself through a live region that was in the document before the swap and is not itself replaced. htmx swapping the region node produces a brand new live region holding a message that was already inside it, which announces nothing while measuring as correct.',
+    'Entries that have not happened yet carry an sr-only "Not yet — " at the head of the line, and the entry currently with somebody carries aria-current="step". The hollow dot is the visual half of the same fact and does nothing on its own.',
+    'The filter strip is role="group" with aria-pressed bound on each member rather than a radiogroup, because several kinds are on at once and there is no single value for a roving tabindex to follow.'
+  ],
+  related: ['audit-page', 'marker', 'avatar', 'record-page'],
+  variants: [
+    {
+      id: 'default',
+      name: 'The rail down one record\'s history',
+      code: `<!-- The strip a record page puts under its line items, and the shape every
+     other variant here is a change to. Newest first, because the reader came
+     to find out what has happened lately rather than to read the order from
+     the beginning.
+
+     The rail is a flex child of the marker column rather than an absolutely
+     positioned line, so the same items-center that centres the dot centres it
+     and there is no left offset to keep in step by hand. It is per-item and
+     hidden on the last one — a single full-height rail overshoots the last
+     mark by the height of that entry's text, which is not a number anybody
+     can hardcode because the entry wraps at 390px.
+
+     The dot is the only colour on the entry. Tinting the approval row green
+     and the short-receipt row red is the first thing everybody tries, and by
+     the twelfth entry the column reads as a pattern rather than as an
+     exception — which is the opposite of what the tint was added for.
+
+     The absolute time is the record; the relative one is a gloss written
+     after it. A strip that says only "2 hours ago" is evidence of nothing the
+     moment it is screenshotted into a ticket, which is the commonest thing
+     anybody does with this region. -->
+<div data-kui="timeline/default" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">8 entries · newest first</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Suresh Kadam</span> posted
+          <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>
+          against lines 1 and 3 — 12.480 MT received in full.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T08:55+05:30">04 Sep 2026, 08:55</time> · 2 hours ago · gate 2, vehicle GJ-15-AT-4482
+        </p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Nilesh Patil</span> approved the order at ₹27,10,400 — level 2 of 2, above the buyer's own limit of ₹20,00,000.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-03T17:05+05:30">03 Sep 2026, 17:05</time> · yesterday · plant head, Silvassa
+        </p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Ritu Deshpande</span> sent the order to Sharma Steel &amp; Alloys with the annexure and the inspection clause attached.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-03T11:20+05:30">03 Sep 2026, 11:20</time> · yesterday · purchase@sharmasteel.in
+        </p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Ritu Deshpande</span> raised the order against rate contract
+          <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">RC-2026-0042</a>,
+          9 lines, ₹26,84,000.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-02T10:31+05:30">02 Sep 2026, 10:31</time> · 2 days ago · from indent IND-2026-0731
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="border-t border-zinc-200 px-5 py-2.5">
+    <a href="#" class="rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See the full trail for this order</a>
+  </div>
+</div>`
+    },
+
+    {
+      id: 'dense',
+      name: 'A long history in a drawer',
+      code: `<!-- The same strip in a 360px drawer beside a register, where twenty-six
+     entries have to be skimmable without the drawer becoming a page of its
+     own. What changes is the type step, not the padding.
+
+     Dropping the entry to text-[12px]/4 moves the marker box to h-4 with it,
+     because the box height is the leading of the text beside it and both are
+     written in the same class name so the two cannot drift. Squeezing the
+     padding while leaving the 20px box behind is how a drawer ends up with
+     every dot sitting a pixel above the line it belongs to.
+
+     The meta line loses everything that is not the time and the person. The
+     gate number, the vehicle and the mailbox are on the record itself, and a
+     drawer is where somebody is looking for the shape of the history rather
+     than reading one entry of it.
+
+     The time keeps its date. A drawer is exactly where "14:22" with no day on
+     it looks like today and turns out to be the eleventh. -->
+<div data-kui="timeline/dense" class="max-w-sm overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-zinc-200 px-4 py-2.5">
+    <h2 class="text-[13px]/5 font-semibold tabular-nums">GRN-4821 · history</h2>
+    <p class="text-[11px]/4 tabular-nums text-zinc-500">26 entries</p>
+  </div>
+
+  <ol role="list" class="px-4 py-3">
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Receipt posted in full — 12.480 MT.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:55+05:30">04 Sep, 08:55</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums"><span class="sr-only">Passed — </span>QC passed lot 26-119 against IS 2062 E250.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:41+05:30">04 Sep, 08:41</time> · Farida Qureshi</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums"><span class="sr-only">Short received — </span>Short receipt of 600 kg raised as DN-26-0117.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:12+05:30">04 Sep, 08:12</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Weighbridge slip 8841 attached at the gate.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:58+05:30">04 Sep, 07:58</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Vehicle GJ-15-AT-4482 booked in at gate 2.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:31+05:30">04 Sep, 07:31</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Receipt opened against PO-2026-0418.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:29+05:30">04 Sep, 07:29</time> · Suresh Kadam</p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'grouped',
+      name: 'Today, Yesterday, and then the date',
+      code: `<!-- A day is the unit people argue in — "what happened on the second" — so
+     past about a dozen entries the date stops belonging on every line and
+     becomes a heading with a list under it. The entry line is then free to
+     carry the time and the person, which is what is actually different
+     between two entries on the same day.
+
+     Today and Yesterday are said in words and the date is said beside them,
+     never instead. "Today" alone is wrong the moment the tab is left open
+     past midnight, printed, or pasted into a mail to the vendor, and a
+     history whose headings depend on when it was read cannot be quoted.
+
+     The heading is an h3 outside the list, not an li. Written as a list item
+     it is announced as item 1 of 3 and every count in the strip is off by
+     one; dropped between two lis without one, the parser lifts it out of the
+     list entirely. Each day's ol points back at its heading, so the count
+     belongs to the day rather than to the panel.
+
+     The bands are a recessed strip inside one panel rather than a card per
+     day. Three bordered boxes with two entries in each restarts the column of
+     marks three times, and the column not restarting is the whole reason it
+     is worth drawing. -->
+<div data-kui="timeline/grouped" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Sharma Steel &amp; Alloys · vendor master</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">14 entries in the last 30 days</p>
+  </div>
+
+  <h3 id="tl-g-d1" class="border-b border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d1" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T14:22+05:30">14:22</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Meena Iyer</span> revised the payment terms from 30 days to 45 days.
+        </p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T09:12+05:30">09:12</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Meena Iyer</span> uploaded the MSME registration certificate, valid to 31 Mar 2027.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 id="tl-g-d2" class="border-y border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Yesterday · Thursday, 03 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d2" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T17:05+05:30">17:05</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Nilesh Patil</span> approved the vendor for the structural steel category.
+        </p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T11:48+05:30">11:48</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Sanjay Rane</span> recorded the plant visit of 28 Aug 2026 and attached the assessment.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 id="tl-g-d3" class="border-y border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Wednesday, 02 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d3" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-02T16:20+05:30">16:20</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Ritu Deshpande</span> sent the category approval to the plant head and it moved to Pending.
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'changes',
+      name: 'What the field was before',
+      code: `<!-- The entry that answers the question people actually open a history for.
+     "Amended by Ritu Deshpande" is a receipt for a history rather than one;
+     the line worth drawing is the one carrying ₹4,20,000 and ₹4,55,000 with
+     the timestamp between them.
+
+     The values live in a bg-zinc-50 well — the recessed fill inside a white
+     surface, and the only band shade allowed there. Three fields as three
+     rows of a <dl> keeps the arrows in one column; written as sentences the
+     same three changes are three paragraphs nobody reads to the end of.
+
+     The strike-through and the arrow are both decoration. line-through is
+     announced as deleted text by some screen readers and as nothing at all by
+     most, so an sr-only "changed to" closes the old value — without it the
+     entry reads as two figures and no direction.
+
+     The two empties are words. A field that had never been filled in reads
+     "not set" and a field that was emptied shows the old value struck through
+     against "cleared", because a blank on either side of the arrow is
+     indistinguishable from an export that dropped the column. -->
+<div data-kui="timeline/changes" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · amendments</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 amendments since the order was approved</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-4 text-amber-700"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="sr-only">Changed after approval — </span>
+          <span class="font-medium">Ritu Deshpande</span> amended line 3 after the vendor asked for the revised rate.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T14:22+05:30">04 Sep 2026, 14:22</time> · reason recorded: mill scale surcharge withdrawn from 01 Sep
+        </p>
+        <dl class="mt-2 space-y-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <dt class="w-36 shrink-0 text-zinc-600">Rate · MS plate 10 mm</dt>
+            <dd class="flex items-baseline gap-1.5 tabular-nums">
+              <span class="text-zinc-500 line-through">₹56.00</span>
+              <span class="sr-only">changed to</span>
+              <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+              <span class="font-medium">₹60.65</span>
+            </dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <dt class="w-36 shrink-0 text-zinc-600">Line value</dt>
+            <dd class="flex items-baseline gap-1.5 tabular-nums">
+              <span class="text-zinc-500 line-through">₹4,20,000</span>
+              <span class="sr-only">changed to</span>
+              <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+              <span class="font-medium">₹4,55,000</span>
+            </dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <dt class="w-36 shrink-0 text-zinc-600">Order value</dt>
+            <dd class="flex items-baseline gap-1.5 tabular-nums">
+              <span class="text-zinc-500 line-through">₹26,84,000</span>
+              <span class="sr-only">changed to</span>
+              <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+              <span class="font-medium">₹27,19,000</span>
+            </dd>
+          </div>
+        </dl>
+        <p class="mt-1.5 text-[12px]/4 text-zinc-600">The amendment stayed inside the 5% tolerance the route allows, so the approval was not voided.</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Ritu Deshpande</span> filled in the inspection agency, which had been left blank when the order was raised.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-03T12:04+05:30">03 Sep 2026, 12:04</time> · yesterday
+        </p>
+        <dl class="mt-2 space-y-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <dt class="w-36 shrink-0 text-zinc-600">Third-party inspection</dt>
+            <dd class="flex items-baseline gap-1.5 tabular-nums">
+              <span class="text-zinc-500 italic">not set</span>
+              <span class="sr-only">changed to</span>
+              <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+              <span class="font-medium">TUV India, Vapi</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Meena Iyer</span> removed the advance, which the revised terms no longer allow.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-03T10:36+05:30">03 Sep 2026, 10:36</time> · yesterday
+        </p>
+        <dl class="mt-2 space-y-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <dt class="w-36 shrink-0 text-zinc-600">Advance against order</dt>
+            <dd class="flex items-baseline gap-1.5 tabular-nums">
+              <span class="text-zinc-500 line-through">₹2,68,400</span>
+              <span class="sr-only">changed to</span>
+              <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+              <span class="font-medium italic">cleared</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'status',
+      name: 'The record moving between states',
+      code: `<!-- A history of one field: the state. Every entry is a transition, so the
+     entry says both states and the dot takes the colour of the one the record
+     was in afterwards.
+
+     The colours are the locked five and there is no sixth. On hold is not in
+     the status table as a dot of its own — it takes Approved's amber-500,
+     because its meaning is exactly the one amber carries, waiting on a
+     person; Cancelled would take Draft's zinc-400, the inert shade, because
+     it is over and that is not good news.
+
+     The pills are both the same graphite shape. It is tempting to fill the
+     Overdue pill red and the Closed pill green so a transition reads as a
+     change of colour, and that is the traffic-light column the badge rule
+     exists to prevent: what separates two states is the 6px dot inside an
+     otherwise identical pill.
+
+     The transition reads left to right and the arrow between them is
+     decoration, so an sr-only "changed to" carries the direction — the same
+     mechanism the diff well uses, because a state change is a field change
+     with two words instead of two figures. -->
+<div data-kui="timeline/status" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · state</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 transitions between 02 Sep 2026 and 04 Sep 2026</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums">All 9 lines received and the last receipt matched the order.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:56+05:30">04 Sep 2026, 08:56</time> · 2 hours ago · closed by the system on GRN-4821</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>On hold
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> released the QC hold after the mill certificate for heat 8841 arrived.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:41+05:30">04 Sep 2026, 08:41</time> · 2 hours ago · lab, Silvassa</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>On hold
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> held the receipt pending the mill test certificate.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:14+05:30">04 Sep 2026, 08:14</time> · 2 hours ago · held 27 minutes</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Pending
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Ritu Deshpande</span> submitted the order for approval at ₹26,84,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T10:44+05:30">02 Sep 2026, 10:44</time> · 2 days ago · route: value above ₹20,00,000</p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'comment',
+      name: 'A note somebody wrote, with the paperwork on it',
+      code: `<!-- The one entry with a body a person composed, sitting in the same column
+     as the events the system wrote. The mark changes from a 6px dot to
+     avatar's circle, because a note is somebody speaking and the face is the
+     first thing worth reading; the rail carries on underneath it unchanged,
+     so the column still reads as one sequence.
+
+     The circle is aria-hidden — the name is written beside it, and without
+     that a screen reader announces "RD Ritu Deshpande".
+
+     The note itself goes in a bg-zinc-50 well and the events around it do
+     not. That is the whole visual difference and it is deliberate: a note is
+     content somebody can disagree with, an event is a fact, and the well says
+     which is which without spending a colour on it.
+
+     A note that has been edited says so with the time it was edited. The
+     strip is append-only in appearance, and a body that can change without
+     saying it changed makes that appearance a lie.
+
+     The attachment is a link to a document that already exists on the record,
+     not an upload control. A drop target inside a history row competes with
+     the page scroll, and a file dropped an inch wide of it navigates the
+     browser away from the record. -->
+<div data-kui="timeline/comment" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">DN-26-0117 · notes and events</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Debit note against Sharma Steel &amp; Alloys · ₹34,200</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">RD</span>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">
+          <span class="font-medium">Ritu Deshpande</span> <span class="text-zinc-600">wrote a note</span>
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T15:10+05:30">04 Sep 2026, 15:10</time> · 40 minutes ago · edited <time datetime="2026-09-04T15:22+05:30">15:22</time>
+        </p>
+        <div class="mt-2 rounded-lg bg-zinc-50 px-3 py-2.5">
+          <p class="text-[13px]/5 tabular-nums text-zinc-900">
+            Spoke to Mr Shah at the mill. The 600 kg short is a slitting loss on the last coil and they have accepted the debit note against the September running account rather than a fresh credit. Do not net it off PO-2026-0418 — finance want it visible separately at the quarter.
+          </p>
+          <ul aria-label="Attachments on this note" class="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <li>
+              <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500" aria-hidden="true"></i>
+                <span class="truncate">sharma-acceptance-04sep.pdf</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">148 KB</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">MI</span>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">
+          <span class="font-medium">Meena Iyer</span> <span class="text-zinc-600">wrote a note</span>
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T11:02+05:30">04 Sep 2026, 11:02</time> · 5 hours ago · finance
+        </p>
+        <div class="mt-2 rounded-lg bg-zinc-50 px-3 py-2.5">
+          <p class="text-[13px]/5 tabular-nums text-zinc-900">Held the September payment run for this vendor until the note is accepted in writing. Two invoices affected, ₹9,84,000.</p>
+        </div>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Suresh Kadam</span> raised the debit note for 600 kg short received against
+          <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T08:12+05:30">04 Sep 2026, 08:12</time> · 8 hours ago · gate 2
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'system',
+      name: 'What the system did, without a colour',
+      code: `<!-- Half of a real history is written by jobs rather than by people — the
+     reminder that went out, the exchange rate that was pulled, the order that
+     was closed automatically when the last line was received. Telling those
+     apart from a person's action matters, because "the order was amended" and
+     "a nightly job amended the order" are different facts.
+
+     Three things separate them and none of them is a colour. The mark is a
+     size-4 icon instead of a 6px disc, the actor is an 11px uppercase System
+     chip instead of a name, and the source — the job, the mailbox, the
+     integration — is written in mono underneath. The first attempt tinted
+     system rows blue, which burned a colour that means nothing in this system
+     and taught readers the palette is decorative. The second greyed the whole
+     row, which said the event mattered less, on a screen where a failed
+     reminder job is often the reason the order is late.
+
+     Because dots and icons share the column, the column takes a fixed w-4 and
+     both are centred in it. Left to their own widths, the disc sits at six
+     pixels and the icon at sixteen, and the rail kinks at every handover
+     between a person and a job.
+
+     A system event that failed still takes red in the dot and says "Failed"
+     in words. Automated is not a severity. -->
+<div data-kui="timeline/system" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0411 · history</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">People and jobs in one column</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 text-red-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span><span class="sr-only">Failed — </span>The delivery reminder to Sharma Steel &amp; Alloys bounced.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">reminders.overdue · 550 mailbox unavailable · purchase@sharmasteel.in</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T06:00+05:30">04 Sep 2026, 06:00</time> · 10 hours ago</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="cpu" class="mt-0.5 size-4 text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span>The order was marked overdue — promised 31 Aug 2026, nothing received.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">orders.age · 4 days past the promised date</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T00:05+05:30">04 Sep 2026, 00:05</time> · 16 hours ago</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Sanjay Rane</span> rang the mill and recorded that despatch is planned for 08 Sep.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T16:40+05:30">03 Sep 2026, 16:40</time> · yesterday · buyer</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="cpu" class="mt-0.5 size-4 text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span>The first delivery reminder was emailed to the vendor.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">reminders.overdue · delivered · purchase@sharmasteel.in</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-01T06:00+05:30">01 Sep 2026, 06:00</time> · 3 days ago</p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'pending',
+      name: 'The step that has not been taken',
+      code: `<!-- A history that is newest first has one place the future can go, and it
+     is above the present. The two entries at the top have not happened: the
+     second approver has not signed and the order has not been sent. Drawing
+     them there is what makes the strip answer "what happens next" as well as
+     "what happened", which is the question a reader on an approval screen
+     actually has.
+
+     The mark is hollow — a size-2 circle with a zinc-400 border and no fill —
+     and that is six pixels of ring and nothing at all to a screen reader, so
+     each one opens with an sr-only "Not yet". The entry currently with
+     somebody carries aria-current="step"; the ones behind it carry nothing,
+     because "next but one" is not a state anybody acts on.
+
+     Pending entries are excluded from the count in the header. The strip that
+     shipped saying "12 entries" with two of them unsigned was quoted in a
+     dispute, and the two that had not happened were read as two that had.
+
+     The rail runs through them in the same zinc-200 it uses everywhere else.
+     Dashing it above the present looks like a good idea for exactly as long
+     as it takes somebody to ask what a dashed rail means on a printout. -->
+<div data-kui="timeline/pending" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">IND-2026-0731 · approval route</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">4 entries · 2 steps still to come</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-2 rounded-full border border-zinc-400 bg-white"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums text-zinc-500"><span class="sr-only">Not yet — </span>The order is raised against the approved indent and sent to the vendor.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Not yet · purchase</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0" aria-current="step">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-2 rounded-full border border-zinc-400 bg-white"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium tabular-nums"><span class="sr-only">Not yet — </span>Waiting on Nilesh Patil for level 2, the value being above ₹20,00,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">With him since <time datetime="2026-09-03T17:06+05:30">03 Sep 2026, 17:06</time> · 21 hours</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Ritu Deshpande</span> approved level 1 at ₹26,84,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T17:05+05:30">03 Sep 2026, 17:05</time> · yesterday · purchase lead</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Sanjay Rane</span> raised the indent for 45 MT of MS plate against the September rolling plan.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T09:18+05:30">02 Sep 2026, 09:18</time> · 2 days ago · works, Silvassa</p>
+      </div>
+    </li>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'load-more',
+      name: 'The 18 entries that are not drawn',
+      code: `<!-- A vendor master carries four years of amendments and a record page is
+     not the place to walk them. Four entries are drawn, the rest are behind a
+     control, and the control says how many — "18 older entries" rather than
+     "Load more", because on a record with four years behind it the difference
+     between the next three and the next three hundred is what decides whether
+     anybody presses at all.
+
+     Entries append downwards and nothing is ever inserted above what is on
+     screen. Newer entries arrive on a reload; this control only ever extends
+     the strip into the past, so the entry somebody is reading stays where it
+     was put.
+
+     The count is a role="status" that was in the document before the first
+     press, so each batch is announced rather than arriving silently below the
+     fold with the button moving down the page as the only sign.
+
+     Focus is the trap. When the last batch lands the button is removed and
+     replaced by a sentence, and a browser drops focus from a removed element
+     to the body — so the handler moves it to the count, which is tabindex="-1"
+     for exactly that reason and is also the sentence saying what happened.
+
+     What this gives up is the citable URL: there is no page number, so a
+     colleague cannot be sent the strip at the depth it was read to. That is
+     acceptable on a record strip and wrong on the audit screen, which is why
+     that page pages by default. -->
+<div data-kui="timeline/load-more" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       shown: 4, step: 6, total: 22,
+       entries: [
+         { id: 'e01', at: '04 Sep 2026, 14:22', iso: '2026-09-04T14:22+05:30', rel: '2 hours ago', who: 'Meena Iyer', what: 'revised the payment terms from 30 days to 45 days.', dot: 'bg-zinc-500' },
+         { id: 'e02', at: '03 Sep 2026, 17:05', iso: '2026-09-03T17:05+05:30', rel: 'yesterday', who: 'Nilesh Patil', what: 'approved the vendor for the structural steel category.', dot: 'bg-emerald-600' },
+         { id: 'e03', at: '03 Sep 2026, 11:48', iso: '2026-09-03T11:48+05:30', rel: 'yesterday', who: 'Sanjay Rane', what: 'recorded the plant visit of 28 Aug 2026 and attached the assessment.', dot: 'bg-zinc-500' },
+         { id: 'e04', at: '02 Sep 2026, 16:20', iso: '2026-09-02T16:20+05:30', rel: '2 days ago', who: 'Ritu Deshpande', what: 'sent the category approval to the plant head.', dot: 'bg-amber-500' },
+         { id: 'e05', at: '29 Aug 2026, 10:04', iso: '2026-08-29T10:04+05:30', rel: '6 days ago', who: 'Meena Iyer', what: 'updated the bank account after the cancelled cheque was verified.', dot: 'bg-zinc-500' },
+         { id: 'e06', at: '27 Aug 2026, 15:31', iso: '2026-08-27T15:31+05:30', rel: '8 days ago', who: 'Meena Iyer', what: 'recorded the MSME registration, valid to 31 Mar 2027.', dot: 'bg-zinc-500' },
+         { id: 'e07', at: '21 Aug 2026, 09:12', iso: '2026-08-21T09:12+05:30', rel: '2 weeks ago', who: 'Farida Qureshi', what: 'failed lot 26-104 on carbon content and raised a rejection.', dot: 'bg-red-600' },
+         { id: 'e08', at: '18 Aug 2026, 12:40', iso: '2026-08-18T12:40+05:30', rel: '2 weeks ago', who: 'Ritu Deshpande', what: 'renewed rate contract RC-2026-0042 to 31 Mar 2027.', dot: 'bg-zinc-500' },
+         { id: 'e09', at: '11 Aug 2026, 08:22', iso: '2026-08-11T08:22+05:30', rel: '3 weeks ago', who: 'Suresh Kadam', what: 'posted GRN-4712 against PO-2026-0388 in full.', dot: 'bg-emerald-600' },
+         { id: 'e10', at: '04 Aug 2026, 17:58', iso: '2026-08-04T17:58+05:30', rel: 'a month ago', who: 'Meena Iyer', what: 'released the August payment run for this vendor, ₹41,20,000.', dot: 'bg-zinc-500' }
+       ],
+       get visible() { return this.entries.slice(0, this.shown) },
+       more() {
+         const finishes = this.shown + this.step >= this.total;
+         this.shown = Math.min(this.shown + this.step, this.total);
+         if (finishes) this.$nextTick(() => this.$refs.count.focus());
+       }
+     }">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Sharma Steel &amp; Alloys · history</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Newest first · older entries are appended below</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <template x-for="e in visible" :key="e.id">
+      <li class="group flex gap-3 pb-4 last:pb-0">
+        <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+          <span class="flex h-5 items-center"><span class="size-1.5 rounded-full" :class="e.dot"></span></span>
+          <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 tabular-nums">
+            <span class="font-medium" x-text="e.who"></span><span x-text="' ' + e.what"></span>
+          </p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <time :datetime="e.iso" x-text="e.at"></time><span x-text="' · ' + e.rel"></span>
+          </p>
+        </div>
+      </li>
+    </template>
+  </ol>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-5 py-2.5">
+    <p role="status" x-ref="count" tabindex="-1"
+       class="text-[13px]/5 tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+       x-text="shown >= total ? 'All ' + total + ' entries shown' : 'Showing ' + shown + ' of ' + total + ' entries'">Showing 4 of 22 entries</p>
+    <button type="button" x-show="shown &lt; total" x-cloak @click="more()"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-down" class="size-4" aria-hidden="true"></i>
+      <span x-text="Math.min(step, total - shown) + ' older entries'">6 older entries</span>
+    </button>
+  </div>
+</div>`
+    },
+
+    {
+      id: 'filter',
+      name: 'Narrowing the trail to one kind of event',
+      code: `<!-- On a record that has been open for six weeks the history is mostly
+     receipts, and the question is usually about something else. The strip
+     narrows by kind of event and by nothing else — there is no sort control,
+     because a history has exactly one order and offering to reverse it is a
+     promise nothing keeps.
+
+     The filters latch rather than replace each other: "approvals and
+     amendments, nothing else" is the ordinary question. That makes it
+     role="group" with aria-pressed on each member and not a radiogroup —
+     several are on at once, so there is no single value for a roving tabindex
+     to follow, and giving it the radiogroup treatment leaves the keyboard
+     able to reach only the last thing switched on.
+
+     aria-pressed is bound rather than written, because Alpine keeps
+     aria-pressed on the element when it resolves to false and strips every
+     other aria-* attribute that does. A latching button with no aria-pressed
+     is announced as an ordinary one and nobody is told it latches.
+
+     The latched fill is the chip token against the strip's white and the
+     status colour stays in the dot, so a filter bar cannot turn into a
+     traffic light. And the result line is a role="status": a filter that only
+     changes which rows are drawn tells a screen-reader user nothing at all. -->
+<div data-kui="timeline/filter" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       on: ['approval', 'amendment'],
+       kinds: { approval: 'Approvals', amendment: 'Amendments', receipt: 'Receipts', note: 'Notes' },
+       toggle(k) {
+         const i = this.on.indexOf(k);
+         i === -1 ? this.on.push(k) : this.on.splice(i, 1);
+       },
+       entries: [
+         { id: 'f1', kind: 'amendment', dot: 'bg-zinc-500', who: 'Ritu Deshpande', what: 'amended the rate on line 3 from ₹56.00 to ₹60.65.', at: '04 Sep 2026, 14:22', iso: '2026-09-04T14:22+05:30', rel: '2 hours ago' },
+         { id: 'f2', kind: 'receipt', dot: 'bg-emerald-600', who: 'Suresh Kadam', what: 'posted GRN-4821 against lines 1 and 3 — 12.480 MT.', at: '04 Sep 2026, 08:55', iso: '2026-09-04T08:55+05:30', rel: '8 hours ago' },
+         { id: 'f3', kind: 'note', dot: 'bg-zinc-500', who: 'Sanjay Rane', what: 'wrote a note about the despatch plan for 08 Sep.', at: '03 Sep 2026, 16:40', iso: '2026-09-03T16:40+05:30', rel: 'yesterday' },
+         { id: 'f4', kind: 'approval', dot: 'bg-amber-500', who: 'Nilesh Patil', what: 'approved the order at ₹27,10,400, level 2 of 2.', at: '03 Sep 2026, 17:05', iso: '2026-09-03T17:05+05:30', rel: 'yesterday' },
+         { id: 'f5', kind: 'approval', dot: 'bg-zinc-500', who: 'Ritu Deshpande', what: 'approved level 1 and sent the order on to the plant head.', at: '03 Sep 2026, 11:20', iso: '2026-09-03T11:20+05:30', rel: 'yesterday' },
+         { id: 'f6', kind: 'amendment', dot: 'bg-zinc-500', who: 'Meena Iyer', what: 'removed the advance of ₹2,68,400 under the revised terms.', at: '03 Sep 2026, 10:36', iso: '2026-09-03T10:36+05:30', rel: 'yesterday' }
+       ],
+       get visible() { return this.on.length ? this.entries.filter(e => this.on.includes(e.kind)) : this.entries }
+     }">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+
+    <div role="group" aria-label="Filter the history by kind of event" class="mt-2 inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+      <button type="button" @click="toggle('approval')" :aria-pressed="on.includes('approval')"
+              class="inline-flex items-center gap-2 rounded-l-[7px] px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('approval') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Approvals</button>
+      <button type="button" @click="toggle('amendment')" :aria-pressed="on.includes('amendment')"
+              class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('amendment') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Amendments</button>
+      <button type="button" @click="toggle('receipt')" :aria-pressed="on.includes('receipt')"
+              class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('receipt') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Receipts</button>
+      <button type="button" @click="toggle('note')" :aria-pressed="on.includes('note')"
+              class="inline-flex items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('note') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Notes</button>
+    </div>
+
+    <p role="status" class="mt-2 text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="on.length ? visible.length + ' of 22 entries · ' + on.map(k => kinds[k]).join(', ').toLowerCase() : 'No filter — showing all 22 entries'"></p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <template x-for="e in visible" :key="e.id">
+      <li class="group flex gap-3 pb-4 last:pb-0">
+        <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+          <span class="flex h-5 items-center"><span class="size-1.5 rounded-full" :class="e.dot"></span></span>
+          <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 tabular-nums">
+            <span class="font-medium" x-text="e.who"></span><span x-text="' ' + e.what"></span>
+          </p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <time :datetime="e.iso" x-text="e.at"></time><span x-text="' · ' + e.rel"></span>
+          </p>
+        </div>
+      </li>
+    </template>
+  </ol>
+</div>`
+    },
+
+    {
+      id: 'inline',
+      name: 'The strip in a record\'s sidebar',
+      code: `<!-- The form the rail takes in a 288px rail beside a record, where it is one
+     of four blocks and not the thing the reader came for. Four entries, one
+     line each, and the whole of it is a pointer at the full trail.
+
+     What goes first is the diff. A rate change written out as an old value
+     and a new one needs the width to put them on one line, and wrapped into a
+     rail it becomes four lines of small type that nobody reads and everybody
+     has to scroll past. The entry says a field changed; the record page's own
+     activity section says what it changed from.
+
+     The second line keeps the time and the person and drops everything else —
+     the gate, the vehicle, the mailbox. Those are facts about the event and
+     this is a list of which events there were.
+
+     "See all 22" is a real link with the figure in it. A count that does
+     nothing is the most-clicked dead element in any internal application, and
+     a link that says only "See all" is one nobody can judge before pressing. -->
+<aside data-kui="timeline/inline" class="w-72 rounded-xl border border-zinc-300 bg-white p-4">
+  <h2 class="text-[13px]/5 font-semibold">Recent activity</h2>
+
+  <ol role="list" class="mt-3">
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Receipt GRN-4821 posted in full.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:55+05:30">04 Sep, 08:55</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Rate on line 3 amended.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T14:22+05:30">04 Sep, 14:22</time> · Ritu Deshpande</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Approved at level 2 of 2.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T17:05+05:30">03 Sep, 17:05</time> · Nilesh Patil</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Order raised against RC-2026-0042.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T10:31+05:30">02 Sep, 10:31</time> · Ritu Deshpande</p>
+      </div>
+    </li>
+  </ol>
+
+  <a href="#" class="mt-1 inline-block rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 22 entries</a>
+</aside>`
+    },
+
+    {
+      id: 'empty',
+      name: 'Two different nothings',
+      code: `<!-- A history has two empties and collapsing them into "No activity" is the
+     defect. The first record has genuinely had nothing happen to it yet and
+     the sentence says what will put the first entry there; the second has
+     twenty-two entries and a filter is hiding all of them, and the only
+     useful control is the one that drops the filter.
+
+     Both are empty-state's compact shape rather than a full-size one, because
+     this is a region inside a record page and not the whole screen — a
+     size-10 well and a 36px button is more vertical space than a section
+     footer has. What is not dropped is the distinction between them.
+
+     The panel heading stays and the empty sentence sits under it as a
+     paragraph rather than a second heading. A heading inside a 110px box adds
+     a level to the outline nobody navigates by.
+
+     The count line is still a role="status" and still says zero in words. A
+     region that empties itself when a filter changes and says nothing has
+     told a screen-reader user that the page stopped responding. -->
+<div data-kui="timeline/empty" class="grid max-w-3xl gap-4 sm:grid-cols-2">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0433 · history</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">No entries yet</p>
+    </div>
+    <div class="flex flex-col items-center px-5 py-8 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="history" class="size-4 text-zinc-600" aria-hidden="true"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">Nothing has happened to this order</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">It is still a draft. The first entry lands here when it is submitted for approval.</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">0 of 22 entries · notes</p>
+    </div>
+    <div class="flex flex-col items-center px-5 py-8 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="filter-x" class="size-4 text-zinc-600" aria-hidden="true"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">No notes on this order</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Twenty-two other entries are hidden by the filter — approvals, amendments and receipts.</p>
+      <button type="button"
+              class="mt-2 rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Show every kind of event
+      </button>
+    </div>
+  </div>
+</div>`
+    },
+
+    {
+      id: 'loading',
+      name: 'The rail before the entries land',
+      code: `<!-- The marker column is the thing to get right. It is a column of its own
+     and the eye reads down it, so a skeleton whose dots sit at a different x
+     from the real ones moves every line of text sideways when the data lands —
+     the one axis nobody thinks to check.
+
+     The dot is drawn as a real size-1.5 disc in the same flex h-5 items-center
+     box the loaded strip uses, not as a grey block: at six pixels a block and
+     a disc are the same shape, and keeping the box is what keeps the x. It is
+     zinc-300 rather than a status colour, which says the state is not known
+     yet without claiming one — a skeleton with an emerald dot in it has
+     guessed that the order was received.
+
+     The rail is drawn too, in the same zinc-200, because it is the strongest
+     line in the region and a strip that grows one when the entries arrive
+     reads as the layout shifting rather than as content filling in.
+
+     Each row is a 20px line, mt-0.5 and a 16px second line inside pb-4, which
+     is the loaded entry exactly. The panel is aria-busy, the pulse is
+     motion-reduce:animate-none, and the one thing announced is a role="status"
+     saying what is loading — the bars themselves are aria-hidden. -->
+<div data-kui="timeline/loading" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+    <p role="status" class="sr-only">Loading the history for PO-2026-0418</p>
+  </div>
+
+  <div class="animate-pulse px-5 py-4 motion-reduce:animate-none" aria-hidden="true">
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-3/4 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-5/6 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-2/3 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+  </div>
+</div>`
+    },
+
+    {
+      id: 'htmx',
+      name: 'A new event arriving at the top',
+      code: `<!-- A history on a record somebody keeps open all morning goes stale, and on
+     a receipt being worked at the gate that matters: the QC verdict lands
+     while the buyer is looking at the strip. The list polls and new entries
+     are swapped in at the top.
+
+     hx-swap="afterbegin" on the ol, not on the panel. Swapping the panel
+     replaces the heading, the count and the footer as well, which throws away
+     focus and any menu open over it every thirty seconds on a schedule
+     nobody can see. hx-sync="this:drop" throws away a poll that arrives while
+     one is still in flight, which is what a tab left open on a slow VPN does
+     all afternoon.
+
+     This is the one insertion above what is on screen this library allows,
+     and it is allowed because a record strip is a dozen entries under a
+     heading the reader can still see — a prepend moves the content by one
+     row. The audit page refuses the same swap, because there the reader can
+     be forty entries deep and the entry they are quoting is evidence.
+
+     The live region is the count line, which was in the document before the
+     first poll and is never itself the target of a swap. htmx replacing a
+     live region produces a brand new one holding a message that was already
+     inside it, and a new region announces nothing — the update then measures
+     as correct and is silent.
+
+     The rail is CSS, so the entry that used to be last stops drawing one the
+     moment another arrives below it and the new first entry grows one. A
+     server-side "is this the last row" flag is right on the first render and
+     wrong on every swap after it. Re-run lucide.createIcons() after a swap
+     that brings in icons, guarded on the selector the shell already uses. -->
+<div data-kui="timeline/htmx" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">GRN-4821 · live history</h2>
+    <p id="tl-hx-count" aria-live="polite" class="text-[12px]/4 tabular-nums text-zinc-500">7 entries · updated 14:22</p>
+  </div>
+
+  <ol id="tl-hx-list" role="list" class="px-5 py-4"
+      hx-get="/receipts/4821/events/since/?after=2026-09-04T08%3A56%2B05%3A30"
+      hx-trigger="every 30s, kui:event from:body"
+      hx-swap="afterbegin" hx-sync="this:drop">
+
+    <!-- the server returns li elements only, newest first, and rewrites the count
+         through an out-of-band swap on the paragraph above -->
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> passed lot 26-119 against IS 2062 E250 and released the hold.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:56+05:30">04 Sep 2026, 08:56</time> · just now · lab, Silvassa</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> held the receipt pending the mill test certificate for heat 8841.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:14+05:30">04 Sep 2026, 08:14</time> · 42 minutes ago · lab, Silvassa</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Suresh Kadam</span> weighed in vehicle GJ-15-AT-4482 at 12.480 MT net.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:58+05:30">04 Sep 2026, 07:58</time> · an hour ago · gate 2</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="border-t border-zinc-200 px-5 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-600">New entries arrive at the top every 30 seconds. Older ones are behind the full trail and are never inserted here.</p>
+  </div>
+</div>`
+    },
+
+    {
+      id: 'django',
+      name: 'Rendered from the event table',
+      code: `<!-- The loop, and the three things that go wrong when a history is rendered
+     from a table rather than assembled by hand.
+
+     The dot comes off the event's own state through the same filter the badge
+     reads. Import it, do not re-declare it: two copies of the mapping is how
+     one screen ends up amber and another green for the same event, and the
+     wrong screen is always the one nobody opened during the review.
+
+     The rail is group-last:hidden and never a forloop.last test. Both are
+     right on a full render and only one survives htmx appending the next
+     batch — forloop.last was true for the row that used to be last, so that
+     row's rail is gone for good and nothing on the page knows to redraw it.
+     The CSS selector recomputes itself on every insertion.
+
+     naturaltime is a gloss and goes after the absolute date, never instead of
+     it, and the datetime attribute carries the ISO value with the offset on
+     it. The humanize library is loaded in this fragment rather than in a base
+     template, because a template is compiled per file and a load elsewhere
+     does nothing here. Amounts go through the project's own inr filter and
+     not intcomma, which groups in thousands and prints 2,710,400 where every
+     other figure on the screen reads 27,10,400.
+
+     The empty case is outside the loop. Django's empty block renders inside
+     the for, which is inside the ol, so "nothing yet" becomes item 1 of a
+     list of 1 and is announced as a list before the sentence saying the list
+     is empty. -->
+{% load humanize %}
+{% load ui %}
+
+{# records/_history.html #}
+<div data-kui="timeline/django" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">{{ record.number }} · history</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">{{ events|length }} of {{ total }} entries · newest first</p>
+  </div>
+
+  {% if events %}
+    <ol role="list" class="px-5 py-4">
+      {% for event in events %}
+        <li class="group flex gap-3 pb-4 last:pb-0">
+          <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+            <span class="flex h-5 items-center"><span class="size-1.5 rounded-full {{ event.state|status_dot }}"></span></span>
+            <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 tabular-nums">
+              <span class="sr-only">{{ event.get_state_display }} — </span>
+              <span class="font-medium">{{ event.actor.get_full_name|default:"System" }}</span> {{ event.summary }}
+            </p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+              <time datetime="{{ event.at|date:'c' }}">{{ event.at|date:"d M Y, H:i" }}</time> · {{ event.at|naturaltime }}{% if event.source %} · {{ event.source }}{% endif %}
+            </p>
+
+            {% if event.changes.all %}
+              <dl class="mt-2 space-y-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                {% for change in event.changes.all %}
+                  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                    <dt class="w-36 shrink-0 text-zinc-600">{{ change.field_label }}</dt>
+                    <dd class="flex items-baseline gap-1.5 tabular-nums">
+                      {% if change.old %}
+                        <span class="text-zinc-500 line-through">{{ change.old }}</span>
+                      {% else %}
+                        <span class="text-zinc-500 italic">not set</span>
+                      {% endif %}
+                      <span class="sr-only">changed to</span>
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+                      {% if change.new %}
+                        <span class="font-medium">{{ change.new }}</span>
+                      {% else %}
+                        <span class="font-medium italic">cleared</span>
+                      {% endif %}
+                    </dd>
+                  </div>
+                {% endfor %}
+              </dl>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-5 py-2.5">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">Order value now ₹{{ record.value|inr }}</p>
+      <a href="{% url 'audit-trail' %}?record={{ record.pk }}"
+         class="rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all {{ total }} entries</a>
+    </div>
+  {% else %}
+    <p class="px-5 py-8 text-center text-[13px]/5 text-zinc-500">Nothing has happened to {{ record.number }} yet.</p>
+  {% endif %}
+</div>`
+    }
+  ]
+},
+{
+  id: 'permission-matrix', name: 'Permission matrix', category: 'data',
+  description: 'A grid of roles down one axis and permissions down the other, with the granted cell as a real checkbox. The screen an admin uses to say who may approve a purchase order over ₹5,00,000.',
+  when: 'The screen where who-may-do-what is both read and changed in one place — a deployment being set up, a new joiner being given a role, an auditor asking why a store keeper could reverse a GRN. Reach for it when the question needs every role and every permission on one grid, because the answer is comparative: the point of the shape is that one glance down a column says what a role can do and one glance across a row says who can do a thing. If the grid is three or four columns and drops into a form you are already writing, that is checkbox/matrix and it costs nothing — this entry is the screen around it, and it only earns its keep once there are enough roles that the axes have to be pinned, enough permissions that they group by module, and a save that can come back an error. If nothing on it is editable, it is a table with ticks and dashes in it, not this. If the screen is the settings section it lives in — the nav down one side, the h1, the Save that belongs to the section — that is settings-page, and this is what goes inside it. And a single flag that takes effect the moment it is touched is a toggle, not a cell in a grid: everything here is a pending change until Save.',
+  notes: [
+    'Every box carries an aria-label naming both axes in the same words that are on screen — "Approve over ₹5,00,000 — Purchase officer". Headers are announced when a screen reader walks a table and not when it tabs the controls in one, which is how everybody fills this screen in, so a cell gives its box no name at all. The first version shortened the labels to codes, "approve_over — PO", and it broke voice control before it broke anything else: voice control matches on the words that are visible, so "click Approve over five lakh" found nothing while the column heading it was reading sat two inches away.',
+    'A disabled box posts nothing, and absence in a POST is indistinguishable from unticked, so the form has to name the columns it is authoritative for in a hidden field. This shipped without one. An admin who held five of the six roles opened the grid, changed one cell and pressed Save, and the server diffed the POST against all six and stripped every permission the sixth role had — the locked column was on screen the whole time, ticked, and the save quietly disagreed with it.',
+    'A module roll-up is a control over the module and not a field in the form, and it went wrong at both ends. indeterminate is a JS property with no matching attribute, so a module with two of its five permissions granted came back from the server reading as plainly off, and three people in a row ticked it to "turn the module on" and granted the other three without meaning to — it is bound with x-effect on the box itself, never on the component root, where $refs is not populated at init. It also carries no name and no value, because mixed changes nothing about what is submitted: the half-granted module whose roll-up had a name posted exactly as though the whole module had been ticked, with the leaves it was summarising posting underneath it. The leaves are what post; the roll-up only moves them.',
+    'Never paint the row from one cell. has-[:checked] on the tr is the register pattern and it is wrong here — a matrix row is not a selected row, it holds one answer per role, and a row tinted because the Purchase officer has a permission reads as the whole row being on. The hover band is the only thing allowed to cross the row, because its job is carrying the eye to the far column and not saying anything about the record.',
+    'Two kinds of disabled box sit on this grid for two different reasons and grey says neither. One comes with the role and is not set here; one belongs to a role the person reading may not grant. Both were drawn as a plain disabled tick and the support ticket was the same both times — "why can I not untick this" — so the reason now lives in the cell caption and in the box\'s accessible name, and the column that cannot be granted says so in its heading, which is the one thing announced alongside every cell under it.',
+    'Revoking something a role inherits is a value, not an absence. An unticked inheriting cell was posted as simply not-granted, the parent role was edited a fortnight later, and the permission came back — because nothing had ever recorded that somebody had taken it away on purpose. An explicit revoke is its own hidden field with its own name, and the cell says "Revoked here" in words so the next person can see it is a decision rather than a gap.',
+    'A width utility on a table cell is a preference the table overrules, and the floor underneath it is the widest unbreakable word in the column. The default grid was written with four role columns at w-28 and a browser sweep measured them at 80, 69, 83 and 82 pixels — "Purchase" in a heading and ₹5,00,000 in a row label are what set those — which put the document at 405px inside a 390px viewport, and the audit view, whose cells carry a date under every mark, at 423px. Tightening the padding moved the total by four pixels a column and never crossed the line, because none of it touched the floor. There are only two honest ways out and this entry takes one each: the default grid dropped a column, so the claim in its own comment that it fits on screen whole is true again, and the audit view went inside a scroller and took rule 14 with it.',
+    'Past four or five roles the grid has to scroll sideways inside its own box, and rule 14 is the whole price: relative on the scroller, role="region" with tabindex="0" and a name, and a sentence underneath saying it scrolls. The relative is the one that gets dropped, and dropping it is invisible — the sr-only caption inside the scroller resolves against the document from a cell several hundred pixels past the right edge of the panel, and the page grows a horizontal scrollbar whose cause cannot be seen because the element causing it cannot be seen.',
+    'border-separate border-spacing-0 before anything sticks. Preflight collapses the borders onto the table, and a collapsed border belongs to the table rather than to the cell, so it stays behind when the cell travels: the head floats over the boxes with no rule under it and the permission column slides across them with no edge to stop at. Every sticky plane then needs an opaque fill, and because that fill is opaque it stops taking the row hover — put back with group-hover on the frozen cell, or hovering a row lights six columns of boxes and leaves the permission white, which reads as the row ending where its name starts.',
+    'The phone arrangement is role-first and it is a separate variant, never a media query on the wide one. Capability-first — who may approve over ₹5,00,000 — is the audit question, and it is read rather than edited; somebody editing is setting a role up and has to see everything that one role may do before they save. Rendering both arrangements into one DOM with one of them display:none posts every permission twice, because a display:none checkbox still submits, and the two copies can disagree.',
+    'The unsaved bar counts changes, not ticks. It read "11 permissions" on a grid where 11 were already granted and two had been touched, which is a number that is true and answers nothing. It says how many cells differ from what was stored and splits them into granted and revoked, because those are the two things somebody wants to check before pressing Save on a screen that decides who can spend money. The bar is also always on screen and only its text changes: a strip that materialises when the form goes dirty adds 52px under a pointer that is already moving towards a cell.',
+    'A save that half-applied showed a confirmation. Eleven changes went up, three came back refused because those permissions are held by an approval policy rather than by the role, and the screen said "Saved" and left all eleven cells looking granted. The failure state now reverts the three cells to what is actually stored, marks each of them where it sits, and names them again above the grid — the grid is the record of what is true, so a cell that did not apply cannot be allowed to keep showing the value somebody asked for.',
+    'A cell that writes on change swaps itself, and swapping the element the user is standing on drops focus to the body. The returned cell keeps the same id as the one it replaces, which is what makes htmx put focus back; without it a keyboard user working down a column lost their place on every tick. hx-sync="this:replace" keeps two quick writes in order, and there is no hx-disabled-elt, because disabling the focused box costs the same focus the swap was already threatening.',
+    'The audit view has no inputs in it at all. It was first drawn as the same grid with every box disabled, and it read as the editable screen with something broken rather than as a different screen — people kept clicking the boxes and then asking who had locked them. A tick is an icon and a blank is an em dash with sr-only words behind it, and neither of them is graphite-on-white by accident: a granted permission is a fact about the record, not a success, so it takes no emerald.'
+  ],
+  anatomy: [
+    ['Panel', 'A bordered white card holding the whole grid, its heading and whatever strip carries Save. overflow-hidden only where nothing inside it opens a menu.'],
+    ['Permission column', 'The row header, a th scope="row" carrying the permission in the words a buyer would use and the money limit it applies to. It is the column that pays for every role added, so it is the one that gets frozen.'],
+    ['Role heading', 'A th scope="col" with the role name and, under it, how many people hold it. Where the role cannot be granted by the person reading, the reason goes here as well.'],
+    ['Cell', 'A native checkbox, size-4 accent-zinc-700, in a centred td, carrying an aria-label naming both axes. No wrapper, no appearance-none, no substitute.'],
+    ['Module row', 'A recessed bg-zinc-50 band opening a tbody, naming the module and holding one roll-up per role. It is a row, not a heading, so it stays inside the table.'],
+    ['Roll-up box', 'The module summary for one role. No name and no value; checked when every leaf under it is, indeterminate when some are, and written back with x-effect on the element.'],
+    ['Cell caption', 'The 11px line under a box that has to say why it is the way it is — from the role, set here, revoked here, not saved. A fixed min height so a caption appearing does not move the row.'],
+    ['Frozen permission column', 'Past four or five roles the row header sticks left with an opaque fill of its own and takes group-hover, and the cell above it is sticky on both axes at z-20 against the z-10 of the two planes.'],
+    ['Scroller', 'The div the wide grid lives in: relative, role="region", tabindex="0", a name, and a sentence under it saying it scrolls. The table never scrolls itself.'],
+    ['Scope field', 'A hidden input naming the role columns this form is authoritative for, so a server diffing the POST cannot revoke the ones it was never shown.'],
+    ['Change bar', 'The strip at the foot of the panel, on screen at all times, carrying either when the grid was last saved or how many cells differ from it, split into granted and revoked, with Discard and Save.'],
+    ['Change mark', 'A 6px amber dot in a fixed-width slot beside a box whose value differs from what is stored. The slot is there whether the dot is or not, so nothing moves when it appears.'],
+    ['Audit mark', 'What replaces the box where nothing is editable — a check icon or an em dash, each with sr-only words behind it, in graphite rather than in a status colour.']
+  ],
+  behaviour: [
+    'Every cell is a pending change until Save. Nothing on the grid writes on touch, which is the difference between this and a column of toggles, and it is why the panel can afford a Discard at all.',
+    'A module roll-up reads three states off the leaves under it — none, some, all — and ticking it grants every permission in that module for that one role, while unticking it releases only those. It never reaches across to another role\'s column.',
+    'The roll-up is a summary and not a subscription: it means the permissions in the module today, so a permission added to the module in October does not quietly join a role somebody set up in August.',
+    'Permissions that come with the role are ticked and locked, and the server does not read them off this form. A role column the current user may not grant stays on the grid, locked, rather than being dropped, because a grid missing it reads as that role having no permissions at all.',
+    'An inheriting column shows what it gets from its parent as a locked tick, what has been added on top of it as a live tick, and what has been taken away as a live empty box with the words to say so — and that last one posts a value of its own rather than nothing.',
+    'The change bar is on screen from first paint. Before anything is touched it says when the grid was last saved and by whom; once a cell differs from what is stored it says how many cells differ, how many of those are grants and how many are revocations, and Discard puts every one of them back.',
+    'Discard restores the stored values without a round trip, because nothing has left the browser yet. It never asks for confirmation on its own — the count beside it is what makes the button legible.',
+    'A save that comes back an error keeps the grid on screen, reverts only the cells the server refused, marks each of them where it sits and lists them once above the grid with the reason. The cells that did apply stay applied and stop being counted as changes.',
+    'Where a cell writes on its own the request goes per cell and the answer replaces that cell, carrying the saved state and the time it was recorded. Two ticks a second apart cannot overtake each other, and a refused one puts the box back and says so in the cell rather than in a toast.',
+    'Below the width at which it clips, the grid scrolls in both axes inside its own box and the page behind it does not move. The head stays while the permissions scroll and the permission column stays while the roles are panned.',
+    'At 390px the grid is gone entirely and one role is on screen at a time, its permissions as a list grouped by module. Switching roles reloads the pane, so the switch is held while there are unsaved changes and the reason is text beside the control.',
+    'The audit view is the same axes with nothing to press: ticks, dashes, and the date each grant was made. Nothing on that screen writes, and it carries no form at all rather than a form with everything disabled.'
+  ],
+  a11y: [
+    'Every box has an aria-label naming its permission and its role in the visible words of both, because a table cell gives its control neither and voice control matches on what is on screen.',
+    'The permission is a th scope="row" and the role is a th scope="col", so a screen reader walking the grid announces both axes on arrival at a cell even though the box inside carries them itself.',
+    'The mixed state on a module roll-up is the indeterminate property on a native input, which already maps to mixed. Nothing here writes aria-checked — an attribute set once outlives a property that keeps changing, which is how a roll-up ends up announced as mixed long after the module was fully granted.',
+    'Locked cells use the disabled attribute, which takes them out of the Tab order and out of the POST, and each one says in its own name which kind of locked it is — comes with the role, or a role you may not grant.',
+    'The scroller takes role="region", tabindex="0" and an accessible name. Chromium will not give keyboard focus to an overflow container, so without it a keyboard user reaches every box in the grid and cannot move it one pixel to see which column they are standing in. Firefox focuses scrollable regions on its own, which is how this passes review on one machine and fails on the next.',
+    'The scroller also takes relative, or the sr-only caption inside it resolves against the document, escapes the clip and widens the whole page.',
+    'The caption on a wide grid says out loud what the shape is — permissions down the rows, roles across the columns, and which column is locked — because that orientation is free to the eye and expensive to everybody else.',
+    'The change count is a role="status" in the bar, not a live region wrapped round the grid. It announces the new count once when it changes rather than announcing a box that has already announced itself.',
+    'A refused save puts its reason in a role="status" that is inserted with the answer, so it is announced on arrival; the revert underneath it is script writing checked, and a programmatic change announces nothing at all.',
+    'On the phone arrangement the boxes carry no aria-label and need none: each has visible words of its own, and the role is the legend on the fieldset, announced on the way in. aria-label belongs to a box a table cell has left nameless.',
+    'The audit view puts real words behind every mark — sr-only "Granted" behind the tick and "Not granted" behind the dash — because an icon with no text and an em dash both read as nothing.',
+    'The grid still loading is aria-busy on the panel with one sr-only role="status" naming what is loading, and the grey squares under it are aria-hidden, or a screen reader walks a table of sixty empty cells and is never told why.'
+  ],
+  related: ['checkbox', 'table', 'settings-page', 'toggle'],
+  variants: [
+    { id: 'default', name: 'Roles across permissions', code: `<!-- The shape the whole entry is about: permissions down, roles across, and
+     the granted cell is a real checkbox rather than a tick somebody draws. Three
+     roles is what stands at 390px, and the number was measured rather than
+     chosen. A fourth column sat here until a browser sweep put the document at
+     405px: a width utility on a table cell is a preference the table overrules,
+     and what a column cannot go under is the widest unbreakable word inside it
+     — "Purchase" in the heading, ₹5,00,000 in a row label — so four role
+     columns plus the permission column overflow however the classes are
+     written. At three the whole grid is on screen at every width, Tab walks it
+     left to right in the order the eye reads it, and no box is off screen when
+     focus lands on it. Past that the permission column pays for every role
+     added and the grid has to scroll, which is the scroll variant and costs a
+     two-axis sticky.
+
+     Every box names both axes. A cell gives its control neither, and headers
+     are announced when a screen reader walks a table and not when it tabs the
+     controls inside one, which is how anybody filling this in moves. The label
+     repeats the words that are on screen, because voice control matches on
+     those and not on the permission code underneath them.
+
+     There is no row tint and no has-[:checked] on the tr. A matrix row holds
+     four separate answers and painting it from one of them says the whole row
+     is on; the hover band is the only thing that crosses the row, and its job
+     is carrying the eye to the far column.
+
+     Viewing the register comes with every role and is not set here, so those
+     four boxes are ticked and disabled. Disabled posts nothing and nothing
+     needs to be posted — but the columns this form does save are named in a
+     hidden field, or a server diffing the POST against every role in the
+     deployment revokes the ones it was never shown. -->
+<form data-kui="permission-matrix/default" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-d-h" class="text-[14px]/5 font-semibold">What each role may do with purchase orders</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 7 permissions · Silvassa and Vapi · last saved 12 Jul 2026 by Nilesh Patil</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-d-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal text-zinc-600">View the purchase register</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Purchase officer, comes with the role" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Store keeper, comes with the role" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — QC inspector, comes with the role" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" checked aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" checked aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:stores" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:qc" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:stores" aria-label="Approve over ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" checked aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" checked aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:purchase" checked aria-label="Cancel an approved order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:stores" aria-label="Cancel an approved order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:qc" aria-label="Cancel an approved order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">Viewing the register comes with the role and is set on the role, not here. Orders over ₹25,00,000 go to the plant head whatever this grid says.</p>
+  </div>
+</form>` },
+
+    { id: 'scroll', name: 'Seven roles, both axes pinned', code: `<!-- Seven roles is what a two-plant deployment actually has, and the default
+     grid cannot draw it: four columns fit on screen whole, seven do not, and
+     every role added is width the permission column pays for. So it scrolls
+     sideways inside its own box, and everything below is what scrolling costs.
+     Splitting it into two grids by module is not the escape it looks like — it
+     puts one role's full picture in two places, which is the question the
+     screen exists to answer.
+
+     border-separate border-spacing-0 first. Preflight collapses the borders
+     onto the table, and a collapsed border belongs to the table rather than to
+     the cell, so it stays behind when the cell travels: the head floats over
+     the boxes with no rule under it and the permission column slides across
+     them with no edge to stop at. The price is every rule moving onto the
+     cells — 63 cells carrying border-b instead of 9 rows carrying it once.
+
+     Every sticky plane needs an opaque fill or the boxes scroll straight
+     through it, and an opaque cell stops taking the row hover, so the tint goes
+     back with group-hover. Without it a hovered row lights seven columns of
+     boxes and leaves the permission white, which reads as the row ending where
+     its name starts. One corner cell at z-20 against the z-10 on the two
+     planes; no sticky foot here, so no second corner. Without the z-20 it is
+     painted over from one side or the other, which is where a two-axis sticky
+     ships broken — it looks right until somebody scrolls right and down at once.
+
+     tabindex="0" with role="region" and a name on the scroller, because
+     Chromium will not focus an overflow container: otherwise a keyboard user
+     reaches all 63 boxes and cannot move the grid one pixel to see which column
+     they are standing in. relative on it as well, or the sr-only caption
+     escapes the clip and widens the entire page. And the sentence underneath,
+     because there is no gradient, no fade and no arrow in this system — the
+     affordance is a line of text.
+
+     Plant head is a role this user may not grant, and the column stays, locked,
+     rather than being dropped: a grid without it reads as the plant head having
+     no permissions when in fact they have more than the person reading. 390px
+     is the phone variant, an arrangement rather than a media query. -->
+<form data-kui="permission-matrix/scroll" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-s-h" class="text-[14px]/5 font-semibold">Role permissions — Konspec Industries</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">7 roles · 9 permissions · Silvassa and Vapi</p>
+  </div>
+
+  <div role="region" aria-labelledby="pm-s-h" tabindex="0"
+       class="relative max-h-[26rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table class="w-full min-w-[64rem] table-fixed border-separate border-spacing-0 text-[13px]/5">
+      <caption class="sr-only">What each of seven roles may do. Permissions down the rows, roles across the columns. The Plant head column is locked because you do not hold that role.</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="sticky top-0 left-0 z-20 w-64 border-r border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-left align-bottom text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Permission</th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Purchase officer</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">7 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Store keeper</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">11 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">QC inspector</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">6 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Accounts</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">5 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Maintenance</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">9 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Auditor</span>
+            <span class="mt-0.5 block text-[11px]/4 font-normal tabular-nums text-zinc-500">2 users</span>
+          </th>
+          <th scope="col" class="sticky top-0 z-10 w-28 border-b border-l border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center align-bottom">
+            <span class="block text-[13px]/5 font-semibold text-zinc-900">Plant head</span>
+            <span class="mt-0.5 flex items-center justify-center gap-1 text-[11px]/4 font-normal text-zinc-500">
+              <i data-lucide="lock" class="size-3.5 shrink-0"></i>You cannot grant this
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="[&>tr:last-child>th]:border-b-0 [&>tr:last-child>td]:border-b-0">
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal text-zinc-600 group-hover:bg-zinc-100">View the purchase register</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Purchase officer, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Store keeper, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — QC inspector, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Accounts, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Maintenance, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Auditor, comes with the role" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="View the purchase register — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Raise a purchase order</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" checked aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:accounts" aria-label="Raise a purchase order — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:maint" checked aria-label="Raise a purchase order — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:audit" aria-label="Raise a purchase order — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Raise a purchase order — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve up to ₹5,00,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" checked aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:stores" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:qc" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:accounts" aria-label="Approve up to ₹5,00,000 — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:maint" aria-label="Approve up to ₹5,00,000 — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:audit" aria-label="Approve up to ₹5,00,000 — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve up to ₹5,00,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal tabular-nums group-hover:bg-zinc-100">Approve over ₹5,00,000</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:stores" aria-label="Approve over ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:accounts" aria-label="Approve over ₹5,00,000 — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:maint" aria-label="Approve over ₹5,00,000 — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:audit" aria-label="Approve over ₹5,00,000 — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Approve over ₹5,00,000 — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Post a GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" checked aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:accounts" aria-label="Post a GRN — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:maint" aria-label="Post a GRN — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:audit" aria-label="Post a GRN — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Post a GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Reverse a posted GRN</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:purchase" aria-label="Reverse a posted GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:stores" aria-label="Reverse a posted GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:qc" aria-label="Reverse a posted GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:accounts" aria-label="Reverse a posted GRN — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:maint" aria-label="Reverse a posted GRN — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:audit" aria-label="Reverse a posted GRN — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Reverse a posted GRN — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Issue material from stores</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:purchase" aria-label="Issue material from stores — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:stores" checked aria-label="Issue material from stores — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:qc" aria-label="Issue material from stores — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:accounts" aria-label="Issue material from stores — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:maint" checked aria-label="Issue material from stores — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="st.issue:audit" aria-label="Issue material from stores — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" disabled aria-label="Issue material from stores — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Release a QC hold</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:purchase" aria-label="Release a QC hold — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:stores" aria-label="Release a QC hold — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:qc" checked aria-label="Release a QC hold — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:accounts" aria-label="Release a QC hold — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:maint" aria-label="Release a QC hold — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:audit" aria-label="Release a QC hold — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Release a QC hold — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+        <tr class="group hover:bg-zinc-100">
+          <th scope="row" class="sticky left-0 z-10 border-r border-b border-r-zinc-200 border-b-zinc-100 bg-white px-4 py-2.5 text-left font-normal group-hover:bg-zinc-100">Change a rate contract</th>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:purchase" checked aria-label="Change a rate contract — Purchase officer" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:stores" aria-label="Change a rate contract — Store keeper" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:qc" aria-label="Change a rate contract — QC inspector" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:accounts" aria-label="Change a rate contract — Accounts" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:maint" aria-label="Change a rate contract — Maintenance" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-zinc-100 px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:audit" aria-label="Change a rate contract — Auditor" class="size-4 accent-zinc-700"></td>
+          <td class="border-b border-l border-b-zinc-100 border-l-zinc-200 bg-zinc-50 px-2 py-2.5 text-center group-hover:bg-zinc-100"><input type="checkbox" checked disabled aria-label="Change a rate contract — Plant head, locked" class="size-4 accent-zinc-700"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+    The head and the permission column both stay put. The grid scrolls in both directions inside this panel; the page behind it does not move at any width.
+  </p>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc,accounts,maint,audit">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">6 of the 7 columns are saved from here. Plant head is on the grid because one that dropped it would read as the plant head having no permissions; it is changed by somebody who holds that role.</p>
+  </div>
+</form>` },
+    { id: 'groups', name: 'Grouped by module, with a roll-up', code: `<!-- Fourteen permissions in one flat list is a screen people scroll rather
+     than read, so they are grouped by the module they belong to and each module
+     opens with a band naming it. The band is a row inside the table, not a
+     heading above one: a heading between two tables breaks the grid into three
+     grids, and a screen reader walking it loses the column headers at every
+     break. One tbody per module is what keeps it one table.
+
+     The band carries a roll-up per role — the module summary, and the reason
+     this variant needs Alpine at all. indeterminate is a JS property with no
+     matching attribute, so a module with two of its four permissions granted
+     cannot be rendered mixed by the server: it comes back reading as plainly
+     off, and somebody ticks it to turn the module on and grants the other two
+     without meaning to. x-effect writes it, and it sits on the box itself
+     rather than on the root, where refs are not populated at init.
+
+     The roll-up has no name and no value. It is a control over the module and
+     not a field in the form — mixed changes nothing about what is submitted, so
+     a half-granted module whose roll-up carried a name posted exactly as though
+     the whole module had been ticked, with its own leaves underneath it. The
+     leaves post; the roll-up only moves them.
+
+     A ticked roll-up also means the permissions in the module today and not a
+     standing subscription to it, so a permission added to Goods receipt in
+     October does not quietly join a role somebody set up in August. If the
+     intent really is everything under here for ever, that is a value of its own
+     with a name on it.
+
+     The band is bg-zinc-50 — a recessed band inside a white surface, the same
+     step a table header takes — and it does not hover, because it is a label
+     rather than something the eye follows across. -->
+<form data-kui="permission-matrix/groups" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        mods: {
+          po: ['raise', 'approve5', 'approveover', 'cancel'],
+          grn: ['post', 'reverse'],
+          qc: ['record', 'release'],
+          vm: ['create', 'rate']
+        },
+        sel: ['po.raise:purchase', 'po.approve5:purchase', 'po.cancel:purchase', 'vm.rate:purchase', 'grn.post:stores', 'qc.record:qc', 'qc.release:qc'],
+        keys(m, r) { return this.mods[m].map(p => m + '.' + p + ':' + r) },
+        full(m, r) { return this.keys(m, r).every(k => this.sel.includes(k)) },
+        part(m, r) { const k = this.keys(m, r); return k.some(x => this.sel.includes(x)) && !k.every(x => this.sel.includes(x)) },
+        toggle(m, r, on) { const k = this.keys(m, r); this.sel = on ? [...new Set([...this.sel, ...k])] : this.sel.filter(x => !k.includes(x)) }
+      }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-g-h" class="text-[14px]/5 font-semibold">Role permissions by module</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 modules · 10 permissions · 3 roles · a module box grants everything in that module today, not what is added to it later</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-g-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="border-b border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Purchase orders</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'purchase')" x-effect="$el.indeterminate = part('po', 'purchase')" @change="toggle('po', 'purchase', $event.target.checked)" aria-label="All 4 purchase order permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'stores')" x-effect="$el.indeterminate = part('po', 'stores')" @change="toggle('po', 'stores', $event.target.checked)" aria-label="All 4 purchase order permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'qc')" x-effect="$el.indeterminate = part('po', 'qc')" @change="toggle('po', 'qc', $event.target.checked)" aria-label="All 4 purchase order permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" x-model="sel" aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" x-model="sel" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" x-model="sel" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" x-model="sel" aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:stores" x-model="sel" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:qc" x-model="sel" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" x-model="sel" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:stores" x-model="sel" aria-label="Approve over ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" x-model="sel" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:purchase" x-model="sel" aria-label="Cancel an approved order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:stores" x-model="sel" aria-label="Cancel an approved order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:qc" x-model="sel" aria-label="Cancel an approved order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Goods receipt</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'purchase')" x-effect="$el.indeterminate = part('grn', 'purchase')" @change="toggle('grn', 'purchase', $event.target.checked)" aria-label="Both goods receipt permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'stores')" x-effect="$el.indeterminate = part('grn', 'stores')" @change="toggle('grn', 'stores', $event.target.checked)" aria-label="Both goods receipt permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'qc')" x-effect="$el.indeterminate = part('grn', 'qc')" @change="toggle('grn', 'qc', $event.target.checked)" aria-label="Both goods receipt permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" x-model="sel" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" x-model="sel" aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" x-model="sel" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Reverse a posted GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:purchase" x-model="sel" aria-label="Reverse a posted GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:stores" x-model="sel" aria-label="Reverse a posted GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:qc" x-model="sel" aria-label="Reverse a posted GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quality</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'purchase')" x-effect="$el.indeterminate = part('qc', 'purchase')" @change="toggle('qc', 'purchase', $event.target.checked)" aria-label="Both quality permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'stores')" x-effect="$el.indeterminate = part('qc', 'stores')" @change="toggle('qc', 'stores', $event.target.checked)" aria-label="Both quality permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'qc')" x-effect="$el.indeterminate = part('qc', 'qc')" @change="toggle('qc', 'qc', $event.target.checked)" aria-label="Both quality permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" x-model="sel" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" x-model="sel" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" x-model="sel" aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Release a QC hold</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:purchase" x-model="sel" aria-label="Release a QC hold — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:stores" x-model="sel" aria-label="Release a QC hold — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:qc" x-model="sel" aria-label="Release a QC hold — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Vendor master</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'purchase')" x-effect="$el.indeterminate = part('vm', 'purchase')" @change="toggle('vm', 'purchase', $event.target.checked)" aria-label="Both vendor master permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'stores')" x-effect="$el.indeterminate = part('vm', 'stores')" @change="toggle('vm', 'stores', $event.target.checked)" aria-label="Both vendor master permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'qc')" x-effect="$el.indeterminate = part('vm', 'qc')" @change="toggle('vm', 'qc', $event.target.checked)" aria-label="Both vendor master permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Create a vendor</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:purchase" x-model="sel" aria-label="Create a vendor — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:stores" x-model="sel" aria-label="Create a vendor — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:qc" x-model="sel" aria-label="Create a vendor — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Change a rate contract</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:purchase" x-model="sel" aria-label="Change a rate contract — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:stores" x-model="sel" aria-label="Change a rate contract — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:qc" x-model="sel" aria-label="Change a rate contract — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="sel.length + ' of 30 cells granted across these 3 roles'">7 of 30 cells granted across these 3 roles</p>
+  </div>
+</form>` },
+
+    { id: 'inherited', name: 'Comes with the role, and the override', code: `<!-- Roles inherit here: Senior buyer is Buyer plus whatever is added on top,
+     and Purchase head is Senior buyer plus the same. So a cell has three things
+     it can say and not two, and the grid is worth nothing if it cannot tell
+     them apart at a glance.
+
+     Comes with the parent — a locked tick and the words "From Buyer". It is not
+     editable in this column because it is not stored in this column; changing
+     it means opening Buyer, which is what the caption is for. Two kinds of
+     disabled box exist on these screens for two different reasons, and grey
+     says neither, so the reason is in the caption and in the box's accessible
+     name both.
+
+     Added here — a live tick and the words "Set here". This is the only kind of
+     cell in an inheriting column that posts a grant.
+
+     Revoked here — a live empty box, the words to say so, and a hidden field
+     with a name of its own. That field is the whole point of the variant. The
+     first version posted an unticked inheriting cell as simply not-granted,
+     somebody edited Buyer a fortnight later, and the permission came back —
+     because nothing had ever recorded that a person took it away on purpose.
+     An absence cannot carry an intention; a value can.
+
+     Every caption sits in a fixed min-h-4 block so a cell gaining or losing one
+     does not move the row, and the captions are words rather than colour: none
+     of these three is a state the record is in, so none of them takes a dot. -->
+<form data-kui="permission-matrix/inherited" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-i-h" class="text-[14px]/5 font-semibold">Buying roles — what each one inherits and what it overrides</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles in one chain · 6 permissions · a locked tick is set on the role above and changed there</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-i-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Buyer</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">The base role</span>
+        </th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Senior buyer</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">Inherits Buyer</span>
+        </th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Purchase head</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">Inherits Senior buyer</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.raise:buyer" checked aria-label="Raise a purchase order — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Raise a purchase order — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Raise a purchase order — Purchase head, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approve5:buyer" aria-label="Approve up to ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approve5:senior" checked aria-label="Approve up to ₹5,00,000 — Senior buyer, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Approve up to ₹5,00,000 — Purchase head, comes with Senior buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Senior buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:buyer" aria-label="Approve over ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:senior" aria-label="Approve over ₹5,00,000 — Senior buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:head" checked aria-label="Approve over ₹5,00,000 — Purchase head, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.cancel:buyer" checked aria-label="Cancel an approved order — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Cancel an approved order — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Cancel an approved order — Purchase head, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Change a rate contract</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.rate:buyer" checked aria-label="Change a rate contract — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Change a rate contract — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" aria-label="Change a rate contract — Purchase head, revoked on this role although Buyer grants it" class="size-4 accent-zinc-700">
+          <input type="hidden" name="revoke" value="vm.rate:head">
+          <span class="mt-1 block min-h-4 text-[11px]/4 font-medium text-zinc-900">Revoked here</span>
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Create a vendor</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.create:buyer" aria-label="Create a vendor — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.create:senior" checked aria-label="Create a vendor — Senior buyer, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" aria-label="Create a vendor — Purchase head, revoked on this role although Senior buyer grants it" class="size-4 accent-zinc-700">
+          <input type="hidden" name="revoke" value="vm.create:head">
+          <span class="mt-1 block min-h-4 text-[11px]/4 font-medium text-zinc-900">Revoked here</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="buyer,senior,head">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save the chain</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">A revocation is stored as a decision, not as a blank, so editing Buyer later cannot hand back the 2 permissions Purchase head has given up.</p>
+  </div>
+</form>` },
+
+    { id: 'readonly', name: 'The audit view', code: `<!-- The same axes with nothing to press. This screen was first drawn as the
+     editable grid with every box disabled and it read as the editable grid with
+     something broken — people clicked the boxes, got nothing, and asked who had
+     locked the page. There is no form here and there are no inputs: a tick is
+     an icon, a blank is an em dash, and both carry real words behind them,
+     because an icon with no text and a dash both read as nothing.
+
+     Neither mark takes a status colour. A granted permission is a fact about
+     the record and not a good outcome, so the tick is graphite; emerald here
+     would mean the same thing as emerald on a Closed dot, which is not what is
+     being said. What does take colour is the one row that is a state — a
+     permission granted outside the role by a standing exception, which is
+     waiting on a review date and takes the amber dot the table gives it.
+
+     The date under each mark is when the grant was made, because that is the
+     question an auditor arrives with, and it is why this grid is wider than the
+     editable one: a read-only cell can afford to say more than a 16px box can.
+     It is also why it scrolls. Four role columns each carrying a date put the
+     document at 423px in a browser sweep, and no class fixes that — a width
+     utility on a table cell is a preference the table overrules, and the floor
+     is the widest unbreakable word in the column, here the words under the
+     mark. So the grid takes rule 14 in full: relative, role="region",
+     tabindex="0", a name, and a line of text saying it scrolls, because there
+     is no gradient, no fade and no arrow in this system.
+
+     Panning rather than restacking, and that is the decision worth arguing.
+     Rule 14 names a comparison matrix as the thing allowed to scroll in its own
+     box, and this is one: the whole value of the audit view is reading down a
+     column and across a row, which a stack of one role at a time destroys —
+     that arrangement answers the editing question and already exists as the
+     phone variant. Nothing here is typed, so panning costs an auditor a thumb
+     and costs them nothing else.
+
+     The permission column does not freeze. A frozen column is what the scroll
+     variant pays for at seven roles, where the far column is a screen and a
+     half from its label; at four the whole grid is inside one short pan, and a
+     sticky plane means border-separate, an opaque fill and the row hover put
+     back by hand on every frozen cell. Not earned here. -->
+<div data-kui="permission-matrix/readonly" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-r-h" class="text-[14px]/5 font-semibold">Who may do what — as on 23 Aug 2026</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 roles · 6 permissions · 29 users · read-only. Changes are made on Settings, Users and roles, and every one of them is in the audit trail.</p>
+  </div>
+
+  <div role="region" aria-labelledby="pm-r-h" tabindex="0"
+       class="relative max-h-[26rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table class="w-full min-w-[46rem] table-fixed text-[13px]/5">
+      <caption class="sr-only">What each of four roles may do as on 23 August 2026. Permissions down the rows, roles across the columns, and the date each grant was made under the mark. Nothing on this screen is editable.</caption>
+      <thead>
+        <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="w-56 px-4 py-2.5 text-left font-medium">Permission</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Purchase officer</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Store keeper</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">QC inspector</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Accounts</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">17 Jun 2026</span>
+          </td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Reverse a posted GRN</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <span class="mx-auto flex items-center justify-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+              <i data-lucide="check" class="size-4 text-zinc-700"></i>
+              <span class="sr-only">Granted by a standing exception that is due for review</span>
+            </span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">Exception, review 30 Sep 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+    The grid scrolls sideways inside this panel; the page behind it does not move at any width.
+  </p>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+    1 of the 8 grants above is a standing exception rather than part of the role. It expires on its review date and is not renewed by anything on this screen.
+  </p>
+</div>` },
+    { id: 'compare', name: 'Two roles side by side', code: `<!-- The question that arrives before a role is retired or a new joiner is
+     slotted into one: what does Store keeper have that Senior store keeper does
+     not. Six columns of grid make that answerable in principle and nobody
+     answers it, because comparing two columns four apart means holding one in
+     your head while your eye travels. Two columns and a verdict beside them
+     turns it into reading.
+
+     The verdict is a word, not a fill. The differing rows do take the recessed
+     bg-zinc-50 band, and that tint is an aid rather than the message: a tint is
+     invisible on a printed sheet, invisible in forced-colours mode and
+     invisible to anybody reading with a screen reader, so what the row actually
+     says is written in the last column. Colour is not carrying it either — a
+     difference between two roles is not a state a record is in, so it takes no
+     dot and no red.
+
+     The count is in the heading and it counts rows, not ticks. "8 permissions"
+     over a comparison is a number that is true and answers nothing; 4 of 12
+     differ is the sentence somebody came for.
+
+     Nothing here is editable, deliberately. Making a difference tickable means
+     deciding which of the two roles a tick lands on, and there is no honest
+     default: the link goes to the role instead. The row order is the grid's
+     order and never sorted with the differences first, because the rows the two
+     roles share are the context that makes a difference legible. -->
+<div data-kui="permission-matrix/compare" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-c-h" class="text-[14px]/5 font-semibold">Store keeper against Senior store keeper</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 of 12 permissions differ · 11 users hold the first, 3 hold the second · Silvassa</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-c-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Senior store keeper</th>
+        <th scope="col" class="w-48 px-4 py-2.5 text-left font-medium">Difference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Reverse a posted GRN</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Issue material from stores</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Return material to stores</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Adjust stock on a physical count</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Print a bin label</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Raise a stock transfer to Vapi</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Receive a stock transfer</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Release a QC hold</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Neither</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium tabular-nums">Write off scrap up to ₹50,000</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">View the purchase register</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Neither</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">3 of the 4 differences are permissions only Senior store keeper holds. Nothing on this screen changes either role.</p>
+    <a href="#" class="shrink-0 text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open Senior store keeper</a>
+  </div>
+</div>` },
+
+    { id: 'dirty', name: 'What changed, and not saved yet', code: `<!-- A grid where changing one cell can decide who signs off ₹5,00,000 has to
+     say what is about to happen before it happens, and the bar is where it
+     says it.
+
+     It counts cells that differ from what is stored, not boxes that are ticked.
+     The first version counted ticks and read "11 permissions" on a grid where
+     eleven were already granted and two had been touched — a number that is
+     true and answers nothing. Splitting the count into granted and revoked is
+     the other half: on this screen those two are not the same kind of change,
+     and revoking is the one somebody wants to reread before pressing Save.
+
+     The bar was already there. It does not appear when the form goes dirty —
+     what changes is the line inside it, which swaps the last-saved stamp for
+     the count. A strip that materialises adds 52px under a pointer that is
+     already moving towards a cell, and on a grid the cell it was moving towards
+     is now under something else.
+
+     Each changed cell is marked where it sits, because a count at the bottom of
+     a grid of forty boxes does not say which forty. The mark is a 6px amber dot
+     in a slot that is w-1.5 whether the dot is in it or not — the dot appearing
+     must not shift the box it belongs to, or every tick nudges its own
+     neighbours. Amber because this is waiting on somebody before it can move,
+     which is what the dot table gives that colour, and it is aria-hidden
+     because the count in the bar is the role="status" that speaks.
+
+     Discard restores the stored values without a round trip — nothing has left
+     the browser — and it never asks for confirmation of its own. The count
+     beside it is what makes the button legible. -->
+<form data-kui="permission-matrix/dirty" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        base: ['po.raise:purchase', 'po.approve5:purchase', 'grn.post:stores', 'st.issue:stores', 'qc.record:qc'],
+        now: [],
+        init() { this.now = [...this.base] },
+        chg(k) { return this.base.includes(k) !== this.now.includes(k) },
+        get changed() { return [...new Set([...this.base, ...this.now])].filter(k => this.chg(k)) },
+        get added() { return this.changed.filter(k => this.now.includes(k)).length },
+        get dropped() { return this.changed.length - this.added },
+        discard() { this.now = [...this.base] }
+      }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-dy-h" class="text-[14px]/5 font-semibold">Role permissions — Stores and quality</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 5 permissions · nothing here is written until you press Save</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-dy-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:purchase" checked x-model="now" aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:stores" x-model="now" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:qc" x-model="now" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:purchase" checked x-model="now" aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:stores" x-model="now" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:qc" x-model="now" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:purchase" x-model="now" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:stores" checked x-model="now" aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:qc" x-model="now" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Issue material from stores</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:purchase" x-model="now" aria-label="Issue material from stores — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:stores" checked x-model="now" aria-label="Issue material from stores — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:qc" x-model="now" aria-label="Issue material from stores — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:purchase" x-model="now" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:stores" x-model="now" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:qc" checked x-model="now" aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+    <p role="status" class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+      <span x-show="!changed.length">Last saved 12 Jul 2026, 09:41 by Nilesh Patil</span>
+      <span x-show="changed.length" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+        <i data-lucide="pencil" class="size-3.5 shrink-0 text-zinc-600"></i>
+        <span x-text="changed.length + ' cells changed — ' + added + ' granted, ' + dropped + ' revoked'">2 cells changed — 1 granted, 1 revoked</span>
+      </span>
+    </p>
+    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+      <button type="button" @click="discard()" :disabled="!changed.length"
+              class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400">Discard</button>
+      <button type="submit" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    </div>
+  </div>
+</form>` },
+
+    { id: 'phone', name: 'One role at a time on a phone', code: `<!-- A grid cannot be a grid at 390px. Frozen or not, three role columns are
+     down to sixty pixels each, the permission names wrap to four lines, and
+     panning a matrix with one thumb while the other hand holds the phone is not
+     a way anybody sets up a role.
+
+     One role at a time, picked by a select, and its permissions as a list
+     grouped by module. The alternative was one permission at a time across the
+     roles, and it answers the wrong question: permission-first is the audit
+     question — who may approve over ₹5,00,000 — which is read rather than
+     edited, and the audit view serves it better than a form would. Editing is
+     role-first, because what somebody has to see before pressing Save is
+     everything one role may do, in one list, rather than assembling it from
+     twelve screens.
+
+     A separate variant and never a media query on the grid. Both arrangements
+     in one DOM with one of them display:none posts every permission twice — a
+     display:none checkbox still submits — and here the two copies can disagree,
+     so the save is a coin toss. The server renders one or the other.
+
+     Two forms side by side, because a form cannot nest: the picker is a GET
+     that reloads with the chosen role, the permissions are a POST. Which leaves
+     a real hole — switching the select throws away ticks that were never saved
+     — so the picker's button is bound to the change count and the reason is
+     text under it, never a tooltip on it. A disabled control fires no pointer
+     events and takes no focus, so a tooltip on one opens for nobody.
+
+     No box here carries an aria-label and none needs one. Each has visible
+     words of its own and the role is the legend on the fieldset, announced on
+     the way in. The aria-labels in the grid exist only because a table cell
+     gives its box neither axis. -->
+<div data-kui="permission-matrix/phone" class="max-w-[390px] rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       base: ['grn.post', 'grn.reverse', 'st.issue', 'st.return'],
+       now: [],
+       init() { this.now = [...this.base] },
+       get changed() { return [...new Set([...this.base, ...this.now])].filter(k => this.base.includes(k) !== this.now.includes(k)) }
+     }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[14px]/5 font-semibold">Role permissions</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 9 permissions · one role on screen at a time</p>
+  </div>
+
+  <form method="get" class="flex items-end gap-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <label for="pm-p-role" class="block text-[12px]/4 font-medium text-zinc-600">Role</label>
+      <select id="pm-p-role" name="role"
+              class="mt-1 h-9 w-full rounded-lg border border-zinc-300 bg-white px-2.5 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="purchase">Purchase officer</option>
+        <option value="stores" selected>Store keeper</option>
+        <option value="qc">QC inspector</option>
+        <option value="accounts">Accounts</option>
+        <option value="maint">Maintenance</option>
+        <option value="plant">Plant head — you cannot edit this one</option>
+      </select>
+    </div>
+    <button type="submit" :disabled="changed.length"
+            class="h-9 shrink-0 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400">Show</button>
+  </form>
+
+  <p x-show="changed.length" x-cloak class="border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+    <span x-text="'Store keeper has ' + changed.length + ' changes that are not saved.'">Store keeper has 1 change that is not saved.</span>
+    Save them before switching roles — the switch reloads this pane and they go with it.
+  </p>
+
+  <form method="post" class="px-4 py-3">
+    <input type="hidden" name="role" value="stores">
+
+    <fieldset>
+      <legend class="mb-2 text-[13px]/5 font-medium">Store keeper — what this role may do</legend>
+
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Goods receipt</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 text-zinc-500">
+          <input type="checkbox" checked disabled class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">View the purchase register</span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500">With the role</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn.post" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Post a GRN</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn.reverse" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Reverse a posted GRN</span>
+        </label>
+      </div>
+
+      <p class="mt-4 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Stores</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.issue" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Issue material from stores</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.return" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Return material to stores</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.adjust" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Adjust stock on a physical count</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.transfer" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise a stock transfer to Vapi</span>
+        </label>
+      </div>
+
+      <p class="mt-4 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Purchase orders</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="po.raise" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise a purchase order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="po.approve5" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve up to ₹5,00,000</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save Store keeper</button>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" x-text="now.length + ' of 9 granted. Saves this role only — the other 5 are unchanged by this form.'">4 of 9 granted. Saves this role only — the other 5 are unchanged by this form.</p>
+  </form>
+</div>` },
+    { id: 'empty', name: 'No roles defined yet', code: `<!-- A grid with no columns is not an empty grid, it is a table of one column
+     and no rows, and that is what shipped first: the permission names down the
+     left, nothing to the right of them, and a Save button under it. It read as
+     a screen that had failed to load rather than a deployment that had not been
+     configured, and two people raised it as a bug.
+
+     So the grid goes entirely. The permissions are not what is missing — all
+     fourteen of them exist, they come with the modules that are switched on,
+     and saying so is the useful half of this screen, because the next question
+     after "why is this empty" is "what will be in it". The roles are what is
+     missing and creating one is the only action offered.
+
+     Two ways forward and one of them is primary. The standard set is offered
+     second and it names what it would create rather than saying "import
+     defaults", because a button that creates six roles and grants them
+     permissions on a live plant has to say what it is about to do before it is
+     pressed.
+
+     The icon well is bg-zinc-200 with its ring, like every tinted shape here.
+     Padding rather than a margin, so the panel keeps a height and cannot
+     collapse against whatever is under it. -->
+<div data-kui="permission-matrix/empty" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[14px]/5 font-semibold">Role permissions</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Konspec Industries Pvt Ltd · Silvassa and Vapi</p>
+  </div>
+
+  <div class="px-6 py-12 text-center">
+    <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="users" class="size-5 text-zinc-600"></i>
+    </span>
+    <h4 class="mt-3 text-[16px]/6 font-semibold">No roles have been created yet</h4>
+    <p class="mx-auto mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+      The grid needs a role to put a column against. All 14 permissions already exist — they come with the modules that are switched on — and every one of them is unassigned, so nobody can raise an order, post a GRN or approve anything until a role holds them.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Create the first role</button>
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Create the 6 standard roles</button>
+    </div>
+    <p class="mx-auto mt-3 max-w-md text-[12px]/4 tabular-nums text-zinc-500">
+      The standard set is Purchase officer, Store keeper, QC inspector, Accounts, Maintenance and Plant head, with the permissions Konspec runs at Silvassa. Every one of them can be changed afterwards on this screen.
+    </p>
+  </div>
+</div>` },
+
+    { id: 'loading', name: 'The grants still loading', code: `<!-- What is loading is the grants, not the axes. The permissions come out of
+     the modules that are switched on and the roles came with the page, so both
+     headers are drawn for real — and drawing them does two jobs at once:
+     somebody can decide which column they are going to read before the boxes
+     land, and the browser's own table layout sets the column widths from the
+     same markup it will use for the loaded grid, so no column moves on arrival.
+
+     The first version greyed the role headings as well, because they are data
+     in the sense that they came from the server. Then the grid arrived, three
+     column headings turned out to be wider than their grey bars, and the whole
+     table reflowed under a pointer that was already on its way to a cell.
+
+     Three role columns because that is what the loaded grid has. The count of
+     columns is as much a promise as the count of rows — a skeleton drawn with
+     four and answered with three reflows the whole table on arrival, which is
+     the one thing a skeleton exists to prevent.
+
+     Six rows because there are six permissions, not because six looks right.
+     The count is what the screen is about to show; where it genuinely cannot be
+     known, guess low, since growth pushes down only what is below the panel
+     while shrinkage pulls the whole page up.
+
+     Each placeholder is a size-4 rounded block in a flex h-5 box, which is the
+     16px box a checkbox occupies inside the 20px line a cell gives it. Put the
+     block straight into the cell and the row comes back four pixels short,
+     which across six rows is most of a row missing.
+
+     aria-busy on the panel, one sr-only status naming what is loading, and the
+     grey body aria-hidden — without that a screen reader walks a table of
+     eighteen empty cells and is never told why. -->
+<div data-kui="permission-matrix/loading" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <p role="status" class="sr-only">Loading who may do what</p>
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-l-h" class="text-[14px]/5 font-semibold">Role permissions — Konspec Industries</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 6 permissions · Silvassa and Vapi</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-l-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Match the invoice against the GRN</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="border-t border-zinc-200 px-4 py-3" aria-hidden="true">
+    <div class="h-9 w-36 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none"></div>
+  </div>
+</div>` },
+
+    { id: 'failed', name: 'The save came back an error', code: `<!-- Eleven changes went up and three came back refused, because those three
+     permissions are held by an approval policy rather than by the role. The
+     first version showed a confirmation anyway and left all eleven cells
+     looking granted, which is the worst outcome available: the grid is the
+     record of what is true, and a cell that did not apply cannot be allowed to
+     go on showing the value somebody asked for.
+
+     So the three are reverted to what is actually stored, and each one is
+     marked where it sits with a red dot and words behind it. The eight that did
+     apply stay applied and stop counting as changes — a failure that rolls back
+     work that succeeded is a second defect wearing the first one's clothes, and
+     on this screen it means somebody re-does eight cells to find out which
+     three they cannot do at all.
+
+     The notice is a plain band inside the panel: white, zinc border, and the
+     only colour is the icon. A full-width red field over a grid shouts louder
+     than the three cells it is describing, and the cells are where the eye has
+     to end up. It names the three in words as well as marking them, because a
+     dot in a grid of twenty-four is findable only if you already know to look.
+
+     The reason is in the notice and not in a tooltip on the cell. A tooltip on
+     something that cannot be pressed opens for nobody, and the reason here is a
+     sentence about policy rather than a label. Try again re-sends the three
+     that failed and nothing else. -->
+<form data-kui="permission-matrix/failed" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-f-h" class="text-[14px]/5 font-semibold">Role permissions — Stores and quality</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 5 permissions · saved 23 Aug 2026, 11:04</p>
+  </div>
+
+  <div role="status" class="flex items-start gap-2.5 border-b border-zinc-200 px-4 py-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium tabular-nums">8 of your 11 changes were saved. 3 were refused and are back as they were.</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        Approve up to ₹5,00,000 for Store keeper and for QC inspector, and Approve over ₹5,00,000 for Store keeper, are set by the approval policy for Silvassa and cannot be granted on a role. Change the policy under Settings, Approval limits, or ask Nilesh Patil.
+      </p>
+      <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <button type="button" class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-3.5 shrink-0 text-zinc-600"></i>Try those 3 again
+        </button>
+        <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the approval policy</a>
+      </div>
+    </div>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-f-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" checked aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" checked aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approve5:stores" aria-label="Approve up to ₹5,00,000 — Store keeper, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approve5:qc" aria-label="Approve up to ₹5,00,000 — QC inspector, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approveover:stores" aria-label="Approve over ₹5,00,000 — Store keeper, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" checked aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" checked aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" checked aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+    <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">8 changes saved 23 Aug 2026, 11:04 by you. The 3 marked cells show what is stored, not what was asked for.</p>
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+  </div>
+</form>` },
+    { id: 'htmx', name: 'A cell that saves itself', code: `<!-- One request per cell, and the answer is the cell. There is no Save on this
+     grid, which makes it the wrong shape for setting a role up from scratch and
+     the right one for the screen somebody lives in — an administrator moving
+     one permission at a time while a plant runs, where a change that is only in
+     the browser is a change that is not made.
+
+     The cell is the target and the swap is its outerHTML, which means the
+     element the user is standing on is destroyed and replaced. That drops focus
+     to the body, and a keyboard user working down a column loses their place on
+     every tick. The returned cell keeps the same id on the box as the one it
+     replaced, and that is the whole fix — htmx restores focus to the element
+     whose id matches. Take the id off and it looks identical and works only
+     with a mouse.
+
+     hx-sync on the cell rather than on the grid. Two boxes ticked a second
+     apart are two independent writes to two independent records, so syncing at
+     the form level makes the second wait for the first for no reason; syncing
+     at the cell keeps a double-tick on ONE cell in order, which is the only
+     race that exists here.
+
+     No hx-disabled-elt. Disabling the box while its own request is in flight
+     costs the same focus the swap was already threatening, and the request is
+     one round trip on a LAN.
+
+     The caption under each box is where the outcome lives, because it is a fact
+     about that permission and the cell is where anybody will look for it. Only
+     the failed caption carries role="status": it is inserted with the answer,
+     so it announces on arrival, and the revert underneath it is script writing
+     checked, which announces nothing at all. Twenty-seven permanent live
+     regions in a grid this size would announce every tick twice.
+
+     The token every one of these posts is in the django variant. -->
+<div data-kui="permission-matrix/htmx" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-h-h" class="text-[14px]/5 font-semibold">Role permissions — written as you tick them</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 4 permissions · every box is one request and there is no Save on this screen</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-h-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-purchase" name="granted" value="1" checked
+                 aria-label="Raise a purchase order — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 11:04</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-stores" name="granted" value="1"
+                 aria-label="Raise a purchase order — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-qc" name="granted" value="1"
+                 aria-label="Raise a purchase order — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-purchase" name="granted" value="1" checked
+                 aria-label="Approve up to ₹5,00,000 — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 09:12</span>
+        </td>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-stores" name="granted" value="1" checked
+                 aria-label="Approve up to ₹5,00,000 — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500">
+            <i data-lucide="loader-circle" class="size-3 shrink-0 animate-spin motion-reduce:animate-none"></i>Saving
+          </span>
+        </td>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-qc" name="granted" value="1"
+                 aria-label="Approve up to ₹5,00,000 — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span role="status" class="mt-1 block min-h-4 text-[11px]/4 font-medium text-red-600">Not saved — the approval policy sets this one</span>
+          <button type="button"
+                  hx-post="/settings/roles/qc/permissions/po.approve5/"
+                  hx-trigger="click" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                  class="mt-0.5 text-[11px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-purchase" name="granted" value="1"
+                 aria-label="Post a GRN — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-stores" name="granted" value="1" checked
+                 aria-label="Post a GRN — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 04 Apr</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-qc" name="granted" value="1"
+                 aria-label="Post a GRN — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+      </tr>
+
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-purchase" name="granted" value="1"
+                 aria-label="Record a QC result — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-stores" name="granted" value="1"
+                 aria-label="Record a QC result — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-qc" name="granted" value="1" checked
+                 aria-label="Record a QC result — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 04 Apr</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Every tick is written when it is made and appears in the audit trail with your name against it. 1 of the 12 cells was refused and shows what is stored.
+  </p>
+</div>` },
+
+    { id: 'django', name: 'The Django loop', code: `<!-- views.py
+
+     The grid is one repeated field name and the cell key is the value, so it
+     comes back with request.POST.getlist('perm') — .get() returns the last one
+     and drops every other tick on the screen. An unticked box posts nothing at
+     all, which is why the diff can only ever be taken against the columns named
+     in the scope field: absence in the POST and a column that was never
+     rendered are the same bytes.
+
+         def role_permissions(request):
+             roles = Role.objects.filter(site=request.site).order_by('rank')
+             editable = [r for r in roles if request.user.may_grant(r)]
+             if request.method == 'POST':
+                 scope = request.POST['scope'].split(',')
+                 if set(scope) - {r.code for r in editable}:
+                     raise PermissionDenied
+                 wanted = set(request.POST.getlist('perm'))
+                 revoked = set(request.POST.getlist('revoke'))
+                 Grant.objects.reconcile(scope=scope, wanted=wanted, revoked=revoked)
+             return render(request, 'settings/role_permissions.html', {
+                 'roles': roles,
+                 'permissions': Permission.objects.for_modules(request.site.modules),
+                 'scope': ','.join(r.code for r in editable),
+             })
+
+     Two loops, permissions outside and roles inside, so the row and the cell
+     come out in the order the header row already promises. Do not build the
+     rows in Python and print them — a cell has three shapes here and each of
+     them is markup.
+
+     The accessible name is assembled from both axes in the template, in the
+     same words the two headers show, because a table cell gives its box neither
+     and voice control matches on what is on screen. Keep the em dash: it is the
+     separator every other grid in this system reads back.
+
+     The scope value is joined in the view rather than with a join filter in the
+     attribute, because the filter argument needs quotes and the attribute is
+     already quoted. The token tag is the first thing inside the form.
+
+     The empty clause of the outer for tag is a real state and not a nicety: a
+     deployment with the modules switched off has no permissions to draw, and
+     without it the table renders a header row over nothing, which is the empty
+     table that reads as a bug. Where there are no ROLES the whole grid goes
+     instead, and that is the empty variant. -->
+<form data-kui="permission-matrix/django" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  {% csrf_token %}
+  <input type="hidden" name="scope" value="{{ scope }}">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-dj-h" class="text-[14px]/5 font-semibold">Role permissions — {{ site.name }}</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ roles|length }} roles · {{ permissions|length }} permissions · last saved {{ last_saved_at }} by {{ last_saved_by }}</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-dj-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        {% for role in roles %}
+          <th scope="col" class="w-32 px-2 py-2.5 font-medium">
+            <span class="block">{{ role.name }}</span>
+            {% if role.editable %}
+              <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case tabular-nums text-zinc-500">{{ role.user_count }} users</span>
+            {% else %}
+              <span class="mt-0.5 flex items-center justify-center gap-1 text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">
+                <i data-lucide="lock" class="size-3 shrink-0"></i>You cannot grant this
+              </span>
+            {% endif %}
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for perm in permissions %}
+        <tr class="border-b border-zinc-100 last:border-b-0 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">{{ perm.label }}</th>
+          {% for role in roles %}
+            <td class="px-2 py-2.5 text-center">
+              {% if perm.code in role.inherited %}
+                <input type="checkbox" checked disabled
+                       aria-label="{{ perm.label }} — {{ role.name }}, comes with the role"
+                       class="size-4 accent-zinc-700">
+              {% elif not role.editable %}
+                <input type="checkbox" disabled
+                       {% if perm.code in role.granted %}checked{% endif %}
+                       aria-label="{{ perm.label }} — {{ role.name }}, locked because you do not hold that role"
+                       class="size-4 accent-zinc-700">
+              {% else %}
+                <input type="checkbox" name="perm" value="{{ perm.code }}:{{ role.code }}"
+                       {% if perm.code in role.granted %}checked{% endif %}
+                       aria-label="{{ perm.label }} — {{ role.name }}"
+                       class="size-4 accent-zinc-700">
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="{{ roles|length|add:1 }}" class="px-6 py-12 text-center">
+            <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="shield-off" class="size-5 text-zinc-600"></i>
+            </span>
+            <h4 class="mt-3 text-[16px]/6 font-semibold">No permissions to grant</h4>
+            <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+              Every module is switched off for {{ site.name }}, so there is nothing a role could be given. Switch a module on under Settings, Modules and the permissions it brings appear here.
+            </p>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">
+      This form is authoritative for {{ editable_count }} of the {{ roles|length }} columns. The rest are on the grid so it does not read as those roles having no permissions.
+    </p>
+  </div>
+</form>` }
+
+  ]
+},
+{
+  id: 'tree-view', name: 'Tree view', category: 'data',
+  description: 'Records that nest, drawn as rows that expand to reveal the rows underneath them. A bill of material exploded into its sub-assemblies, a chart of accounts, a plant broken down to the bin — every row still a record with its own code and its own figures.',
+  when: 'Reach for this when the records are the same kind of thing at every level and the nesting is part of the data rather than part of the page: a BOM and its sub-assemblies, an account and its ledgers, a plant that contains buildings that contain racks that contain bins. The test is whether a child row would still make sense on its own in a register — if it would, this is a tree; if the second level is a paragraph, a form or a panel of detail, it is not. A flat set of sections whose headings read as a list is accordion, and one trigger over one panel is collapsible. Two levels where the upper one is a heading with a subtotal rather than a record — orders under a vendor name — is table/grouped, which does not collapse at all because a register is scanned rather than navigated. The application\'s own navigation is sidebar, whose nested variant is this shape with links in it and none of the figures. A queue worked one record at a time, with the record beside the list, is list-detail. And a tree that has grown past a few hundred visible rows is usually a filter problem wearing a hierarchy: the user is looking for one part, and search-page or a combobox finds it in one step instead of four.',
+  notes: [
+    'The row is a full-bleed band and the indent is a run of empty w-6 spans inside it, not padding on the nested list. Indenting the <ul> was the first thing anyone tried and it moves the row\'s left edge inwards with it: at the third level the hover band starts 72px from the card edge, so four levels of tree hover as four stacked lists that happen to be lined up, and the eye reads the ragged left edges of the fills rather than the rows. Padding the row instead keeps every band the full width of the card and puts the whole difference into where the text starts, which is the only place the depth is meant to show.',
+    'role="tree" is a widget with one tab stop, and taking the role means taking all of it. A nested list of chevron buttons wearing role="tree" was shipped once: the screen reader announced a tree and then the Tab key walked through forty chevrons anyway, because nothing had made them tabindex="-1", and the level it announced came from a DOM the search filter had already flattened. Either build the widget — roving tabindex, the arrow-key contract, aria-level, aria-setsize, aria-posinset, all of it, which is the keyboard variant — or build a nested list of disclosures, which is every other variant here and is the right answer for a tree that is read rather than navigated.',
+    'The chevron is its own button with its own name; it is never the row. A BOM row carries a part code somebody clicks through to, a checkbox that puts the part on an issue slip, and a menu that opens where it is stocked, and one control cannot both open the branch and open the part. That is also why the row may not be a <label> in the selection variant — the chevron is inside it, so labelling the row means a click on the chevron ticks the box, and expanding a sub-assembly silently adds every part under it to the slip.',
+    'A leaf gets an empty size-6 box where a chevron would be. Rendering nothing there is the same defect as forgetting the box on a marker: every leaf\'s description starts 24px left of its siblings\', so the column of names has two left edges and the nesting reads one level shallower than it is. The box is aria-hidden and takes no hover, because it is a spacer and not a control that has run out of things to do.',
+    'A leaf must not carry aria-expanded, and Alpine will not let a binding take it off. Falsy values are removed from most attributes and deliberately preserved on anything starting aria- or data-, so :aria-expanded="false" on a row with no children renders the attribute set to false — which announces a row that has children and is currently hiding them, a different and wrong fact about a bought-out part. The only way to remove it from a binding is x-effect on the element itself, setting the attribute when the node has children and removing it when it does not, which is the same shape indeterminate takes on a checkbox and for the same reason.',
+    'A nested panel must never carry padding on the element x-collapse animates, and in a tree that rule bites twice, because the panels are inside each other. Collapse a parent while a child of it is still animating and the plugin measures the child mid-transition: the parent records a height that was true for one frame, and the branch reopens to a box that clips its own last two rows until something forces a reflow. Keep the animated <ul> free of padding, borders and margins, put the spacing on the rows, and expect a deep tree to be one of the places a 200ms duration is worth shortening.',
+    'A sub-assembly quantity is per assembly and multiplies everything under it. The 2 on a shell assembly means the tank has two of them, so the 62.500 kg on the granule row under it is 125.000 kg of granule in the finished good — and a tree that prints the stored per-assembly quantity in one column beside a rolled-up amount in the next is reporting two different bases in one row. Decide which the tree is: per-assembly quantities with per-assembly amounts, or the exploded figures throughout. Then say which in the column header, because a buyer reading a BOM cannot tell the two apart by looking.',
+    'A rolled-up figure is a sum of the records, never a sum of what is on screen. Compute a branch\'s amount from the same array its children paint from and it cannot disagree with them; add up the visible rows instead and collapsing a branch quietly changes the total, which is how a works order came to show a different value on a manager\'s screen than on the storekeeper\'s. The corollary is that a collapsed branch still has to carry its own figure, because the figure is the reason anybody would open it.',
+    'A shut branch has to say what is wrong underneath it. Colour lives in the dot and there is one dot per row, so a parent takes the worst state under it — red beats amber beats everything else — with a count beside it saying how many rows that is. Without it a blocked operation four levels down is invisible on a screen that fits, the user closes the last branch at the end of the day and the tree reads as clear. The count is what makes the dot honest: one red dot on a parent that means eleven blocked lines and one that means one are different mornings.',
+    'A parent checkbox reads its leaf descendants, not its direct children. Written against the children it works perfectly at two levels and breaks silently at three: the grandparent goes fully checked as soon as its two child branches report checked, and stays checked when a grandchild is unticked because the child branch it asks is the one now reporting indeterminate. Keep a map from every branch to the leaves under it — the leaves are what the form posts — and read every state off that. indeterminate has no attribute, so it is written by script on each render with x-effect on the box itself, exactly as checkbox/nested does it.',
+    'Search keeps a hit\'s ancestors on screen, and those ancestors are scaffolding rather than results. They are drawn dimmed and unmarked, they are not counted in "4 matches", and the count that is quoted is the count of rows carrying a mark — a tree that counted the rows it drew reported eleven matches for a query that hit four parts, and the buyer went looking for the other seven. The children of a hit are not results either and are not drawn; the branch keeps its chevron so they can be asked for.',
+    'The filter must not expand branches by writing into the same open set the user\'s clicks write into. That was the defect: typing a query opened nine branches, clearing the query left all nine open, and the tree the user had carefully collapsed was gone. While a query is in force the open set is ignored entirely and visibility is derived from the matches; the moment the query is cleared the user\'s own set is still there, untouched, and the tree snaps back to the shape they left it in.',
+    'A branch is only a branch if the server said it has children. A chevron rendered on every row because the client does not know yet gives the user a control that opens onto nothing, and an empty 200 from the lazy endpoint leaves it spinning and then blank, which reads as a failure rather than as an answer. Send a child count with the parent row, draw the chevron from it, and have the endpoint answer an empty branch with the one line that says so — a store bin that is genuinely empty is a fact worth a row.',
+    'A cycle in the data is an infinite tree. A part that appears in its own bill — an assembly reused as a component of itself, which is a data entry mistake and not an impossible one — recurses until the template engine or the browser gives up, and Django\'s include does not notice, it just resolves the same template again. The depth guard in the recursive partial is the last line of defence rather than the fix: it stops the page rendering for ever and prints a row saying the tree was cut off, so somebody sees the defect. The fix is a cycle check where the BOM is saved.'
+  ],
+  anatomy: [
+    ['Root', 'The card, and where the open set lives. One x-data for the whole tree, keyed by record id — never by index, because a filtered or reordered tree moves every index but no key.'],
+    ['Row', 'A full-bleed band, min-h-9, holding the indent, the chevron, the label and the figures. It is a SURFACE: it hovers one step off the band it crosses, zinc-100 inside a white card, and it takes the negative focus offset because the card clips it.'],
+    ['Indent', 'One empty w-6 span per ancestor level, inside the row. Depth is a count of spans, so nothing about the indent has to be recomputed when a node moves level.'],
+    ['Chevron', 'A size-6 button carrying aria-expanded and aria-controls, with its own accessible name saying what it opens. The rotation class goes on a flex span around the icon, never on the <i data-lucide>.'],
+    ['Leaf box', 'The same size-6 box, empty and aria-hidden, on every row that has no children. It exists so the descriptions line up.'],
+    ['Label', 'min-w-0 flex-1 truncate, holding the code and the description. The code is what people quote, so it is font-medium and tabular-nums and never truncated out first.'],
+    ['Figures', 'The shrink-0 columns on the right — quantity, rate, amount. tabular-nums throughout, and a branch shows the roll-up of the records under it rather than of the rows on screen.'],
+    ['Group', 'The nested <ul> the chevron names through aria-controls. It carries the id, x-show, x-collapse and nothing else — no padding, no border, no background — or the collapse bottoms out at its own padding and snaps.'],
+    ['Guides', 'The elbow and the continuation rails, drawn with borders on empty spans inside the indent columns. The rail above a last child stops at the elbow, because a rail running past the last row points at nothing.'],
+    ['Status', 'The 6px dot on a row, and on a shut branch the worst state under it with a count beside it. One dot per row and no other colour on it.'],
+    ['Row menu', 'The trigger revealed on hover and brought back by focus-visible, hidden with opacity rather than display so it stays in the tab order at all times.'],
+    ['Branch note', 'The single row a branch shows when it opens onto nothing — an empty bin, a bought-out part with no explosion, a query that matched the parent and none of its children.']
+  ],
+  behaviour: [
+    'Clicking a chevron opens or closes that branch and nothing else. Several branches are open at once, because two sub-assemblies are compared against each other far more often than one is read alone, and a tree that shuts the first when the second opens makes that comparison impossible.',
+    'The open set is keyed by record id and survives a sort, a filter and a re-render. Keyed by position it survives none of them: the tree comes back with the wrong three branches open and nothing on screen says why.',
+    'A branch that starts closed carries x-cloak. A branch that starts open must not, or it stays hidden until Alpine boots and the tree assembles itself in front of the reader.',
+    'A branch figure is the roll-up of the records under it, computed from the data rather than from the rows drawn. Collapsing a branch changes what is on screen and never changes a number.',
+    'A group control expands or collapses the whole tree and its label is derived from how many branches are open. It states the row count it is about to produce, because a fully exploded BOM is not the same size as the tree in front of the user.',
+    'While a search is in force the open set is ignored: every node with a match in its subtree is drawn, hits are marked, and ancestors are dimmed. Clearing the query restores the shape the user had, because the filter never wrote into it.',
+    'A lazily loaded branch is fetched on the first expand and never again. The spinner takes the chevron\'s place rather than sitting beside it, so the label does not move 20px right and back, and a failure leaves a retry in the branch rather than an empty one.',
+    'Selection cascades down to every leaf under a branch and reads back up as checked, indeterminate or clear. The leaves are what posts; a branch box has no name and no value of its own.',
+    'A row menu is revealed on hover and present at all times for the keyboard. The tree\'s own card is not overflow-hidden while a menu is in it, or the menu is clipped at the card edge; the rows are kept off the rounded corners by a strip above and below them instead.',
+    'On a phone the indent step drops to 16px and the figures move under the label. Nothing scrolls sideways: the description truncates and the code, which is the part nobody can reconstruct, keeps its width.',
+    'The keyboard tree is one tab stop. Arrows move within it, Enter activates the row, and the tab stop follows the active row so returning to the tree lands where the user left it.'
+  ],
+  a11y: [
+    'Two shapes, and the choice is a real one. A nested list of disclosures is a plain <ul> of <li>, each expandable row carrying a real button with aria-expanded bound to the open state and aria-controls naming the nested <ul>; every control is reachable with Tab, which is what a tree holding links, checkboxes and row menus needs.',
+    'The widget shape is role="tree" on the container, role="treeitem" on each row and role="group" on each nested list, and it is a single tab stop with a roving tabindex: the active row is tabindex="0" and every other row is tabindex="-1". Do not put that role on a list of buttons and stop there — a tree that still has forty tab stops in it is announced as a widget and behaves as a list.',
+    'Where the rows are rendered flat rather than nested — a tree table, or any tree drawn from a flattened array — the DOM no longer carries the depth, so aria-level, aria-setsize and aria-posinset become load-bearing. aria-setsize counts siblings at that level, not rows on screen, and aria-posinset is the row\'s position among those siblings; both are wrong the moment they are taken from the rendered index.',
+    'The arrow-key contract is fixed. Down and Up move to the next and previous visible row regardless of level; Right expands a closed branch and moves into the first child of an open one; Left collapses an open branch and moves to the parent of a closed one or of a leaf; Home and End go to the first and last visible row. Enter activates the row, Space selects it where the tree has selection.',
+    'Type-ahead moves focus to the next visible row whose label starts with what has been typed, wrapping past the end, with the buffer cleared after about half a second. It matches the label the row displays — a user types the part code they can see, so a buffer matched against an internal key finds nothing and looks broken.',
+    'aria-expanded goes on whatever the user operates: the button in the disclosure shape, the row itself in the widget shape. It is bound rather than hardcoded, and a leaf carries no aria-expanded at all — false there says the row has children that are hidden, which is a different fact.',
+    'Moving focus into rows the same key press just revealed needs the render to have happened. Set the open state, then move focus in the next tick; focusing an element that x-show is about to unhide is a silent no-op and the keyboard stays where it was.',
+    'The tab stop cannot disappear. Collapse a branch while the active row is inside it and the roving tabindex is on an element that is now display:none, so the tree drops out of the tab order entirely; move the active row up to the branch that was collapsed, which is where the user\'s attention already is.',
+    'A chevron\'s accessible name says what it opens, not what it is. Twelve buttons all named Expand is twelve identical rows in a screen reader\'s element list, so the name carries the record — Parts under SA-1140 Tank shell assembly — and the chevron itself is decorative inside it.',
+    'The row\'s figures are read as part of the row and belong in it, but a status has to be a word as well as a dot. The dot is aria-hidden and the state is written beside it, in text or sr-only text, for the same reason a badge does it: colour and shape are for the eye and the word is the data.',
+    'A count on a shut branch is announced with the branch, which is the only place it can be heard, so it says what it counts: "3 blocked" and not "3". The tree is where a screen reader user finds out that something is wrong under a row they have not opened.',
+    'A tree table is role="treegrid" with aria-level, aria-posinset, aria-setsize and aria-expanded on each row. It is a grid first, so the moment a cell holds a control the arrow keys owe the user cell navigation as well; a treegrid whose cells are read-only figures is the one case where row-level movement is the whole contract.'
+  ],
+  related: ['accordion', 'table', 'sidebar', 'checkbox'],
+  variants: [
+{ id: 'default', name: 'Default', code: `<!-- A bill of material exploded: the finished good, the sub-assemblies under it
+     and the material under those. Three levels of the same kind of record —
+     every row has a code, a description and a quantity — which is what
+     separates a tree from an accordion, where the heading and the contents are
+     two different things.
+
+     Real nesting, a <ul> inside the <li> it belongs to. The indent is a run of
+     empty w-6 spans inside the row, not padding on that nested list: the row is
+     a full-bleed band and has to reach both edges of the card to hover as one
+     thing, and a padded list moves the left edge inwards and takes the hover
+     with it.
+
+     The chevron is its own button with its own name. It is not the row — the
+     row carries a part code somebody clicks through to, and one control cannot
+     both open the branch and open the part. Which is also why a leaf gets an
+     empty size-6 box where a chevron would be: without it every leaf's
+     description starts 24px left of its siblings' and the column of names has
+     two left edges.
+
+     This is a nested list of disclosures and not role="tree". A tree is a
+     widget with one tab stop and an arrow-key contract, and taking the role
+     means taking all of it — that is the keyboard variant. Here every chevron
+     is a button the Tab key reaches, which is the right trade for eleven rows
+     that are read rather than navigated.
+
+     The animated <ul> carries the id, x-show and x-collapse and nothing else.
+     Padding on it means height:0 cannot go below the padding, so the branch
+     bottoms out and x-show then removes it in one frame, which reads as a snap
+     — and in a tree that goes wrong twice, because the panels are inside each
+     other.
+
+     Sub-assembly quantities are per assembly: the 2 on the lid assembly
+     multiplies every row indented under it. -->
+<div data-kui="tree-view/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { fg: true, shell: true, lid: true, weld: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Bill of material — FG-2200 Water tank 1000 L</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Rev 4 · 11 lines</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-d-fg"
+                aria-label="Sub-assemblies of FG-2200 Water tank 1000 L"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2200</span> <span class="text-zinc-600">Water tank 1000 L, roto-moulded</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+      </div>
+
+      <ul role="list" id="tv-d-fg" x-show="open.fg" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-d-shell"
+                    aria-label="Parts under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+          <ul role="list" id="tv-d-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade M60075</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1.250 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-d-lid"
+                    aria-label="Parts under SA-1155 Lid and gasket assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+          </div>
+          <ul role="list" id="tv-d-lid" x-show="open.lid" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.weld = !open.weld" :aria-expanded="open.weld" aria-controls="tv-d-weld"
+                    aria-label="Parts under SA-1163 Fitting and finish kit"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.weld && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1163</span> <span class="text-zinc-600">Fitting and finish kit</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+          <ul role="list" id="tv-d-weld" x-show="open.weld" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">CN-7710</span> <span class="text-zinc-600">Teflon tape, 12 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">0.030 kg</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PK-6620</span> <span class="text-zinc-600">Stretch film, 23 micron</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">0.180 kg</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>` },
+{ id: 'guides', name: 'Indent guides', code: `<!-- A chart of accounts is four levels deep and every level looks like the one
+     above it, so the indent alone stops carrying the structure: by 1113 the eye
+     has to count spaces backwards to work out which parent the row belongs to.
+     Rules and elbows answer that without asking anybody to count.
+
+     They are borders on empty spans, not an image and not a background. A
+     repeating background would have to be positioned against an indent step
+     that is written in the markup, so the two would drift the first time
+     somebody changed w-6 to w-5; drawn as boxes inside the same indent columns
+     the row already has, the rail is by construction in the middle of the
+     column it belongs to.
+
+     Each indent column is 24px wide and the rail sits at its midpoint — a w-3
+     box carrying border-r — so the rail lands under the centre of the parent's
+     chevron rather than under its left edge. The elbow is the same rail cut at
+     18px, which is half of the 36px row, with a 12px border-b running from it
+     to the row's own chevron. Both halves are the row height, so a row that
+     wraps keeps its elbow on the first line where the chevron is.
+
+     The rail above a last child stops at the elbow: the continuation span is
+     simply not rendered. A rail that runs past the last row of a branch points
+     at nothing, and in a deep tree it reads as a sibling that failed to load.
+
+     An ancestor that was itself a last child contributes a blank column, not a
+     rail. That is the whole rule — a column carries a rail when the ancestor at
+     that level still has a sibling below it — and it is why the guides have to
+     be rendered from the node's ancestry rather than from its depth.
+
+     All of it is aria-hidden. The structure is already in the nesting and in
+     aria-expanded; the guides are the picture of it for the eye. -->
+<div data-kui="tree-view/guides" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { a: true, ca: true, inv: true, bank: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Chart of accounts — Konspec Polymers Pvt Ltd</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">As at 31 Mar 2026</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.a = !open.a" :aria-expanded="open.a" aria-controls="tv-g-a"
+                aria-label="Accounts under 1000 Assets"
+                class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.a && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1000</span> <span class="font-medium">Assets</span></span>
+        <span class="ml-3 shrink-0 self-center tabular-nums">₹18,42,10,600</span>
+      </div>
+
+      <ul role="list" id="tv-g-a" x-show="open.a" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="flex w-6 shrink-0">
+              <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+              <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+            </span>
+            <button type="button" @click="open.ca = !open.ca" :aria-expanded="open.ca" aria-controls="tv-g-ca"
+                    aria-label="Accounts under 1100 Current assets"
+                    class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.ca && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1100</span> <span class="text-zinc-600">Current assets</span></span>
+            <span class="ml-3 shrink-0 self-center tabular-nums">₹11,08,74,200</span>
+          </div>
+
+          <ul role="list" id="tv-g-ca" x-show="open.ca" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <button type="button" @click="open.inv = !open.inv" :aria-expanded="open.inv" aria-controls="tv-g-inv"
+                        aria-label="Accounts under 1110 Inventory"
+                        class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="flex transition-transform motion-reduce:transition-none" :class="open.inv && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                </button>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1110</span> <span class="text-zinc-600">Inventory</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums">₹7,64,29,800</span>
+              </div>
+
+              <ul role="list" id="tv-g-inv" x-show="open.inv" x-collapse.duration.200ms>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1111</span> <span class="text-zinc-600">Raw material — Vasai plant</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹4,18,60,400</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1112</span> <span class="text-zinc-600">Work in progress</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹1,12,84,000</span>
+                  </div>
+                </li>
+                <li>
+                  <!-- last child of 1110: the elbow has no continuation below it -->
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1113</span> <span class="text-zinc-600">Finished goods</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹2,32,85,400</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1120</span> <span class="text-zinc-600">Trade receivables</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹2,84,12,900</span>
+              </div>
+            </li>
+
+            <li>
+              <!-- last child of 1100, and a branch: rail stops, chevron stays -->
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <button type="button" @click="open.bank = !open.bank" :aria-expanded="open.bank" aria-controls="tv-g-bank"
+                        aria-label="Accounts under 1130 Bank accounts"
+                        class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="flex transition-transform motion-reduce:transition-none" :class="open.bank && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                </button>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1130</span> <span class="text-zinc-600">Bank accounts</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹60,31,500</span>
+              </div>
+              <ul role="list" id="tv-g-bank" x-show="open.bank" x-cloak x-collapse.duration.200ms>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="w-6 shrink-0"></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1131</span> <span class="text-zinc-600">HDFC Bank — CC 00120340001188</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹60,31,500</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <!-- last child of 1000 -->
+          <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="flex w-6 shrink-0">
+              <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+              <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+            </span>
+            <span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1200</span> <span class="text-zinc-600">Plant and machinery, net of depreciation</span></span>
+            <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹7,33,36,400</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>` },
+{ id: 'expand-all', name: 'Opening the whole tree at once', code: `<!-- A location hierarchy is read two ways: down from the plant, looking for the
+     rack a pallet is on, and all at once, when somebody is checking a physical
+     count against the system. One control serves the second reading, and it is
+     one button rather than an Expand all beside a Collapse all, because two of
+     them means one is always the dead one.
+
+     Its label is computed from the open set, never toggled from a flag of its
+     own. Open the last rack by hand and the button has to already say Collapse
+     all; driven by a flag it says Expand all, the press collapses nothing
+     visible, and the control reads as broken. allOpen is derived from the same
+     array the chevrons paint from, so the two cannot drift.
+
+     The label also says how many rows the press produces. Twelve is nothing;
+     the same control over a plant with four hundred bins draws four hundred
+     rows of bindings in one frame on a machine that is also running the ERP in
+     another tab, and a number in the label is the only warning anybody gets
+     before it happens. Count the rows on the server and send it with the tree.
+
+     The button is not aria-expanded. That attribute describes what the control
+     itself opens and this one opens six things, so it takes aria-controls
+     listing all six group ids — that is what the space-separated form is for —
+     and the label carries which way the next press will go.
+
+     Group ids come from the location code through the state, never from a loop
+     index. Two of these trees on one transfer screen both mint the same ids
+     from an index, and the second tree's chevrons then open branches in the
+     first. -->
+<div data-kui="tree-view/expand-all"
+     x-data="{
+       open: ['vas', 'sta'],
+       branches: ['vas', 'sta', 'r11', 'r12', 'stb', 'b21'],
+       rows: 12,
+       has(id) { return this.open.includes(id) },
+       toggle(id) { this.open = this.has(id) ? this.open.filter(x => x !== id) : [...this.open, id] },
+       get allOpen() { return this.open.length === this.branches.length },
+       everything() { this.open = this.allOpen ? [] : [...this.branches] },
+       panels() { return this.branches.map(b => 'tv-x-' + b).join(' ') }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 pb-2">
+    <h3 class="min-w-0 flex-1 text-[16px]/6 font-semibold">Storage locations</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="open.length + ' of ' + branches.length + ' branches open'">2 of 6 branches open</p>
+    <button type="button" @click="everything()" :aria-controls="panels()"
+            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex transition-transform motion-reduce:transition-none" :class="allOpen && 'rotate-180'">
+        <i data-lucide="chevrons-up-down" class="size-4 text-zinc-600"></i>
+      </span>
+      <span class="tabular-nums" x-text="allOpen ? 'Collapse all' : 'Expand all — ' + rows + ' rows'">Expand all — 12 rows</span>
+    </button>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="toggle('vas')" :aria-expanded="has('vas')" aria-controls="tv-x-vas"
+                  aria-label="Stores in PLT-VAS Vasai plant"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="has('vas') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PLT-VAS</span> <span class="font-medium">Vasai plant</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹4,18,60,400</span>
+        </div>
+
+        <ul role="list" id="tv-x-vas" x-show="has('vas')" x-collapse.duration.200ms>
+          <li>
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="toggle('sta')" :aria-expanded="has('sta')" aria-controls="tv-x-sta"
+                      aria-label="Racks in ST-A Store A, raw material"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="has('sta') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-A</span> <span class="text-zinc-600">Store A — raw material</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹3,02,18,900</span>
+            </div>
+
+            <ul role="list" id="tv-x-sta" x-show="has('sta')" x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('r11')" :aria-expanded="has('r11')" aria-controls="tv-x-r11"
+                          aria-label="Bins on RK-A11 Rack A11"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('r11') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,88,40,000</span>
+                </div>
+                <ul role="list" id="tv-x-r11" x-show="has('r11')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A11-01</span> <span class="text-zinc-600">HDPE M60075 — 42 bags</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,05,00,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A11-02</span> <span class="text-zinc-600">LLDPE film grade — 33 bags</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹83,40,000</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('r12')" :aria-expanded="has('r12')" aria-controls="tv-x-r12"
+                          aria-label="Bins on RK-A12 Rack A12"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('r12') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,13,78,900</span>
+                </div>
+                <ul role="list" id="tv-x-r12" x-show="has('r12')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A12-01</span> <span class="text-zinc-600">Masterbatch blue 2% — 18 drums</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹64,80,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A12-02</span> <span class="text-zinc-600">Slip additive — 9 drums</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹48,98,900</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="toggle('stb')" :aria-expanded="has('stb')" aria-controls="tv-x-stb"
+                      aria-label="Racks in ST-B Store B, packing"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="has('stb') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-B</span> <span class="text-zinc-600">Store B — packing</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+            </div>
+            <ul role="list" id="tv-x-stb" x-show="has('stb')" x-cloak x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('b21')" :aria-expanded="has('b21')" aria-controls="tv-x-b21"
+                          aria-label="Bins on RK-B21 Rack B21"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('b21') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-B21</span> <span class="text-zinc-600">Rack B21 — cartons and liners</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+                </div>
+                <ul role="list" id="tv-x-b21" x-show="has('b21')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">B21-01</span> <span class="text-zinc-600">Corrugated cartons 5-ply — 1,240 nos</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹74,40,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">B21-02</span> <span class="text-zinc-600">PE liners 200 micron — 640 nos</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹42,01,500</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>` },
+{ id: 'keyboard', name: 'The tree widget, walked with the keyboard', code: `<!-- The real role="tree": one tab stop, a roving tabindex, and the arrow-key
+     contract in full. This is the shape for a tree somebody navigates — a
+     component picker, a location chooser, an account picker — and it is the
+     only variant here that claims the role, because claiming it means owing all
+     of the behaviour below.
+
+     One tab stop. The active row is tabindex="0", every other row is
+     tabindex="-1", and the tab stop follows the active row, so Tab out and back
+     lands where the user was rather than at the top.
+
+     Which is why the chevron is a span with a click handler and not a button. A
+     button inside a treeitem is a second tab stop inside a widget that promised
+     one; the row owns the click and owns the keys. That is the trade every
+     other variant in this entry refuses to make, because a row carrying a link,
+     a checkbox and a menu needs Tab to reach all three.
+
+     The rows are rendered flat rather than nested, because the arrow keys move
+     between visible rows regardless of level and a flat array is that list. The
+     nesting a screen reader would have read out of the DOM has to be written
+     back on: aria-level, and aria-setsize and aria-posinset counted among the
+     node's SIBLINGS, not among the rows on screen — take those from the render
+     index and the tree announces 3 of 9 for the second child of a branch.
+
+     aria-expanded cannot be bound on a leaf. Alpine preserves a falsy aria-*
+     binding instead of removing it, so :aria-expanded="false" on a row with no
+     children renders the attribute set to false, which tells a screen reader
+     the row has children that are hidden — a different and wrong fact. The only
+     way to take it off from a binding is x-effect on the element itself, which
+     is the same reason indeterminate is written that way on a checkbox.
+
+     Focus moves in the next tick, never in the same statement. ArrowRight on a
+     closed branch sets the open state and then moves in; at the moment the
+     handler runs the child rows are not rendered yet and .focus() on an element
+     that is not there is a silent no-op that leaves the keyboard where it was.
+
+     And the tab stop may not disappear. Collapse a branch while the active row
+     is inside it and tabindex="0" is on something that is now display:none, so
+     the whole tree drops out of the tab order; close() moves the active row up
+     to the branch that was collapsed, which is where the user is looking. -->
+<div data-kui="tree-view/keyboard" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{
+       active: 'fg',
+       open: ['fg', 'shell'],
+       picked: '',
+       buf: '',
+       timer: 0,
+       nodes: [
+         { id: 'fg',    parent: null,    code: 'FG-2200', name: 'Water tank 1000 L, roto-moulded', qty: '1 no' },
+         { id: 'shell', parent: 'fg',    code: 'SA-1140', name: 'Tank shell assembly',             qty: '1 no' },
+         { id: 'rm01',  parent: 'shell', code: 'RM-3301', name: 'HDPE, blow moulding grade',       qty: '62.500 kg' },
+         { id: 'rm02',  parent: 'shell', code: 'RM-3312', name: 'Masterbatch, blue 2%',            qty: '1.250 kg' },
+         { id: 'lid',   parent: 'fg',    code: 'SA-1155', name: 'Lid and gasket assembly',         qty: '2 nos' },
+         { id: 'pt02',  parent: 'lid',   code: 'PT-4402', name: 'Lid, moulded, 400 mm',            qty: '1 no' },
+         { id: 'pt18',  parent: 'lid',   code: 'PT-4418', name: 'Gasket, EPDM 3 mm',               qty: '1 no' },
+         { id: 'hw01',  parent: 'fg',    code: 'HW-5501', name: 'Outlet nipple, GI, 1 in',         qty: '1 no' },
+         { id: 'pk20',  parent: 'fg',    code: 'PK-6620', name: 'Stretch film, 23 micron',         qty: '0.180 kg' }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       label(n) { return n.code + ' ' + n.name },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       sibs(n) { return this.nodes.filter(x => x.parent === n.parent) },
+       pos(n) { return this.sibs(n).findIndex(x => x.id === n.id) + 1 },
+       isOpen(n) { return this.open.includes(n.id) },
+       shown(n) { let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent } return true },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       go(id) { this.active = id; this.$nextTick(() => this.$root.querySelector('#tv-k-' + id).focus()) },
+       openIt(n) { if (!this.isOpen(n)) this.open = [...this.open, n.id] },
+       close(n) { this.open = this.open.filter(x => x !== n.id); if (!this.shown(this.by(this.active))) this.go(n.id) },
+       step(d) { const r = this.rows, i = r.findIndex(n => n.id === this.active), j = i + d; if (j >= 0 && j < r.length) this.go(r[j].id) },
+       right(n) { if (!this.kids(n.id).length) return; if (!this.isOpen(n)) { this.openIt(n) } else { this.go(this.kids(n.id)[0].id) } },
+       left(n) { if (this.kids(n.id).length && this.isOpen(n)) { this.close(n) } else if (n.parent) { this.go(n.parent) } },
+       pick(n) { if (this.kids(n.id).length) { this.isOpen(n) ? this.close(n) : this.openIt(n) } else { this.picked = this.label(n) } },
+       type(k) {
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => this.buf = '', 600);
+         this.buf += k.toLowerCase();
+         const r = this.rows, i = r.findIndex(n => n.id === this.active);
+         const order = [...r.slice(i + 1), ...r.slice(0, i + 1)];
+         const found = order.find(n => this.label(n).toLowerCase().startsWith(this.buf));
+         if (found) this.go(found.id);
+       }
+     }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Add a component to WO-2026-0412</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="rows.length + ' rows visible'">4 rows visible</p>
+  </div>
+
+  <ul role="tree" aria-label="Components of FG-2200 Water tank 1000 L" class="py-1"
+      @keydown.down.prevent="step(1)"
+      @keydown.up.prevent="step(-1)"
+      @keydown.right.prevent="right(by(active))"
+      @keydown.left.prevent="left(by(active))"
+      @keydown.home.prevent="go(rows[0].id)"
+      @keydown.end.prevent="go(rows[rows.length - 1].id)"
+      @keydown.enter.prevent="pick(by(active))"
+      @keydown.space.prevent="pick(by(active))"
+      @keydown="$event.key.length === 1 && $event.key !== ' ' && type($event.key)">
+    <template x-for="n in rows" :key="n.id">
+      <li role="treeitem" :id="'tv-k-' + n.id"
+          :tabindex="active === n.id ? 0 : -1"
+          :aria-level="level(n)" :aria-setsize="sibs(n).length" :aria-posinset="pos(n)"
+          x-effect="kids(n.id).length ? $el.setAttribute('aria-expanded', isOpen(n)) : $el.removeAttribute('aria-expanded')"
+          @click="go(n.id)"
+          class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+        <span aria-hidden="true" @click.stop="pick(n); go(n.id)"
+              class="flex size-6 shrink-0 items-center justify-center text-zinc-500">
+          <template x-if="kids(n.id).length">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </template>
+        </span>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums" x-text="n.code"></span> <span class="text-zinc-600" x-text="n.name"></span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="n.qty"></span>
+      </li>
+    </template>
+  </ul>
+
+  <div class="border-t border-zinc-200 bg-zinc-50 px-4 py-2">
+    <p class="text-[12px]/4 text-zinc-500">Up and down move between visible rows. Right opens a branch, then moves into it; left closes one, or steps out to its parent. Home and End go to the ends. Type a part code to jump to it.</p>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-show="picked" x-cloak><span class="font-medium">Enter added</span> <span x-text="picked"></span></p>
+  </div>
+</div>` },
+{ id: 'selection', name: 'Boxes that cascade down and read back up', code: `<!-- Picking what goes on a material issue slip. The leaves are the answer —
+     they are the rows that post — and every box above them is a shortcut for
+     ticking them, with no name and no value of its own.
+
+     Each branch reads its LEAF descendants and not its direct children. Written
+     against the children it works perfectly at two levels and breaks silently
+     at three: the top box goes fully checked as soon as its two sub-assemblies
+     report checked, and stays checked when a part under one of them is
+     unticked, because the branch it is asking has by then gone indeterminate
+     rather than clear. The under map holds the flattened leaves for every
+     branch, so a grandparent and a parent are answering the same question
+     against the same list.
+
+     indeterminate is a property with no matching attribute, so it cannot be
+     rendered by the server and cannot be written as a class. x-effect on the
+     box itself writes it on every render — on the root instead, $refs is not
+     populated when the component initialises and the first paint is wrong.
+     checkbox/nested does the same thing one level down and this is that logic
+     with the depth taken off.
+
+     The row is not a <label>. The chevron is inside it, so labelling the whole
+     row means a click on the chevron ticks the box as well, and opening a
+     sub-assembly to look at it silently puts every part under it on the slip.
+     The label wraps the description only, tied to the box with for and id.
+
+     What a ticked branch means is these parts, now. It is not a standing rule
+     about the assembly, so a part added to SA-1140 next month does not quietly
+     join a slip somebody raised today. Where the intent really is everything
+     under here for ever, that is a value of its own with a name, not a parent
+     box read back off its leaves.
+
+     Ticking a branch does not open it. Selection and disclosure are two
+     different questions and one gesture may not answer both — but the count on
+     a shut branch has to move, or the user has no way of telling that anything
+     happened. -->
+<form data-kui="tree-view/selection" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+      x-data="{
+        open: { fg: true, shell: true, lid: false },
+        under: {
+          fg:    ['rm01', 'rm02', 'pt71', 'pt02', 'pt18', 'hw01'],
+          shell: ['rm01', 'rm02', 'pt71'],
+          lid:   ['pt02', 'pt18']
+        },
+        sel: ['rm01', 'rm02'],
+        every(k) { return this.under[k].every(v => this.sel.includes(v)) },
+        some(k) { return this.under[k].some(v => this.sel.includes(v)) && !this.every(k) },
+        set(k, on) { const rest = this.sel.filter(v => !this.under[k].includes(v)); this.sel = on ? [...rest, ...this.under[k]] : rest },
+        picked(k) { return this.under[k].filter(v => this.sel.includes(v)).length }
+      }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Issue material against WO-2026-0412</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="sel.length + ' of 6 parts'">2 of 6 parts</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-s-fg"
+                aria-label="Sub-assemblies of FG-2200 Water tank 1000 L"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <input type="checkbox" id="tv-s-all" class="ml-2 size-4 shrink-0 accent-zinc-700"
+               :checked="every('fg')" x-effect="$el.indeterminate = some('fg')" @change="set('fg', $event.target.checked)">
+        <label for="tv-s-all" class="ml-2.5 min-w-0 flex-1 truncate font-medium">FG-2200 — everything on this bill</label>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('fg') + ' of 6'">2 of 6</span>
+      </div>
+
+      <ul role="list" id="tv-s-fg" x-show="open.fg" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-s-shell"
+                    aria-label="Parts under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <input type="checkbox" id="tv-s-shell-box" class="ml-2 size-4 shrink-0 accent-zinc-700"
+                   :checked="every('shell')" x-effect="$el.indeterminate = some('shell')" @change="set('shell', $event.target.checked)">
+            <label for="tv-s-shell-box" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('shell') + ' of 3'">2 of 3</span>
+          </div>
+
+          <ul role="list" id="tv-s-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-rm01" name="part" value="rm01" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-rm01" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-rm02" name="part" value="rm02" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-rm02" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1.250 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt71" name="part" value="pt71" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt71" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-s-lid"
+                    aria-label="Parts under SA-1155 Lid and gasket assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <input type="checkbox" id="tv-s-lid-box" class="ml-2 size-4 shrink-0 accent-zinc-700"
+                   :checked="every('lid')" x-effect="$el.indeterminate = some('lid')" @change="set('lid', $event.target.checked)">
+            <label for="tv-s-lid-box" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('lid') + ' of 2'">0 of 2</span>
+          </div>
+          <ul role="list" id="tv-s-lid" x-show="open.lid" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt02" name="part" value="pt02" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt02" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt18" name="part" value="pt18" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt18" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <input type="checkbox" id="tv-s-hw01" name="part" value="hw01" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+            <label for="tv-s-hw01" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-600">The slip is raised for the ticked parts as they stand today, not for whatever the assembly holds later.</p>
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Raise issue slip
+    </button>
+  </div>
+</form>` },
+{ id: 'columns', name: 'A tree table with figures that roll up', code: `<!-- A costed bill of material: the hierarchy in the first column and quantity,
+     rate and amount in the rest. This is the shape to reach for when the
+     branches are not headings but records with figures of their own — an
+     accordion or a grouped table cannot do it, because both put the group name
+     on a row of its own shape rather than in the first cell of a row like every
+     other.
+
+     Rows are flat, because a table cannot nest: <tbody> inside <tbody> is not
+     markup. So the whole hierarchy is carried by the attributes —
+     role="treegrid" on the table, aria-level, aria-posinset, aria-setsize and
+     aria-expanded on each row — and by the indent spans in the first cell. Take
+     posinset from the rendered index rather than from the node's siblings and
+     the second child of a branch is announced as 4 of 9.
+
+     A branch's amount is summed from the records under it, recursively, from
+     the same array the child rows paint from. Summing the visible rows instead
+     is how a works order came to show one figure on the manager's screen and
+     another on the storekeeper's: collapse a branch and the total changed. The
+     roll-up survives the collapse precisely because it never looked at what was
+     on screen.
+
+     Rate is blank on a branch, not zero. A sub-assembly has no rate — it has
+     the cost of what is under it — and a 0.00 in a rate column is a number
+     somebody will eventually multiply by something.
+
+     Quantity here is per assembly. The 2 on SA-1155 means the tank takes two of
+     them, so the amounts under it are already multiplied by that 2 and the
+     quantities are not. Say which basis the columns are on in the header, or a
+     buyer reading the rate against the quantity gets a different answer to the
+     one in the amount column.
+
+     The panel scrolls sideways below the width four columns need, and carries
+     the three things that come with that: relative, so the sr-only cell heading
+     cannot escape the clip and widen the page; role="region" with tabindex and
+     a name, because Chromium will not give an overflow container keyboard focus
+     on its own; and a line of text saying so, because there is no gradient and
+     no arrow in this system.
+
+     One tab stop, a roving tabindex on the rows, and the arrow keys move
+     between rows rather than between cells. That is the whole contract only
+     because these cells are read-only figures — put a control in a cell and a
+     treegrid owes the user cell navigation too. -->
+<div data-kui="tree-view/columns" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       active: 'fg',
+       open: ['fg', 'shell', 'lid'],
+       nodes: [
+         { id: 'fg',    parent: null,    code: 'FG-2200', name: 'Water tank 1000 L',        qty: '1 no',      rate: null, amount: 0 },
+         { id: 'shell', parent: 'fg',    code: 'SA-1140', name: 'Tank shell assembly',      qty: '1 no',      rate: null, amount: 0 },
+         { id: 'rm01',  parent: 'shell', code: 'RM-3301', name: 'HDPE, blow moulding',      qty: '62.500 kg', rate: 138,  amount: 8625 },
+         { id: 'rm02',  parent: 'shell', code: 'RM-3312', name: 'Masterbatch, blue 2%',     qty: '1.250 kg',  rate: 420,  amount: 525 },
+         { id: 'pt71',  parent: 'shell', code: 'PT-4471', name: 'Outlet boss, brass',       qty: '1 no',      rate: 310,  amount: 310 },
+         { id: 'lid',   parent: 'fg',    code: 'SA-1155', name: 'Lid and gasket assembly',  qty: '2 nos',     rate: null, amount: 0 },
+         { id: 'pt02',  parent: 'lid',   code: 'PT-4402', name: 'Lid, moulded, 400 mm',     qty: '1 no',      rate: 640,  amount: 1280 },
+         { id: 'pt18',  parent: 'lid',   code: 'PT-4418', name: 'Gasket, EPDM 3 mm',        qty: '1 no',      rate: 95,   amount: 190 },
+         { id: 'hw01',  parent: 'fg',    code: 'HW-5501', name: 'Outlet nipple, GI, 1 in',  qty: '1 no',      rate: 210,  amount: 210 },
+         { id: 'pk20',  parent: 'fg',    code: 'PK-6620', name: 'Stretch film, 23 micron',  qty: '0.180 kg',  rate: 165,  amount: 30 }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       sibs(n) { return this.nodes.filter(x => x.parent === n.parent) },
+       pos(n) { return this.sibs(n).findIndex(x => x.id === n.id) + 1 },
+       isOpen(n) { return this.open.includes(n.id) },
+       shown(n) { let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent } return true },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       roll(n) { const k = this.kids(n.id); return k.length ? k.reduce((s, c) => s + this.roll(c), 0) : n.amount },
+       money(v) { return '₹' + v.toLocaleString('en-IN') },
+       go(id) { this.active = id; this.$nextTick(() => this.$root.querySelector('#tv-c-' + id).focus()) },
+       openIt(n) { if (!this.isOpen(n)) this.open = [...this.open, n.id] },
+       close(n) { this.open = this.open.filter(x => x !== n.id); if (!this.shown(this.by(this.active))) this.go(n.id) },
+       step(d) { const r = this.rows, i = r.findIndex(n => n.id === this.active), j = i + d; if (j >= 0 && j < r.length) this.go(r[j].id) },
+       right(n) { if (!this.kids(n.id).length) return; if (!this.isOpen(n)) { this.openIt(n) } else { this.go(this.kids(n.id)[0].id) } },
+       left(n) { if (this.kids(n.id).length && this.isOpen(n)) { this.close(n) } else if (n.parent) { this.go(n.parent) } }
+     }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Costed bill of material — FG-2200, rev 4</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="money(roll(by('fg'))) + ' per tank'">₹11,170 per tank</p>
+  </div>
+
+  <div role="region" tabindex="0" aria-label="Costed bill of material, scrolls sideways"
+       class="relative overflow-x-auto focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table role="treegrid" aria-label="Costed bill of material for FG-2200" class="w-full min-w-[560px] text-[13px]/5"
+           @keydown.down.prevent="step(1)"
+           @keydown.up.prevent="step(-1)"
+           @keydown.right.prevent="right(by(active))"
+           @keydown.left.prevent="left(by(active))"
+           @keydown.home.prevent="go(rows[0].id)"
+           @keydown.end.prevent="go(rows[rows.length - 1].id)">
+      <thead>
+        <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-3 py-2.5 font-medium">Component</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium whitespace-nowrap">Qty per assembly</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium">Rate</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="n in rows" :key="n.id">
+          <tr :id="'tv-c-' + n.id" :tabindex="active === n.id ? 0 : -1"
+              :aria-level="level(n)" :aria-setsize="sibs(n).length" :aria-posinset="pos(n)"
+              x-effect="kids(n.id).length ? $el.setAttribute('aria-expanded', isOpen(n)) : $el.removeAttribute('aria-expanded')"
+              @click="go(n.id)"
+              class="border-b border-zinc-100 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <td class="py-1.5 pr-3 pl-3">
+              <span class="flex min-h-6 items-center">
+                <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+                <span aria-hidden="true" @click.stop="kids(n.id).length && (isOpen(n) ? close(n) : openIt(n)); go(n.id)"
+                      class="flex size-6 shrink-0 items-center justify-center text-zinc-500">
+                  <template x-if="kids(n.id).length">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </template>
+                </span>
+                <span class="ml-2 min-w-0 truncate"><span class="font-medium tabular-nums" x-text="n.code"></span> <span class="text-zinc-600" x-text="n.name"></span></span>
+              </span>
+            </td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="n.qty"></td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="n.rate === null ? '—' : money(n.rate)"></td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap" :class="kids(n.id).length && 'font-medium'" x-text="money(roll(n))"></td>
+          </tr>
+        </template>
+      </tbody>
+      <tfoot>
+        <tr class="bg-zinc-50">
+          <th scope="row" colspan="3" class="px-3 py-2.5 text-left text-[12px]/4 font-medium">Material cost per tank</th>
+          <td class="px-3 py-2.5 text-right text-[13px]/5 font-medium tabular-nums whitespace-nowrap" x-text="money(roll(by('fg')))">₹11,170</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500">Four columns below 560px: the table scrolls sideways inside this panel. Up and down walk the rows, right and left open and close a sub-assembly.</p>
+</div>` },
+{ id: 'lazy', name: 'Children fetched the first time a branch opens', code: `<!-- A plant has forty racks and two thousand bins. The tree ships down to the
+     racks and every rack's bins are a query, so the page renders in one round
+     trip and the branches nobody opens cost nothing.
+
+     Alpine does not fetch. It owns open, busy and failed — the three flags the
+     row paints from — and htmx owns the request, the target and the swap. The
+     moment a component reaches for fetch() inside x-data both halves start
+     needing to know about the other.
+
+     hx-trigger="intersect once" on the body inside the branch, not click on the
+     chevron. A display:none element never intersects, so the request goes out
+     the first time the branch is genuinely on screen: nothing is fetched for a
+     rack nobody opens, and the eleventh open of the same rack is not the
+     eleventh request. On the chevron instead it fires while the branch is still
+     shut whenever the open set is restored from a URL or a preference.
+
+     The spinner takes the chevron's place rather than sitting beside it. Added
+     to the row it pushes the code 20px right and back again when it lands,
+     which is a row moving under a pointer that is about to click it.
+
+     The chevron exists because the server sent a child count with the rack. A
+     chevron drawn on every row because the client does not know yet is a
+     control that opens onto nothing, and an empty 200 leaves it spinning and
+     then blank, which reads as a failure rather than as an answer. Rack A12 is
+     the answer: six bins, all of them empty, and the endpoint says so in a row
+     rather than returning nothing.
+
+     A failure leaves a retry inside the branch, and the retry carries its own
+     hx-get, because intersect once has already spent the body's one request.
+     htmx does not swap on a non-2xx, so the placeholder is still underneath and
+     has to be taken off screen — x-show="!failed" on the same element, rather
+     than a second wrapper, so there is one thing to hide and one thing to put
+     back when the retry lands. -->
+<div data-kui="tree-view/lazy" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">ST-A Store A — raw material</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 racks</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li x-data="{ open: false, busy: false, failed: false }"
+        @htmx:before-request="busy = true" @htmx:after-request="busy = false"
+        @htmx:response-error="failed = true" @htmx:send-error="failed = true">
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r11"
+                aria-label="Bins on RK-A11 Rack A11"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-show="!busy" class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin motion-reduce:animate-none"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">8 bins</span>
+      </div>
+
+      <ul role="list" id="tv-l-r11" x-show="open" x-cloak x-collapse.duration.200ms>
+        <li id="tv-l-r11-body" x-show="!failed"
+            hx-get="/stores/racks/RK-A11/bins/" hx-trigger="intersect once" hx-swap="outerHTML">
+          <div aria-hidden="true" class="animate-pulse motion-reduce:animate-none">
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+          </div>
+          <p role="status" class="sr-only">Loading the bins on rack A11.</p>
+        </li>
+
+        <li x-show="failed" x-cloak>
+          <div class="flex flex-wrap items-center gap-3 py-2 pr-3 pl-[60px]">
+            <p class="flex min-w-0 flex-1 items-start gap-2 text-[13px]/5 text-zinc-600">
+              <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+              The bins on this rack could not be loaded.
+            </p>
+            <button type="button" @click="failed = false"
+                    hx-get="/stores/racks/RK-A11/bins/" hx-target="#tv-l-r11-body" hx-swap="outerHTML"
+                    class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Try again
+            </button>
+          </div>
+        </li>
+      </ul>
+    </li>
+
+    <li x-data="{ open: true }">
+      <!-- already answered: six bins, none of them holding anything. The branch
+           says so in a row of its own rather than opening onto a gap. -->
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r12"
+                aria-label="Bins on RK-A12 Rack A12"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">6 bins</span>
+      </div>
+      <ul role="list" id="tv-l-r12" x-show="open" x-collapse.duration.200ms>
+        <li>
+          <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">All six bins on this rack are empty. Last issue was GRN-3288 on 04 Aug 2026.</p>
+        </li>
+      </ul>
+    </li>
+
+    <li x-data="{ open: false, busy: false, failed: false }"
+        @htmx:before-request="busy = true" @htmx:after-request="busy = false"
+        @htmx:response-error="failed = true" @htmx:send-error="failed = true">
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r13"
+                aria-label="Bins on RK-A13 Rack A13"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-show="!busy" class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin motion-reduce:animate-none"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A13</span> <span class="text-zinc-600">Rack A13 — additives and pigment</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">4 bins</span>
+      </div>
+      <ul role="list" id="tv-l-r13" x-show="open" x-cloak x-collapse.duration.200ms>
+        <li id="tv-l-r13-body" x-show="!failed"
+            hx-get="/stores/racks/RK-A13/bins/" hx-trigger="intersect once" hx-swap="outerHTML">
+          <div aria-hidden="true" class="animate-pulse motion-reduce:animate-none">
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+          </div>
+          <p role="status" class="sr-only">Loading the bins on rack A13.</p>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>` },
+{ id: 'search', name: 'Filtering without losing the hierarchy', code: `<!-- Somebody is looking for one part in a bill of two hundred lines and does
+     not know which sub-assembly it is under. A flat result list would answer
+     that and throw away the one thing the tree was for — where the part sits —
+     so a hit keeps its ancestors on screen and the path is the answer.
+
+     Those ancestors are scaffolding rather than results. They are drawn at
+     zinc-500 and carry no mark, they are not counted, and the count that is
+     quoted is the count of MARKED rows: a tree that counted the rows it drew
+     reported eleven matches for a query that hit four parts, and the buyer went
+     looking for the other seven. The children of a hit are not results either
+     and are not drawn — the branch keeps its chevron so they can be asked for.
+
+     The filter does not write into the open set. That was the defect: typing a
+     query opened nine branches, clearing it left all nine open, and the shape
+     the user had spent a minute collapsing was gone. While a query is in force
+     the open set is ignored entirely and visibility comes from the matches;
+     clear the query and their own set is still there, untouched.
+
+     Which is why a branch's chevron stops being a button while filtering. It
+     would be a control writing into a value nothing is reading — a click that
+     does nothing, which is worse than a control that is not there. It becomes a
+     plain rotated chevron, aria-hidden, and comes back as a button the moment
+     the field is empty.
+
+     The mark is a real <mark> between two spans, not a string built in
+     JavaScript and handed to x-html. Building it by hand means escaping the
+     value before the tag goes in, and a description carrying an angle bracket —
+     "Gasket <3 mm" — becomes markup the day somebody types one. Three spans and
+     a slice cannot have that bug. It takes the tint and its ring like every
+     other tinted shape, because it is a shape and not a status.
+
+     The rows are flat here because the filter decides what is visible, so there
+     is no group element for a chevron to name: the button carries aria-expanded
+     and no aria-controls at all. An aria-controls pointing at an id that is not
+     in the document is worse than none, because it measures as wired and
+     announces a button that expands nothing.
+
+     A query that matches nothing gets a row saying so rather than an empty
+     panel with a header on it. -->
+<div data-kui="tree-view/search"
+     x-data="{
+       q: 'gasket',
+       open: ['fg', 'shell'],
+       nodes: [
+         { id: 'fg',    parent: null,    label: 'FG-2200 Water tank 1000 L',       qty: '1 no' },
+         { id: 'shell', parent: 'fg',    label: 'SA-1140 Tank shell assembly',     qty: '1 no' },
+         { id: 'rm01',  parent: 'shell', label: 'RM-3301 HDPE, blow moulding',     qty: '62.500 kg' },
+         { id: 'rm02',  parent: 'shell', label: 'RM-3312 Masterbatch, blue 2%',    qty: '1.250 kg' },
+         { id: 'lid',   parent: 'fg',    label: 'SA-1155 Lid and gasket assembly', qty: '2 nos' },
+         { id: 'pt02',  parent: 'lid',   label: 'PT-4402 Lid, moulded, 400 mm',    qty: '1 no' },
+         { id: 'pt18',  parent: 'lid',   label: 'PT-4418 Gasket, EPDM 3 mm',       qty: '1 no' },
+         { id: 'hw01',  parent: 'fg',    label: 'HW-5501 Outlet nipple, GI, 1 in', qty: '1 no' },
+         { id: 'pk20',  parent: 'fg',    label: 'PK-6620 Stretch film, 23 micron', qty: '0.180 kg' }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       term() { return this.q.trim().toLowerCase() },
+       at(n) { return this.term() ? n.label.toLowerCase().indexOf(this.term()) : -1 },
+       hit(n) { return this.at(n) > -1 },
+       pre(n) { const i = this.at(n); return i < 0 ? n.label : n.label.slice(0, i) },
+       mid(n) { const i = this.at(n); return i < 0 ? '' : n.label.slice(i, i + this.term().length) },
+       post(n) { const i = this.at(n); return i < 0 ? '' : n.label.slice(i + this.term().length) },
+       deep(n) { return this.hit(n) || this.kids(n.id).some(k => this.deep(k)) },
+       isOpen(n) { return this.open.includes(n.id) },
+       toggle(n) { this.open = this.isOpen(n) ? this.open.filter(x => x !== n.id) : [...this.open, n.id] },
+       shown(n) {
+         if (this.term()) return this.deep(n);
+         let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent }
+         return true;
+       },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       get hits() { return this.nodes.filter(n => this.hit(n)).length }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pb-2">
+    <label for="tv-f-q" class="sr-only">Search the bill of material</label>
+    <div class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="size-4 shrink-0 text-zinc-500"></i>
+      <input id="tv-f-q" type="search" x-model="q" placeholder="Part code or description"
+             class="min-w-0 flex-1 bg-transparent text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-show="term()"
+       x-text="hits + (hits === 1 ? ' part matches' : ' parts match') + ' — shown with the assemblies they sit under'">1 part matches</p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <ul role="list" class="py-1">
+      <template x-for="n in rows" :key="n.id">
+        <li class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+
+          <template x-if="!term() && kids(n.id).length">
+            <button type="button" @click="toggle(n)" :aria-expanded="isOpen(n)"
+                    :aria-label="'Parts under ' + n.label"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+          </template>
+          <template x-if="term() && kids(n.id).length">
+            <span aria-hidden="true" class="flex size-6 shrink-0 rotate-90 items-center justify-center text-zinc-400"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </template>
+          <template x-if="!kids(n.id).length">
+            <span aria-hidden="true" class="size-6 shrink-0"></span>
+          </template>
+
+          <span class="ml-2 min-w-0 flex-1 truncate tabular-nums" :class="term() && !hit(n) && 'text-zinc-500'"><span x-text="pre(n)"></span><mark x-show="hit(n)" class="rounded-sm bg-zinc-200 px-0.5 text-zinc-900 ring-1 ring-inset ring-zinc-300" x-text="mid(n)"></mark><span x-text="post(n)"></span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600" :class="term() && !hit(n) && 'text-zinc-500'" x-text="n.qty"></span>
+        </li>
+      </template>
+
+      <li x-show="term() && hits === 0" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing in this bill matches “<span x-text="q.trim()"></span>”</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">The search covers this bill only. A part used on another assembly is found from the item master.</p>
+      </li>
+    </ul>
+  </div>
+</div>` },
+{ id: 'actions', name: 'A menu on the row', code: `<!-- Every row is a record, so every row has things you can do to it: open the
+     part, see where else it is used, look at its stock by bin, take it off this
+     assembly. Eleven visible triggers would be eleven pieces of furniture in a
+     column whose job is to be scanned, so the trigger is revealed on hover —
+     and is there at all times for anybody not using a pointer.
+
+     Hidden with opacity, never with display or visibility. Both of those take
+     the button out of the tab order entirely, so the keyboard user has no route
+     to the row menu at all and nothing on screen says a menu exists. opacity-0
+     keeps it focusable, and the focus-visible variant brings it back into view
+     the moment it takes focus.
+
+     The visible state is driven by attribute variants and not by a class
+     binding: group-hover for the pointer, focus-visible for the keyboard, and
+     aria-expanded for the open menu, which is an attribute the button already
+     has to carry. A bound :class alongside a static opacity-0 is the shape rule
+     6 warns about — Alpine removes only what it added, so the static class
+     survives every state change and the two fight in the cascade.
+
+     The panel is NOT overflow-hidden. A menu opening from the last row is
+     clipped at the card edge by a panel that clips, and the fix people reach
+     for — moving the menu into a portal — takes it out of the row it belongs
+     to. What keeps the tinted hover off the rounded corners instead is the
+     header band above the rows and the footer band below them, so no row ever
+     touches a corner.
+
+     The menu is anchored to the row, so the row carries relative and the menu
+     carries z-10. Anchored to the card it would need the row's offset measured
+     by hand, and a tree re-renders its rows every time a branch opens.
+
+     Destructive last, under a divider, and it says what it removes. "Remove"
+     over a tree is ambiguous by construction: the row could be a part or a
+     whole sub-assembly with nine parts under it, and the menu is the last place
+     that difference can be stated before it happens. -->
+<div data-kui="tree-view/actions" class="rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { shell: true } }">
+  <div class="flex items-baseline justify-between gap-3 rounded-t-xl border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">SA-1140 Tank shell assembly</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 components</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li x-data="{ menu: false }">
+      <div class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100">
+      <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-a-shell"
+              aria-label="Parts under SA-1140 Tank shell assembly"
+              class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+      </button>
+      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+      <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+              aria-label="Actions for SA-1140 Tank shell assembly"
+              class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+        <i data-lucide="ellipsis" class="size-4"></i>
+      </button>
+      <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+           class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-500"></i>Open the sub-assembly
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 4 bills
+        </button>
+        <div class="my-1 border-t border-zinc-100"></div>
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove SA-1140 and its 3 parts
+        </button>
+      </div>
+      </div>
+
+      <ul role="list" id="tv-a-shell" x-show="open.shell" x-collapse.duration.200ms>
+        <li class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100" x-data="{ menu: false }">
+          <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+          <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+                  aria-label="Actions for RM-3301 HDPE, blow moulding grade"
+                  class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+            <i data-lucide="ellipsis" class="size-4"></i>
+          </button>
+          <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+               class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package" class="size-4 shrink-0 text-zinc-500"></i>Stock by bin — 4 bins
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 11 bills
+            </button>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove RM-3301 from this assembly
+            </button>
+          </div>
+        </li>
+
+        <li class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100" x-data="{ menu: false }">
+          <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+                  aria-label="Actions for PT-4471 Outlet boss, brass"
+                  class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+            <i data-lucide="ellipsis" class="size-4"></i>
+          </button>
+          <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+               class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package" class="size-4 shrink-0 text-zinc-500"></i>Stock by bin — 1 bin
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 2 bills
+            </button>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove PT-4471 from this assembly
+            </button>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p class="rounded-b-xl border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-500">Tab reaches every row menu whether or not the pointer is anywhere near it.</p>
+</div>` },
+{ id: 'status', name: 'A state on the row, and on the branch above it', code: `<!-- A works order and the material against it. Every row is doing something, so
+     every row carries a state, and the whole reason to look at this screen is
+     to find the two that are not moving.
+
+     A shut branch carries the worst state under it, with a count. Without it a
+     line short-received four levels down is invisible on a screen that fits:
+     the storekeeper collapses the last branch at the end of the shift and the
+     order reads as clear. Red beats amber beats everything else, and the count
+     is what makes the dot honest — one red dot meaning eleven blocked lines and
+     one meaning a single line are different mornings.
+
+     One dot per row and the word beside it stays graphite. A column of tinted
+     pills in a tree is a traffic light with an indent, and by the eighth row it
+     has stopped meaning anything; the dot is the only colour on the row and the
+     eye finds it down the column without reading a word. That is the pill rule
+     applied to a row that has no room for a pill.
+
+     The dot is aria-hidden and the state is the word. A screen reader gets
+     "Short received" and a count; a 6px background circle announces nothing at
+     all, so a tree that put the state only in the colour has no state in it for
+     half its users.
+
+     Short received and Blocked both take red — the alarm meanings — and
+     Awaiting QC takes amber, because somebody has to act before it can move.
+     The dots come from the fixed table and never from a per-screen reading of
+     what feels urgent.
+
+     The figure that explains a red row goes on the row. "1.250 kg of 3.000 kg"
+     is the whole story of a short receipt, and putting it behind a link is
+     asking somebody to open eleven rows to find the one that is wrong. -->
+<div data-kui="tree-view/status" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { wo: true, shell: true, lid: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">WO-2026-0412 — Water tank 1000 L × 40</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Due 28 Aug 2026</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.wo = !open.wo" :aria-expanded="open.wo" aria-controls="tv-t-wo"
+                aria-label="Material against WO-2026-0412"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.wo && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2200</span> <span class="text-zinc-600">Water tank 1000 L</span></span>
+        <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>In progress</span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+      </div>
+
+      <ul role="list" id="tv-t-wo" x-show="open.wo" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-t-shell"
+                    aria-label="Material under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>Issuing</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+          </div>
+
+          <ul role="list" id="tv-t-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received in full</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2,500.000 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Short received</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">28.000 of 50.000 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Awaiting QC</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <!-- shut, and carrying the worst state of the two rows underneath it -->
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-t-lid"
+                    aria-label="Material under SA-1155 Lid and gasket assembly, 2 lines blocked"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-zinc-900"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>2 blocked</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">80 nos</span>
+          </div>
+          <ul role="list" id="tv-t-lid" x-show="open.lid" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Blocked — mould under repair</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Blocked — failed inspection</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received in full</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>` },
+{ id: 'empty', name: 'Nothing to draw, and branches with nothing under them', code: `<!-- Three different nothings, and the whole job here is saying which one it is.
+
+     A tree with no root at all is a record that has never been built: this item
+     has no bill of material yet. It takes the empty-state shape — a well, a
+     line saying what is missing, and the action that fixes it — and it does not
+     draw a header row over an empty panel, because a header with nothing under
+     it reads as a tree that failed to load.
+
+     A branch with nothing under it is a different fact and belongs on a row,
+     indented where its children would have been. The row is the answer, not a
+     gap: an empty branch that renders nothing leaves a chevron that opens onto
+     four pixels of white and reads as broken every time, and the user clicks it
+     twice to make sure.
+
+     And a node with no children at all is not an empty branch. A bought-out
+     part has no explosion and never will, so it has no chevron — only the empty
+     size-6 box that keeps its description in the same column as its siblings'.
+     Giving it a disabled chevron instead says the branch exists and is refused,
+     which is a third thing again and not true here.
+
+     The difference between the last two comes from the server. A child count of
+     zero on a row that CAN have children draws the branch and its one line; no
+     child capability at all draws the spacer. The client cannot tell them
+     apart, and a tree that guesses gets it wrong on exactly the rows somebody
+     is querying. -->
+<div data-kui="tree-view/empty" class="space-y-4">
+  <div class="rounded-xl border border-zinc-300 bg-white px-6 py-10 text-center">
+    <span aria-hidden="true" class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="git-branch" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[14px]/5 font-medium">FG-2260 has no bill of material</h3>
+    <p class="mx-auto mt-1 max-w-md text-[13px]/5 text-zinc-600">Nothing can be planned or costed for this item until one exists. Copy the bill from a similar tank, or build it a line at a time.</p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Build a bill of material
+      </button>
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Copy from FG-2200
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5" x-data="{ open: { fg: true, kit: true } }">
+    <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+      <h3 class="min-w-0 truncate text-[13px]/5 font-medium">FG-2205 Water tank 500 L — rev 1</h3>
+      <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 lines</p>
+    </div>
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-e-fg"
+                  aria-label="Components of FG-2205 Water tank 500 L"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2205</span> <span class="text-zinc-600">Water tank 500 L</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+        </div>
+
+        <ul role="list" id="tv-e-fg" x-show="open.fg" x-collapse.duration.200ms>
+          <li>
+            <!-- a branch the item master says CAN hold components, holding none -->
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="open.kit = !open.kit" :aria-expanded="open.kit" aria-controls="tv-e-kit"
+                      aria-label="Components of SA-1170 Fitting kit, none defined"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="open.kit && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1170</span> <span class="text-zinc-600">Fitting kit</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+            </div>
+            <ul role="list" id="tv-e-kit" x-show="open.kit" x-collapse.duration.200ms>
+              <li>
+                <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">This sub-assembly has no components on it yet, so nothing under it is planned or costed.</p>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <!-- a bought-out part: no children, no chevron, only the spacer -->
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in — bought out</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>` },
+{ id: 'phone', name: 'At 390px', code: `<!-- The storekeeper walks the racks with this in one hand, so the tree is drawn
+     at 390px rather than shrunk into it.
+
+     The indent step drops from 24px to 16px. Four levels at 24px spends 72px
+     plus a 32px chevron before the first character of a bin code, out of a
+     content column that is 340px wide — the description then wraps every other
+     word and the tree reads as a column of fragments. At 16px the same four
+     levels cost 48px. Below that the levels stop being distinguishable, so 16px
+     is the floor and a fifth level on a phone is a screen that needs a
+     different answer: a breadcrumb into one rack rather than the whole plant.
+
+     Nothing scrolls sideways. The description truncates and the code does not,
+     because a truncated bin code is not a bin code — the description can be
+     guessed from context and A11-0… cannot.
+
+     The figures move under the label instead of sitting beside it. Kept on the
+     right they compete with the description for the same 200px and both lose;
+     under it they get the full width of the text column and stay in one line.
+
+     The chevron is a 32 by 44 target, not a 24px square. A 24px control between
+     two 24px controls is two mistaps a shift with a glove on, and the row
+     around it is deliberately not the target — the row will carry a link to the
+     bin, and a tree whose rows both navigate and expand does neither reliably
+     under a thumb.
+
+     The row is min-h-11 and grows to two lines rather than changing height
+     between open and shut. A row that gets taller when it opens moves the row
+     under it out from under the thumb that is about to tap it. -->
+<div data-kui="tree-view/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 p-3 text-zinc-900"
+     x-data="{ open: { vas: true, sta: true, r11: true } }">
+  <div class="mb-2">
+    <h2 class="text-[16px]/6 font-semibold">Stock by location</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Vasai plant · counted 21 Aug 2026</p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="open.vas = !open.vas" :aria-expanded="open.vas" aria-controls="tv-p-vas"
+                  aria-label="Stores in Vasai plant"
+                  class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open.vas && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-1.5 min-w-0 flex-1 py-2">
+            <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">PLT-VAS</span> Vasai plant</span>
+            <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">2 stores · ₹4,18,60,400</span>
+          </span>
+        </div>
+
+        <ul role="list" id="tv-p-vas" x-show="open.vas" x-collapse.duration.200ms>
+          <li>
+            <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-4 shrink-0"></span>
+              <button type="button" @click="open.sta = !open.sta" :aria-expanded="open.sta" aria-controls="tv-p-sta"
+                      aria-label="Racks in Store A, raw material"
+                      class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="open.sta && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-1.5 min-w-0 flex-1 py-2">
+                <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">ST-A</span> Store A — raw material</span>
+                <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">4 racks · ₹3,02,18,900</span>
+              </span>
+            </div>
+
+            <ul role="list" id="tv-p-sta" x-show="open.sta" x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span>
+                  <button type="button" @click="open.r11 = !open.r11" :aria-expanded="open.r11" aria-controls="tv-p-r11"
+                          aria-label="Bins on rack A11"
+                          class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="open.r11 && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-1.5 min-w-0 flex-1 py-2">
+                    <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">RK-A11</span> Rack A11 — granule</span>
+                    <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">8 bins · ₹1,88,40,000</span>
+                  </span>
+                </div>
+
+                <ul role="list" id="tv-p-r11" x-show="open.r11" x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-8 shrink-0"></span>
+                      <span class="ml-1.5 min-w-0 flex-1 py-2">
+                        <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">A11-01</span> HDPE M60075, natural</span>
+                        <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">42 bags · 1,050.000 kg · ₹1,05,00,000</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-8 shrink-0"></span>
+                      <span class="ml-1.5 min-w-0 flex-1 py-2">
+                        <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">A11-02</span> LLDPE film grade, natural</span>
+                        <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">33 bags · 825.000 kg · ₹83,40,000</span>
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Four levels at a 16px step. A fifth is a rack screen of its own, reached from a breadcrumb.</p>
+</div>` },
+{ id: 'htmx', name: 'The open set on the server, in the URL', code: `<!-- No Alpine at all. The shape of the tree is a query parameter, the server
+     renders exactly the rows that are visible, and every toggle is a real link
+     to the tree in its next state.
+
+     Which buys the two things a client-held open set cannot have. The URL is
+     the view, so a buyer can send "the tree open down to rack A11" to a
+     storekeeper in a message; and a reload, a back button and a restored
+     session all land on the tree the user left rather than on the default one.
+     For a plant tree that is walked over an hour, that is the whole difference.
+
+     Every toggle is an <a> with a real href before it is anything to htmx.
+     Middle-click, copy link, and open in a new tab all keep working, and the
+     screen still functions with JavaScript switched off — the same request
+     without hx- attributes just returns the whole page.
+
+     No rotation binding, because there is nothing on the client to animate. The
+     server already knows which way each chevron points and renders
+     chevron-down or chevron-right; the transform in the other variants exists
+     to move a chevron in response to a change the browser made, and here the
+     browser makes none.
+
+     Every toggle carries a stable id minted from the location code. htmx
+     restores focus after a swap by looking the previously focused element up by
+     id, so a toggle rendered without one drops the keyboard to the top of the
+     document on every single expand — which makes the tree unusable from a
+     keyboard while looking perfectly fine with a mouse. tv-h-RK-A11 comes from
+     the record, not from a counter, so it is the same id before and after the
+     swap.
+
+     hx-swap="outerHTML" on the whole tree rather than a per-branch swap. A
+     branch swap has to know where the rows go and what the parent's roll-up now
+     says; the tree is one view of one query and re-rendering it whole is both
+     the simplest and the only one that cannot show a stale subtotal.
+
+     aria-expanded on a link is correct here: it describes the state of the
+     thing the control operates, and the control happens to be a navigation. The
+     group it names is in the response, so aria-controls resolves after the
+     swap as well as before it. -->
+<div data-kui="tree-view/htmx" id="tv-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Storage locations — Vasai plant</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">2 of 7 branches open</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <a id="tv-h-PLT-VAS" href="?open=" hx-get="/stores/tree/?open=" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+           aria-expanded="true" aria-controls="tv-h-g-PLT-VAS" aria-label="Collapse PLT-VAS Vasai plant"
+           class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-down" class="size-4"></i>
+        </a>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PLT-VAS</span> <span class="text-zinc-600">Vasai plant</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹4,18,60,400</span>
+      </div>
+
+      <ul role="list" id="tv-h-g-PLT-VAS">
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <a id="tv-h-ST-A" href="?open=PLT-VAS" hx-get="/stores/tree/?open=PLT-VAS" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+               aria-expanded="true" aria-controls="tv-h-g-ST-A" aria-label="Collapse ST-A Store A"
+               class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-down" class="size-4"></i>
+            </a>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-A</span> <span class="text-zinc-600">Store A — raw material</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹3,02,18,900</span>
+          </div>
+
+          <ul role="list" id="tv-h-g-ST-A">
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <a id="tv-h-RK-A11" href="?open=PLT-VAS,ST-A,RK-A11" hx-get="/stores/tree/?open=PLT-VAS,ST-A,RK-A11" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+                   aria-expanded="false" aria-label="Expand RK-A11 Rack A11"
+                   class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="chevron-right" class="size-4"></i>
+                </a>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,88,40,000</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <a id="tv-h-RK-A12" href="?open=PLT-VAS,ST-A,RK-A12" hx-get="/stores/tree/?open=PLT-VAS,ST-A,RK-A12" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+                   aria-expanded="false" aria-label="Expand RK-A12 Rack A12"
+                   class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="chevron-right" class="size-4"></i>
+                </a>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,13,78,900</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <a id="tv-h-ST-B" href="?open=PLT-VAS,ST-B" hx-get="/stores/tree/?open=PLT-VAS,ST-B" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+               aria-expanded="false" aria-label="Expand ST-B Store B"
+               class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-right" class="size-4"></i>
+            </a>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-B</span> <span class="text-zinc-600">Store B — packing</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p class="border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-500">The address bar holds the shape of this tree, so it can be sent to somebody else and it survives a reload.</p>
+</div>` },
+{ id: 'django', name: 'Server-rendered, one partial that includes itself', code: `{% comment %} templates/bom/_node.html — one file. It renders one node, then
+   includes itself for every child, and at depth zero it also draws the card
+   around the whole thing.
+
+   One file rather than a wrapper plus a partial, because a template is compiled
+   per file: split them and the money library has to be loaded in both, and the
+   failure of forgetting it is a TemplateSyntaxError raised only on the
+   recursive file, which nothing sees until a bill is deep enough to render one.
+
+   Six things the server settles that the browser cannot.
+
+   1. The recursion. A tree of unknown depth is a partial that includes itself,
+      which Django supports because it resolves the template by name on every
+      pass — there is no compile-time cycle for it to object to. That is also
+      the danger, and it is why point 2 exists.
+
+   2. The depth guard. A part that appears inside its own bill — an assembly
+      reused as a component of itself, which is a data entry mistake and not an
+      impossible one — recurses until Python's recursion limit or the request
+      timeout ends it, and what the user gets is a 500 with nothing in it that
+      names the part. The guard caps the render and prints a row saying the tree
+      was cut off, so somebody can see the defect. It is the last line of
+      defence and not the fix: the fix is a cycle check where the bill is saved.
+
+   3. The context. The include takes the "only" keyword, so each node renders
+      against the four values it needs rather than against the whole page
+      context. Without it every one of four hundred nodes re-pushes the request,
+      the user, the messages and whatever else the view left lying about.
+
+   4. The indent. A Django template has no range, so the run of spacer spans
+      loops over a string of depth spaces built with the ljust filter. Passing a
+      range down from the view instead puts the view in charge of how far the
+      markup indents, and the two then have to be changed together for ever.
+
+   5. The ids. Minted from the bill's primary key and the node's code, never
+      from a loop counter. Two bills on one comparison screen both have a node
+      called SA-1140, and a counter-derived id has the second tree's chevron
+      opening a branch in the first.
+
+   6. Which branches start open. It comes down as a list of codes, so a reload
+      lands on the tree the user left. x-cloak goes only on the branches that
+      start closed — on one that starts open it holds the branch hidden until
+      Alpine boots, which is the exact flash x-cloak exists to prevent. And
+      aria-expanded is written twice on purpose, once as a literal matching the
+      seed and once bound: a bound attribute does not exist until Alpine boots,
+      so the literal is what a reader hitting the page mid-load is given.
+
+   views.py
+       def bom_tree(request, pk):
+           bom = get_object_or_404(Bill, pk=pk)
+           return render(request, "bom/_node.html", {
+               "node": bom.root,
+               "depth": 0,
+               "bom": bom,
+               "open_ids": request.GET.get("open", "").split(","),
+           })
+{% endcomment %}
+
+{% load money %}
+{% if depth == 0 %}
+  <div data-kui="tree-view/django" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+      <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Bill of material — {{ bom.item.code }} {{ bom.item.name }}</h3>
+      <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Rev {{ bom.revision }} · {{ bom.line_count }} line{{ bom.line_count|pluralize }} · {{ bom.total_cost|rupees }}</p>
+    </div>
+    <ul role="list" class="py-1">
+{% endif %}
+
+  <li x-data="{ open: {% if node.code in open_ids %}true{% else %}false{% endif %} }">
+    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+      {% for _ in ""|ljust:depth %}<span aria-hidden="true" class="w-6 shrink-0"></span>{% endfor %}
+
+      {% if node.children_count %}
+        <button type="button" @click="open = !open"
+                aria-expanded="{% if node.code in open_ids %}true{% else %}false{% endif %}" :aria-expanded="open"
+                aria-controls="tv-dj-{{ bom.pk }}-{{ node.code }}"
+                aria-label="Components under {{ node.code }} {{ node.name }}"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+      {% else %}
+        <span aria-hidden="true" class="size-6 shrink-0"></span>
+      {% endif %}
+
+      <span class="ml-2 min-w-0 flex-1 truncate">
+        <span class="font-medium tabular-nums">{{ node.code }}</span> <span class="text-zinc-600">{{ node.name }}</span>
+      </span>
+      {% if node.status %}
+        <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full {{ node.status_dot }}"></span>{{ node.get_status_display }}
+        </span>
+      {% endif %}
+      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">{{ node.qty }} {{ node.uom }}</span>
+      <span class="ml-3 hidden shrink-0 tabular-nums sm:inline">{{ node.rolled_cost|rupees }}</span>
+    </div>
+
+    {% if node.children_count %}
+      <ul role="list" id="tv-dj-{{ bom.pk }}-{{ node.code }}"
+          x-show="open" {% if node.code not in open_ids %}x-cloak{% endif %} x-collapse.duration.200ms>
+        {% if depth < 6 %}
+          {% for child in node.children %}
+            {% include "bom/_node.html" with node=child depth=depth|add:1 bom=bom open_ids=open_ids only %}
+          {% empty %}
+            <li>
+              <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">Nothing is defined under {{ node.code }} yet, so nothing under it is planned or costed.</p>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>
+            <p class="flex min-h-9 items-center gap-2 py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-600">
+              <i data-lucide="alert-triangle" class="size-4 shrink-0 text-amber-700"></i>
+              This bill is nested more than six levels deep under {{ node.code }} and has been cut off here. A bill that reaches this row usually contains itself — check the components on {{ node.code }}.
+            </p>
+          </li>
+        {% endif %}
+      </ul>
+    {% endif %}
+  </li>
+
+{% if depth == 0 %}
+    </ul>
+  </div>
+{% endif %}` },
+
+  ]
+}
 );

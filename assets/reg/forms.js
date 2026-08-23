@@ -15649,5 +15649,2237 @@ Gujarat Polymers Ltd</textarea>
 </form>` }
     ]
   },
+{
+  id: 'filter-builder', name: 'Filter builder', category: 'forms',
+  description: 'Conditions composed into a query over a register — one row carrying a field, an operator and a value, added and removed until the list on screen is the list somebody asked for. The control a buyer uses to ask for open orders over ₹2,00,000, from three vendors, due before the end of the month.',
+  when: 'Only where the set of questions is open. The line against data-table/filters is the one that matters and it is not a matter of taste: that entry is a fixed strip of three selects — status, vendor, plant — and the register knows all three at build time, so the user picks values and never picks a field. Two or three fixed filters must NOT become a builder. A strip of selects is one gesture per filter and it reads at rest, because the control says what it is filtering on even when nothing is set; a builder is three gestures per condition and reads as an empty form until somebody fills it in. Reach for this entry at the point where the strip stops working — where the register has fifteen filterable fields and no six of them are the right six for everybody, where the same field has to be asked twice in one query (raised after 1 April AND before 30 June), where the operator is the question rather than the value (is over, is between, is blank), or where a query is worth saving and sending to somebody else. Below that, the strip wins every time. The line against search-page is different again: that page searches every register at once and does not know which one holds the answer, so its narrowing controls are facets — a fixed list of values with a count on each, ticked off. This builds a predicate against one register whose columns are known, so it names fields and operators and has no counts to offer until it is run. A facet is a value you tick; a condition is a sentence you write. And once the query is composed, the thing on screen most of the time is not this component at all but its chips variant — the applied set summarised over the register, with the builder itself behind a trigger.',
+  notes: [
+    'The strip this replaces was three selects, and the first version of this component was shipped as a straight upgrade of it: same screen, same place, builder always open above the register. Every buyer hated it and the reason took a week to find. A select says what it filters on at rest — "All vendors" is a sentence about the register even when nothing is chosen — and an empty condition row says nothing at all, so a register that had been legible from the toolbar down became a register with an empty form on top of it. The builder belongs behind a trigger with the applied set drawn as chips, which is why chips is the variant most screens should take and default is the one they open into.',
+    'Changing the field discards the value, and it has to. The row Order value is over 200000 asked for Delivery date leaves a 200000 in the value cell, and the register that came back was every order due after the year 200000 — which is to say all of them, silently. Discarding looks destructive in review and is the only safe answer: the value belonged to a field that is no longer in the row, and there is no reading of it that survives the change. The operator survives only where the new field has an operator by that name, and it is reset to the first one on the list where it does not.',
+    'Changing the operator discards the value only when the shape of the value changes. is over to is under keeps ₹2,00,000, because one number is still one number; is over to is between keeps the first box and empties the second, because a floor with no ceiling is a half-written condition and not a wrong one; anything to is blank drops both, because the operator now takes no value at all. Discarding on every operator change was the first implementation and it made the commonest edit in the component — flipping a comparison the wrong way round — cost the user the figure they had just typed.',
+    'An operator that takes no value must not leave a disabled input in the row. A greyed box beside "is blank" reads as a value the user is not allowed to set rather than a value the condition does not have, and three people asked in a fortnight what to type in it. The cell becomes grey text saying the operator needs nothing, which is the same width, holds the column, and is not a tab stop.',
+    'Nesting stops at one level and the limit is in the markup, not in a warning. Two levels — conditions inside groups, groups joined to each other — covers every real procurement query anybody has brought to this: open orders from these three vendors OR any order over ₹10,00,000, at Silvassa, due this month. A third level is where a filter stops being a form and becomes a query language, and a query language needs precedence rules, brackets you can see, and a way to read the whole thing back — none of which a row of selects has. Where somebody genuinely needs the third level, the honest answer is a saved report written by a person who can read SQL, and the builder should say so rather than growing another Add group button.',
+    'The applied query and the query being edited are two different objects, and the one thing that must never happen is the register reflecting a half-typed condition. A user who has chosen Order value and is over and has typed the 2 of 2,00,000 has, for one keystroke, asked for every order over two rupees. Live application handles that with a debounce and by refusing to run a row whose value is empty; explicit application handles it with a draft that is copied over on Apply and reseeded from the applied set every time the builder opens. Both are here because both are right, on different registers — but a builder that writes straight into the applied set on every input event is wrong on all of them.',
+    'The result count is the only feedback the component gives, and it is worthless unless it says what it is counting out of. "12 orders" after an Apply does not tell a buyer whether the query was sharp or whether the register is empty this month; "12 of 1,438 orders" does. When every condition is dropped the line has to stop saying "1,438 of 1,438" and say "1,438 orders", because a fraction of itself reads as a filter that is still on.',
+    'A count that is above what the screen will draw is a different answer and must not be rounded into the same sentence. 18,204 rows behind a register that pages 50 at a time is a query that has not narrowed anything, and "18,204 orders" over a page of fifty is read as a working filter. The line names both figures and says which conditions would cut it, because the user who wrote four conditions and got the whole register back has usually written one of them against the wrong field.',
+    'A condition whose value does not fit its operator blocks the Apply, and the Apply stays focusable while it does. Disabling it is what every first implementation does and it strands the keyboard: the browser blurs a disabled element to the body, so a user who tabbed to Apply and then broke a value is thrown to the top of the document with nothing on screen saying why. aria-disabled leaves the button in the tab order, and pressing it moves focus to the first condition that is wrong — which is also the only way a screen reader user finds out which of six rows is the problem.',
+    'The query lives in the URL or it does not exist. A buyer who has spent four conditions working out which orders are actually late sends that screen to the plant head, and a builder holding its state in Alpine sends a link to the unfiltered register. Serialising is also what makes the export and the screen agree, what makes Back work between two versions of the same question, and what lets the saved view be nothing more cunning than a stored query string. The encoding has to survive a value with a comma in it — every vendor name has one — so it is one parameter per condition rather than one comma-joined list.',
+    'A saved view that has been edited must say so on the view, not only in a strip below it. The strip is where the three answers live — write the change into the view, keep the view and make a new one, throw the change away — but it scrolls away and the pill does not, and a register whose pill says "Overdue receipts" while the conditions say something else is how a saved view quietly becomes a lie. The pill carries "edited" beside its name for as long as the draft differs.',
+    'Three controls in a row do not fit on a phone and no amount of stacking makes them, because a stacked row loses the one thing a row is for: reading the condition as a sentence left to right. Below sm the builder goes into a bottom sheet where each condition is a bordered block with its three controls stacked and the sentence repeated above them in words, so the block still reads as one thought. The sheet is also where Apply has room to be a full-width button that says what it will do — "Show 24 orders" — which is the only place in the component where the count and the commit are the same control.',
+    'min-w-0 does nothing to a percent-encoded query string, and this component is where that was learnt. A flex item is allowed to shrink below its content only if the content has somewhere to break, and a parameter reading f=vendor:any: followed by two percent-encoded vendor names is one token with no space, no hyphen and no soft break anywhere in it — the encoding turned every space into %20 and the separating comma into %2C. So the item held its intrinsic width, the row held the item, and the document went to 471px inside a 390px viewport. Nothing in the class list predicts that and no static lint can catch it; it took a browser building the DOM and measuring it. Any run of characters the reader cannot break has to be given a break with break-all, or a scroller of its own carrying rule 14\'s whole apparatus — and for a URL somebody is meant to copy, wrapping is the right one of the two, because a link readable in three lines beats a link dragged sideways inside a box.',
+    'A chip is whitespace-nowrap, so whatever is written into it has to be the summarised form of the condition and never the raw value. "Vendor is any of 3" holds its line; "Vendor is any of Gujarat Polymers Ltd, Sharma Extrusions, Nashik Steel Traders" is a 400px pill that cannot wrap and takes the page with it at 390px. That is a rule about the string the server hands over, which is why the Django variant renders a display attribute off the condition object rather than joining the values in the template.',
+    'The row is assembled from controls that already exist and none of them may be redrawn here. The field and operator cells are select/filter\'s dense 34px select, the value cell is input-group when it takes a unit or a range, select when the field is a short fixed list, combobox/filter when it is a register of records, and calendar/presets behind the trigger when it is a date. A builder that draws its own miniature versions of those is four more places for the focus outline to be wrong, and it is the reason this entry\'s markup is mostly wiring.',
+    'Removing a row has to move focus somewhere deliberate and say what went. Focus lands on the field select of the row that took its place, or on Add condition when the last row goes, and a status region says which condition was removed by its sentence rather than by its number — "Removed: Vendor is any of 3". Leaving focus on a button that no longer exists drops the keyboard at the top of the document, and it is the single most common defect in a component made of rows you can delete.'
+  ],
+  anatomy: [
+    ['Panel', 'The bordered white box holding the whole builder. It is never overflow-hidden, because the value cell opens a vendor panel and a date panel that have to cross its edge.'],
+    ['Condition row', 'One predicate: the joiner, the field, the operator, the value and the remove button, on one line above sm and in a bordered block below it. It is a plain band inside the panel, not a shape, so it takes no rounding and no hover of its own.'],
+    ['Joiner', 'The first cell. Fixed text "Where" on the first row and the conjunction on every row after it. It is one setting for the whole group and is drawn as a control on the second row only — a select on every row invites a query that alternates and cannot be read.'],
+    ['Field select', 'The register\'s filterable columns, grouped where there are more than about ten. Changing it rebuilds the operator list and discards the value.'],
+    ['Operator select', 'The operators the chosen field\'s type has, and nothing else. A date has no "contains" and a status has no "is between".'],
+    ['Value cell', 'The one cell that changes shape: a text box, a number, an amount with its ₹, a date behind presets, a select, a vendor combobox, two boxes in one enclosure for a range, or grey text where the operator takes no value.'],
+    ['Remove button', 'An icon button at the end of the row, named for the condition it drops. It moves focus to the row that takes the place of the one it removed.'],
+    ['Add condition', 'The one control in the footer of the group. It appends a row seeded with the first field and that field\'s first operator, and puts focus on the new row\'s field select.'],
+    ['Group', 'A recessed band holding its own conditions and its own joiner, joined to the other groups by the outer joiner. There is no Add group inside a group — one level and no more.'],
+    ['Footer', 'Where the commit lives: Apply, Reset and the count of what has changed since the applied set. The live builder has no footer at all, which is what makes it a different variant rather than a flag.'],
+    ['Result count', 'A role="status" in the document from first paint, saying how many records match out of how many are in the register. It is never rendered inside the block it describes.'],
+    ['Chips', 'The applied set as one removable chip per condition over the register, each chip the whole sentence and each remove button named for it. This is what the screen shows when the builder is shut.'],
+    ['Saved views', 'A nav of named queries with aria-current on the one in force, the count beside each, and "edited" on the current one while the draft differs from what was saved.'],
+    ['Problem summary', 'The strip above the footer listing every condition whose value does not fit its operator, each entry a button that focuses the cell it names.']
+  ],
+  behaviour: [
+    'A row is a field, an operator and a value, and the operator list is a property of the field\'s type: text takes contains, is, starts with and the two blank tests; a number takes is, is more than, is less than and is between; a date takes before, after, between and has no date; a status takes is, is not and is any of; a vendor takes is any of and is none of.',
+    'Choosing a different field rebuilds the operator list, keeps the operator only if the new field has one by that name, and always discards the value — a figure typed for one field is never a value for another.',
+    'Choosing a different operator keeps the value where the shape of the value is unchanged, keeps the first half of a range when a single comparison becomes a between, and discards everything when the operator takes no value at all.',
+    'The value cell swaps with the field\'s type and the operator\'s arity: no control for is blank, one for a comparison, two inside a single enclosure for a between. Dates are chosen from presets first and a picker second, because nobody clicks their way to the end of the month.',
+    'The explicit builder holds a draft. Opening it reseeds the draft from the applied set, so a panel abandoned mid-edit cannot commit something the user walked away from; Apply copies the draft over the applied set, and Reset copies it back the other way.',
+    'The live builder has no Apply. It debounces at 300ms, skips any row whose value is still empty, and writes the result count into a live region — which is why it is only correct on a register that filters in the browser or behind a request that costs nothing.',
+    'The URL is the source of truth for the applied set. Every applied condition is one parameter, the joiner is one more, and the builder reads its opening state out of the query string rather than out of storage — so Back moves between two answers, a link carries the query, and the export and the screen cannot disagree.',
+    'Applying pushes a new URL and re-fetches the register; it does not filter what is already drawn. The rows on screen stay until the new ones arrive and the panel carries aria-busy while they are in flight.',
+    'A saved view is a stored query string with a name. Picking one replaces the whole condition set and resets the register to its first page; editing any condition marks the view edited, and the three answers to that are save into it, save as a new one, or reset.',
+    'Apply is blocked while any condition\'s value does not fit its operator — a date in a number field, a between whose floor is above its ceiling, an operator that needs a value against an empty cell. The button stays focusable and pressing it moves focus to the first condition that is wrong.',
+    'Removing the last condition returns the register to its unfiltered state and the count line stops quoting a fraction of itself.',
+    'Below sm the whole builder moves into a bottom sheet: one bordered block per condition with its three controls stacked, the sentence repeated in words above them, and an Apply that carries the count it will produce.'
+  ],
+  a11y: [
+    'Every control in a row is named for its row and for its field, because "Field", "Operator" and "Value" repeated six times is what a screen reader user otherwise hears. The names are aria-labels rather than visible labels — there is no room for three labels on a 34px row — and they read "Condition 2, field", "Condition 2, operator for Order value", "Condition 2, value for Order value".',
+    'The remove button is named for the condition it drops and not for its position alone: "Remove condition 2, Order value is over ₹2,00,000". Six buttons called Remove is the version of this that ships first and cannot be used without sight.',
+    'Removing a row moves focus deliberately — to the field select of the row that has taken its place, or to Add condition when the last row goes — and a role="status" says what was removed by its sentence. Focus left on a destroyed button lands on the body and the keyboard user is at the top of the document with no explanation.',
+    'Adding a row moves focus to the new row\'s field select, so the keyboard is already in the thing that was just created rather than still on the button that created it.',
+    'The result count is a role="status" rendered with the page and never inside the block it describes. A live region that arrives with its message already in it has not changed and is announced to nobody, which is exactly what happens when the count is written into the empty state.',
+    'The value cell changes control when the field or the operator changes, so the new control is given focus only if the old one had it. Moving focus into a cell nobody was in steals the keyboard out of the operator select the user is still walking with the arrow keys.',
+    'A group is a real fieldset with a legend naming it and its joiner — "Group 1, any of these" — so the nesting is audible. Without it a screen reader hears twelve selects in a row and no indication that four of them are bracketed together.',
+    'The joiner is one control for the whole group and it carries a name that says so: "Join every condition in this group with". A select per row that all write the same value is three tab stops promising three independent settings.',
+    'A condition whose value does not fit its operator carries aria-invalid on the control and aria-describedby pointing at the message, and the summary above the footer is a role="alert" listing every one of them as a button that focuses the cell it names.',
+    'Apply carries aria-disabled rather than disabled while the set is invalid, so it stays in the tab order and can explain itself when pressed. disabled removes it from the tab order and blurs it to the body if it was focused when the set went bad.',
+    'Each chip\'s remove button names the whole condition — "Remove the condition Vendor is any of 3" — and the chip row itself is a labelled group, so it is reachable as one thing rather than as loose pills above a table.',
+    'The saved views are a nav of buttons carrying aria-current, not a tablist and not a radiogroup: there are no panels that switch and there is no single tab stop to walk with arrows. The word "edited" is real text inside the current pill rather than a colour or a dot.',
+    'The bottom sheet is a role="dialog" with aria-modal and a focus trap, Escape closes it, and focus returns to the trigger — and the trigger carries the number of conditions in force in its own text rather than in a title.'
+  ],
+  related: ['data-table', 'select', 'combobox', 'input-group', 'badge'],
+  variants: [
+    {
+      id: 'default', name: 'Conditions over a register', code: `<!-- One row per condition — the joiner, the field, the operator, the value —
+     and Add condition under them. Every field in this variant is a short fixed
+     list, so the value cell is one select throughout; the moment a field is a
+     number, an amount or a date the cell has to swap and that is the types
+     variant, not a flag on this one.
 
+     The joiner is fixed text on the first row and a control on the second only.
+     It is one setting for the whole set, and a select on every row invites a
+     query that alternates between and and or, which nothing in a row of selects
+     can render legibly and nobody can read back.
+
+     The field select does not use x-model. Choosing a field has to rebuild the
+     operator list and throw the value away, and x-model writes the value before
+     anything else runs — which is how a row left the builder reading Plant is
+     open. :value with a change handler is the whole fix.
+
+     Removing a row moves focus to the field select of the row that took its
+     place, or to Add condition when the last one goes, and the status line says
+     what went by its sentence. A row you can delete that leaves focus on the
+     button it destroyed drops the keyboard at the top of the document.
+
+     The count is a role="status" in the document from first paint, and it stops
+     quoting a fraction of itself the moment the last condition goes. -->
+<div data-kui="filter-builder/default" class="max-w-3xl"
+     x-data="{
+       next: 4,
+       announce: '',
+       joiner: 'and',
+       fields: [
+         { id: 'status', label: 'Status' },
+         { id: 'vendor', label: 'Vendor' },
+         { id: 'plant', label: 'Plant' },
+         { id: 'buyer', label: 'Raised by' }
+       ],
+       values: {
+         status: [['open', 'Open'], ['approved', 'Approved'], ['overdue', 'Overdue'], ['closed', 'Closed']],
+         vendor: [['gujarat', 'Gujarat Polymers Ltd'], ['sharma', 'Sharma Extrusions'], ['nashik-steel', 'Nashik Steel Traders'], ['konkan', 'Konkan Chemicals Pvt Ltd']],
+         plant: [['silvassa', 'Silvassa'], ['nashik', 'Nashik'], ['vadodara', 'Vadodara']],
+         buyer: [['ap', 'A Prabhu'], ['rk', 'R Kulkarni'], ['sd', 'S Desai']]
+       },
+       rows: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'plant', op: 'is', v: 'silvassa' },
+         { id: 3, field: 'vendor', op: 'is not', v: 'konkan' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', status: 'overdue', vendor: 'gujarat', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1191', status: 'open', vendor: 'sharma', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1194', status: 'open', vendor: 'nashik-steel', plant: 'silvassa', buyer: 'rk' },
+         { po: 'PO-24-1199', status: 'approved', vendor: 'gujarat', plant: 'nashik', buyer: 'sd' },
+         { po: 'PO-24-1203', status: 'open', vendor: 'konkan', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1207', status: 'closed', vendor: 'sharma', plant: 'vadodara', buyer: 'rk' },
+         { po: 'PO-24-1211', status: 'open', vendor: 'gujarat', plant: 'silvassa', buyer: 'sd' },
+         { po: 'PO-24-1218', status: 'open', vendor: 'nashik-steel', plant: 'nashik', buyer: 'ap' }
+       ],
+       label(fid) { return this.fields.find(f => f.id === fid).label },
+       valueLabel(r) { const v = this.values[r.field].find(x => x[0] === r.v); return v ? v[1] : 'nothing yet' },
+       sentence(r) { return this.label(r.field) + ' ' + r.op + ' ' + this.valueLabel(r) },
+       hit(o, r) { return r.op === 'is' ? o[r.field] === r.v : o[r.field] !== r.v },
+       get matched() {
+         const live = this.rows.filter(r => r.v);
+         if (!live.length) return this.orders;
+         return this.orders.filter(o => this.joiner === 'and'
+           ? live.every(r => this.hit(o, r))
+           : live.some(r => this.hit(o, r)));
+       },
+       setField(r, id) { r.field = id; r.v = ''; },
+       add() {
+         const r = { id: this.next++, field: 'status', op: 'is', v: '' };
+         this.rows.push(r);
+         this.announce = 'Condition ' + this.rows.length + ' added.';
+         this.$nextTick(() => document.getElementById('fb-d-f-' + r.id).focus());
+       },
+       remove(i) {
+         const gone = this.sentence(this.rows[i]);
+         this.rows.splice(i, 1);
+         this.announce = 'Removed: ' + gone + '.';
+         this.$nextTick(() => {
+           const next = this.rows[i] || this.rows[i - 1];
+           const el = next ? document.getElementById('fb-d-f-' + next.id) : this.$refs.add;
+           if (el) el.focus();
+         });
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions on the purchase order register</h3>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="rows.filter(r => r.v).length
+                   ? matched.length + ' of ' + orders.length + ' orders match'
+                   : orders.length + ' orders'"></p>
+    </div>
+
+    <div>
+      <template x-for="(r, i) in rows" :key="r.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+
+          <div class="w-14 shrink-0">
+            <template x-if="i === 0">
+              <span class="block text-[12px]/4 text-zinc-500">Where</span>
+            </template>
+            <template x-if="i === 1">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="joiner" aria-label="Join every condition with"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1 pr-5 pl-1.5 text-[12px]/4 outline-none">
+                  <option value="and">and</option>
+                  <option value="or">or</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-1 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3"></i>
+                </span>
+              </div>
+            </template>
+            <template x-if="i > 1">
+              <span class="block text-[12px]/4 text-zinc-500" x-text="joiner"></span>
+            </template>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-d-f-' + r.id" :value="r.field" @change="setField(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="f in fields" :key="f.id">
+                  <option :value="f.id" x-text="f.label"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="r.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + label(r.field)"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="is not">is not</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', value for ' + label(r.field)"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="">Choose a value</option>
+                <template x-for="v in values[r.field]" :key="v[0]">
+                  <option :value="v[0]" x-text="v[1]"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <button type="button" @click="remove(i)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(r)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" x-ref="add" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <p class="min-w-0 text-[12px]/4 text-zinc-500">
+        <span x-text="rows.length"></span> conditions, joined with <span class="font-medium text-zinc-700" x-text="joiner"></span>
+      </p>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="announce"></p>
+</div>` },
+
+    {
+      id: 'types', name: 'The value cell swapping per field type', code: `<!-- The whole difficulty of the component is one cell. A field type decides
+     which operators exist, and the operator decides how many values the row
+     takes — none, one, or two in a single enclosure — so the value cell is the
+     only part of the row that is not a select.
+
+     Text takes contains, is, starts with and the two blank tests. A number
+     takes the comparisons and a between. An amount is a number wearing its ₹
+     inside the enclosure, so the symbol sits inside the focus outline rather
+     than beside it. A date is chosen from presets first, because nobody clicks
+     their way to the end of the month, and the picker only appears when the
+     preset is the one that says a date will be picked. A status is a short
+     fixed list, so it is a select. A vendor is a register of records, so it is
+     combobox/filter's trigger-and-panel shape and not a select with four
+     hundred options in it.
+
+     Changing the field discards the value without asking. Order value is over
+     200000, switched to Delivery date, once left the 200000 behind and asked
+     the server for every order due after the year 200000 — which is every
+     order, and nothing on screen said so.
+
+     Changing the operator only discards when the shape changes. is over to is
+     under keeps the figure, is over to is between keeps the floor and empties
+     the ceiling, and anything to is blank drops both.
+
+     An operator that takes no value leaves grey text and not a disabled box. A
+     greyed input beside "is blank" reads as a value the user is not permitted
+     to set, and three people in a fortnight asked what to type in it. -->
+<div data-kui="filter-builder/types" class="max-w-4xl"
+     x-data="{
+       next: 8, openPanel: null,
+       fields: [
+         { id: 'po', label: 'PO number', type: 'text' },
+         { id: 'grn', label: 'GRN reference', type: 'text' },
+         { id: 'lines', label: 'Line count', type: 'number' },
+         { id: 'amount', label: 'Order value', type: 'amount' },
+         { id: 'due', label: 'Delivery date', type: 'date' },
+         { id: 'status', label: 'Status', type: 'status' },
+         { id: 'vendor', label: 'Vendor', type: 'record' }
+       ],
+       ops: {
+         text: [['contains', 'contains'], ['is', 'is'], ['starts', 'starts with'], ['empty', 'is blank'], ['filled', 'is not blank']],
+         number: [['eq', 'is'], ['gt', 'is more than'], ['lt', 'is less than'], ['between', 'is between']],
+         amount: [['gt', 'is over'], ['lt', 'is under'], ['between', 'is between'], ['eq', 'is exactly']],
+         date: [['before', 'is before'], ['after', 'is after'], ['between', 'is between'], ['empty', 'has no date']],
+         status: [['is', 'is'], ['not', 'is not']],
+         record: [['any', 'is any of'], ['none', 'is none of']]
+       },
+       statuses: [['open', 'Open'], ['approved', 'Approved'], ['overdue', 'Overdue'], ['closed', 'Closed']],
+       presets: [['week', 'the end of this week'], ['month', 'the end of this month'], ['quarter', 'the end of this quarter'], ['fy', 'the end of the financial year'], ['pick', 'a date I pick']],
+       vendors: [
+         { id: 'gujarat', label: 'Gujarat Polymers Ltd', orders: 12 },
+         { id: 'sharma', label: 'Sharma Extrusions', orders: 8 },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', orders: 6 },
+         { id: 'deccan', label: 'Deccan Fasteners Pvt Ltd', orders: 5 },
+         { id: 'konkan', label: 'Konkan Chemicals Pvt Ltd', orders: 4 }
+       ],
+       rows: [
+         { id: 1, field: 'po', op: 'starts', v: 'PO-24-', v2: '', sel: [] },
+         { id: 2, field: 'lines', op: 'between', v: '4', v2: '20', sel: [] },
+         { id: 3, field: 'amount', op: 'gt', v: '2,00,000', v2: '', sel: [] },
+         { id: 4, field: 'due', op: 'before', v: 'month', v2: '2026-08-31', sel: [] },
+         { id: 5, field: 'status', op: 'is', v: 'open', v2: '', sel: [] },
+         { id: 6, field: 'vendor', op: 'any', v: '', v2: '', sel: ['gujarat', 'sharma', 'nashik-steel'] },
+         { id: 7, field: 'grn', op: 'empty', v: '', v2: '', sel: [] }
+       ],
+       f(id) { return this.fields.find(x => x.id === id) },
+       opsFor(r) { return this.ops[this.f(r.field).type] },
+       opLabel(r) { const o = this.opsFor(r).find(x => x[0] === r.op); return o ? o[1] : '' },
+       arity(r) { return (r.op === 'empty' || r.op === 'filled') ? 0 : (r.op === 'between' ? 2 : 1) },
+       setField(r, id) {
+         r.field = id;
+         const list = this.ops[this.f(id).type];
+         if (!list.some(o => o[0] === r.op)) r.op = list[0][0];
+         r.v = ''; r.v2 = ''; r.sel = [];
+       },
+       setOp(r, op) { const was = this.arity(r); r.op = op; const now = this.arity(r); if (now === 0) { r.v = ''; r.v2 = '' } else if (now !== was) { r.v2 = '' } },
+       statusLabel(v) { const s = this.statuses.find(x => x[0] === v); return s ? s[1] : 'nothing yet' },
+       presetLabel(v) { const p = this.presets.find(x => x[0] === v); return p ? p[1] : 'nothing yet' },
+       money(v) { return v ? '₹' + v : 'nothing yet' },
+       sentence(r) {
+         const t = this.f(r.field).type, head = this.f(r.field).label + ' ' + this.opLabel(r);
+         if (this.arity(r) === 0) return head;
+         if (this.arity(r) === 2) return head + ' ' + (r.v || '—') + ' and ' + (r.v2 || '—');
+         if (t === 'status') return head + ' ' + this.statusLabel(r.v);
+         if (t === 'record') return head + ' ' + (r.sel.length || 'no') + ' vendors';
+         if (t === 'amount') return head + ' ' + this.money(r.v);
+         if (t === 'date') return head + ' ' + (r.v === 'pick' ? (r.v2 || 'a date not yet chosen') : this.presetLabel(r.v));
+         return head + ' ' + (r.v || 'nothing yet');
+       },
+       add() {
+         const r = { id: this.next++, field: 'po', op: 'contains', v: '', v2: '', sel: [] };
+         this.rows.push(r);
+         this.$nextTick(() => document.getElementById('fb-t-f-' + r.id).focus());
+       },
+       remove(i) { this.rows.splice(i, 1) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Every field type the order register has</h3>
+    </div>
+
+    <div>
+      <template x-for="(r, i) in rows" :key="r.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-t-f-' + r.id" :value="r.field" @change="setField(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="f in fields" :key="f.id">
+                  <option :value="f.id" x-text="f.label"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-32">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :value="r.op" @change="setOp(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', operator for ' + f(r.field).label"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="o in opsFor(r)" :key="o[0]">
+                  <option :value="o[0]" x-text="o[1]"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-56">
+
+            <template x-if="arity(r) === 0">
+              <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+            </template>
+
+            <template x-if="arity(r) === 2 && f(r.field).type === 'date'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="date" x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', earliest delivery date'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-[13px]/5 tabular-nums outline-none">
+                <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                <input type="date" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', latest delivery date'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 2 && f(r.field).type !== 'date'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span x-show="f(r.field).type === 'amount'" x-cloak aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                <input inputmode="numeric" x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', lowest ' + f(r.field).label"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                <input inputmode="numeric" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', highest ' + f(r.field).label"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'text'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="r.v" placeholder="Type a value"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + f(r.field).label"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'number'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input inputmode="numeric" x-model="r.v" placeholder="0"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + f(r.field).label"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'amount'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                <input inputmode="numeric" x-model="r.v" placeholder="0"
+                       :aria-label="'Condition ' + (i + 1) + ', order value in rupees'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'date'">
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="relative min-w-0 flex-1 basis-40 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', delivery date'"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="">Choose a date</option>
+                    <template x-for="p in presets" :key="p[0]">
+                      <option :value="p[0]" x-text="p[1]"></option>
+                    </template>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                    <i data-lucide="chevron-down" class="size-3.5"></i>
+                  </span>
+                </div>
+                <div x-show="r.v === 'pick'" x-cloak class="min-w-0 flex-1 basis-36 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input type="date" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', the delivery date picked'"
+                         class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'status'">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', status'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option value="">Choose a status</option>
+                  <template x-for="s in statuses" :key="s[0]">
+                    <option :value="s[0]" x-text="s[1]"></option>
+                  </template>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'record'">
+              <div class="relative" @click.outside="if (openPanel === r.id) openPanel = null">
+                <button type="button" @click="openPanel = openPanel === r.id ? null : r.id"
+                        :aria-expanded="openPanel === r.id" :aria-controls="'fb-t-p-' + r.id"
+                        :aria-label="'Condition ' + (i + 1) + ', vendors, ' + r.sel.length + ' chosen'"
+                        class="flex w-full items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-1.5 pr-2 pl-2.5 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="min-w-0 flex-1 truncate" x-text="r.sel.length ? r.sel.length + ' vendors' : 'Choose vendors'"></span>
+                  <i data-lucide="chevron-down" class="size-3.5 shrink-0 text-zinc-600"></i>
+                </button>
+                <div :id="'fb-t-p-' + r.id" x-show="openPanel === r.id" x-cloak
+                     @keydown.escape="$event.stopPropagation(); openPanel = null; $el.previousElementSibling.focus()"
+                     class="absolute top-full left-0 z-30 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+                  <template x-for="v in vendors" :key="v.id">
+                    <label class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 hover:bg-zinc-100">
+                      <input type="checkbox" :value="v.id" x-model="r.sel" class="size-4 shrink-0 accent-zinc-700">
+                      <span class="min-w-0 flex-1 truncate" x-text="v.label"></span>
+                      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="v.orders"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <button type="button" @click="remove(i)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(r)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">The query these rows read as</p>
+    <ol role="list" class="mt-1.5 space-y-0.5">
+      <template x-for="(r, i) in rows" :key="r.id">
+        <li class="text-[13px]/5 tabular-nums text-zinc-700">
+          <span class="text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+          <span x-text="sentence(r)"></span>
+        </li>
+      </template>
+    </ol>
+  </div>
+</div>` },
+
+    {
+      id: 'chips', name: 'The applied set as chips over the register', code: `<!-- What the screen shows almost all of the time. The builder is three
+     controls per condition and it is worth that only while somebody is
+     composing; once the query is applied, the thing the register owes the user
+     is a sentence per condition and a way to drop one.
+
+     Each chip is the whole condition — "Order value is over ₹2,00,000", not
+     "Order value" — because a chip that names only the field says which
+     controls are set and not what they are set to, and the usual reason a
+     register looks empty is a figure somebody typed last Tuesday.
+
+     Every chip's remove button is named for the condition it drops. Six buttons
+     called Remove is what gets read out otherwise.
+
+     Clear all is a link beside them rather than a second filled button. It is
+     the blunt answer, and it throws away the four conditions that were right
+     along with the one that was not.
+
+     The chip band is bg-zinc-100 inside the white panel, so the chips keep a
+     fill of their own at bg-zinc-200 and the x inside a chip steps to zinc-300
+     — hovering to the fill of the pill it sits in is the one hover that makes a
+     control less visible than it was at rest.
+
+     Edit conditions reopens the builder with exactly this set in it, which is
+     the whole contract: chips are a rendering of the applied query and never a
+     second copy of it. -->
+<div data-kui="filter-builder/chips" class="max-w-3xl"
+     x-data="{
+       joiner: 'and',
+       conds: [
+         { id: 1, text: 'Status is Open', field: 'status', v: 'open' },
+         { id: 2, text: 'Order value is over ₹2,00,000', field: 'amount', v: 200000 },
+         { id: 3, text: 'Vendor is any of 3', field: 'vendor', v: ['gujarat', 'sharma', 'nashik-steel'] },
+         { id: 4, text: 'Delivery date is before 31 Aug 2026', field: 'due', v: '2026-08-31' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 1842000, due: '2026-08-28' },
+         { po: 'PO-24-1191', vname: 'Sharma Extrusions', vendor: 'sharma', status: 'open', amount: 468500, due: '2026-08-19' },
+         { po: 'PO-24-1194', vname: 'Nashik Steel Traders', vendor: 'nashik-steel', status: 'overdue', amount: 2710400, due: '2026-08-02' },
+         { po: 'PO-24-1199', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 132900, due: '2026-08-05' },
+         { po: 'PO-24-1203', vname: 'Konkan Chemicals Pvt Ltd', vendor: 'konkan', status: 'open', amount: 967500, due: '2026-08-27' },
+         { po: 'PO-24-1207', vname: 'Sharma Extrusions', vendor: 'sharma', status: 'closed', amount: 5460000, due: '2026-08-30' },
+         { po: 'PO-24-1211', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 2143000, due: '2026-09-04' },
+         { po: 'PO-24-1218', vname: 'Nashik Steel Traders', vendor: 'nashik-steel', status: 'open', amount: 1290500, due: '2026-08-08' }
+       ],
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       name: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       hit(o, c) {
+         if (c.field === 'status') return o.status === c.v;
+         if (c.field === 'amount') return o.amount > c.v;
+         if (c.field === 'vendor') return c.v.includes(o.vendor);
+         return o.due < c.v;
+       },
+       get rows() { return this.orders.filter(o => this.conds.every(c => this.hit(o, c))) },
+       drop(id) { this.conds = this.conds.filter(c => c.id !== id) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-3 py-2.5">
+      <button type="button"
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Edit conditions
+        <span x-show="conds.length" x-cloak aria-hidden="true"
+              class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="conds.length"></span>
+      </button>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="conds.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></p>
+    </div>
+
+    <div x-show="conds.length" role="group" aria-label="Conditions in force"
+         class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-3 py-2">
+      <template x-for="(c, i) in conds" :key="c.id">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">
+          <span x-show="i > 0" x-cloak aria-hidden="true" class="text-zinc-500" x-text="joiner"></span>
+          <span x-text="c.text"></span>
+          <button type="button" @click="drop(c.id)" :aria-label="'Remove the condition ' + c.text"
+                  class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-3"></i>
+          </button>
+        </span>
+      </template>
+      <button type="button" @click="conds = []"
+              class="ml-auto rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+    </div>
+
+    <table x-show="rows.length" class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-3 py-2 font-medium whitespace-nowrap">PO number</th>
+          <th scope="col" class="hidden px-3 py-2 font-medium sm:table-cell">Vendor</th>
+          <th scope="col" class="px-3 py-2 font-medium">Status</th>
+          <th scope="col" class="px-3 py-2 text-right font-medium">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="o in rows" :key="o.po">
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-3 py-2 font-medium whitespace-nowrap tabular-nums" x-text="o.po"></td>
+            <td class="hidden px-3 py-2 text-zinc-600 sm:table-cell" x-text="o.vname"></td>
+            <td class="px-3 py-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[o.status]" aria-hidden="true"></span><span x-text="name[o.status]"></span>
+              </span>
+            </td>
+            <td class="px-3 py-2 text-right tabular-nums" x-text="money(o.amount)"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+    <div x-show="!rows.length" x-cloak class="px-6 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+      </span>
+      <p class="mt-3 text-[16px]/6 font-semibold">No order matches all four conditions</p>
+      <p class="mx-auto mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">Every chip above is in force. Drop one and the register widens; the eight orders are still there.</p>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'groups', name: 'One level of AND / OR nesting', code: `<!-- Two levels and no more. Conditions inside a group, groups joined to each
+     other, and that is the last Add group button this component will ever have.
+
+     The reason is the limit of the shape rather than a preference. Two levels
+     covers every query anybody has actually brought to this — open orders from
+     these three vendors OR anything over ₹10,00,000, at Silvassa, due this
+     month — and a third is where a filter stops being a form and becomes a
+     query language, which needs precedence rules, brackets somebody can see,
+     and a way to read the whole thing back. A row of selects has none of those.
+     Where the third level is genuinely needed, the honest answer is a saved
+     report written by somebody who can read SQL, and the panel says so at the
+     foot rather than growing another button.
+
+     So there is no Add group inside a group. The control exists once, at the
+     outer level, and its absence inside the band is the whole enforcement.
+
+     Each group is a real fieldset with a legend that names it and its joiner —
+     "Group 1, any of these" — because a screen reader hearing nine selects in a
+     row has nothing to tell it that four of them are bracketed.
+
+     The group band is bg-zinc-50, a band recessed inside the white panel, so
+     the nesting is one step of fill rather than a second border inside a
+     border. -->
+<div data-kui="filter-builder/groups" class="max-w-3xl"
+     x-data="{
+       nextG: 3, nextC: 7, outer: 'and',
+       fields: [['status', 'Status'], ['vendor', 'Vendor'], ['plant', 'Plant'], ['amount', 'Order value'], ['due', 'Delivery date']],
+       groups: [
+         { id: 1, join: 'or', conds: [
+           { id: 1, field: 'vendor', op: 'is', v: 'Gujarat Polymers Ltd' },
+           { id: 2, field: 'vendor', op: 'is', v: 'Sharma Extrusions' },
+           { id: 3, field: 'amount', op: 'is over', v: '10,00,000' }
+         ] },
+         { id: 2, join: 'and', conds: [
+           { id: 4, field: 'plant', op: 'is', v: 'Silvassa' },
+           { id: 5, field: 'status', op: 'is not', v: 'Closed' },
+           { id: 6, field: 'due', op: 'is before', v: '31 Aug 2026' }
+         ] }
+       ],
+       label(id) { const f = this.fields.find(x => x[0] === id); return f ? f[1] : id },
+       sentence(c) { return this.label(c.field) + ' ' + c.op + ' ' + (c.v || 'nothing yet') },
+       addCond(g) {
+         const c = { id: this.nextC++, field: 'status', op: 'is', v: '' };
+         g.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-g-f-' + c.id).focus());
+       },
+       addGroup() {
+         const g = { id: this.nextG++, join: 'and', conds: [{ id: this.nextC++, field: 'status', op: 'is', v: '' }] };
+         this.groups.push(g);
+         this.$nextTick(() => document.getElementById('fb-g-f-' + g.conds[0].id).focus());
+       },
+       removeCond(g, i) { g.conds.splice(i, 1); if (!g.conds.length) this.groups = this.groups.filter(x => x !== g) },
+       removeGroup(gi) { this.groups.splice(gi, 1) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Purchase orders matching every group below</h3>
+    </div>
+
+    <div class="space-y-2 p-3">
+      <template x-for="(g, gi) in groups" :key="g.id">
+        <div>
+          <div x-show="gi > 0" x-cloak class="flex items-center gap-2 py-1.5">
+            <span class="text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase" x-text="outer"></span>
+            <span class="flex-1 border-t border-zinc-200" aria-hidden="true"></span>
+          </div>
+
+          <fieldset class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 pt-2 pb-3">
+            <legend class="px-1 text-[12px]/4 text-zinc-600">
+              Group <span class="tabular-nums" x-text="gi + 1"></span>, <span x-text="g.join === 'or' ? 'any of these' : 'all of these'"></span>
+            </legend>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="g.join" :aria-label="'Join every condition in group ' + (gi + 1) + ' with'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1 pr-7 pl-2 text-[12px]/4 outline-none">
+                  <option value="and">Match all of these</option>
+                  <option value="or">Match any of these</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3"></i>
+                </span>
+              </div>
+              <button type="button" @click="removeGroup(gi)" :aria-label="'Remove group ' + (gi + 1)"
+                      class="inline-flex h-7 items-center gap-1.5 rounded-lg px-2 text-[12px]/4 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="trash-2" class="size-3.5"></i>Remove group
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <template x-for="(c, ci) in g.conds" :key="c.id">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="w-10 shrink-0 text-[12px]/4 text-zinc-500" x-text="ci === 0 ? 'Where' : g.join"></span>
+
+                  <div class="min-w-0 flex-1 basis-32">
+                    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <select :id="'fb-g-f-' + c.id" x-model="c.field"
+                              :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', field'"
+                              class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                        <template x-for="f in fields" :key="f[0]">
+                          <option :value="f[0]" x-text="f[1]"></option>
+                        </template>
+                      </select>
+                      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                        <i data-lucide="chevron-down" class="size-3.5"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1 basis-28">
+                    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <select x-model="c.op" :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', operator for ' + label(c.field)"
+                              class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                        <option value="is">is</option>
+                        <option value="is not">is not</option>
+                        <option value="is over">is over</option>
+                        <option value="is before">is before</option>
+                      </select>
+                      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                        <i data-lucide="chevron-down" class="size-3.5"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1 basis-44">
+                    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <input type="text" x-model="c.v" placeholder="Type a value"
+                             :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', value for ' + label(c.field)"
+                             class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+                    </div>
+                  </div>
+
+                  <button type="button" @click="removeCond(g, ci)"
+                          :aria-label="'Remove group ' + (gi + 1) + ' condition ' + (ci + 1) + ', ' + sentence(c)"
+                          class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <i data-lucide="x" class="size-4"></i>
+                  </button>
+                </div>
+              </template>
+            </div>
+
+            <button type="button" @click="addCond(g)"
+                    class="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition to this group
+            </button>
+          </fieldset>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="addGroup()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add group
+      </button>
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-text="groups.length"></span> groups, joined with <span class="font-medium text-zinc-700" x-text="outer"></span>. A group cannot hold another group.
+      </p>
+    </div>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">
+    A question that needs a third level is a saved report. Ask Reporting for one rather than nesting further — this builder has no way to draw the brackets.
+  </p>
+</div>` },
+
+    {
+      id: 'saved', name: 'Saved views, and one that has been edited', code: `<!-- A saved view is a stored query and a name, nothing cleverer. Picking one
+     replaces the whole condition set; the count beside the name is what makes
+     the row worth reading before anything is pressed.
+
+     They are a nav of buttons with aria-current, not a tablist and not a
+     radiogroup. A tablist promises panels that switch and arrow keys that own
+     the row, and there are no panels here — there is one register that gets a
+     different query. A radiogroup makes the same promise about arrows and puts
+     four named places behind one tab stop.
+
+     The second state is the reason this variant exists: the view has been
+     edited and the page has to say so in two places. The strip below carries
+     the three answers — write the change into the view, keep the view and make
+     a new one, throw the change away — because they are three different
+     intentions and a single Save picks one of them silently. The word "edited"
+     also goes inside the pill, because the strip scrolls away and the pill does
+     not, and a register whose pill says "Overdue receipts" while the conditions
+     say something else is how a saved view quietly becomes a lie.
+
+     Reset restores every condition the view holds and not only the one that was
+     touched. A view is one query and half of it is not a state anybody asked
+     for.
+
+     The pills sit inside a list, so they are surfaces rather than shapes and
+     step once off the white panel they cross. -->
+<div data-kui="filter-builder/saved" class="max-w-3xl"
+     x-data="{
+       view: 'mine',
+       views: [
+         { id: 'mine', name: 'My open POs', count: 12, conds: [
+           { id: 1, field: 'Status', op: 'is', v: 'Open' },
+           { id: 2, field: 'Raised by', op: 'is', v: 'A Prabhu' }
+         ] },
+         { id: 'late', name: 'Overdue receipts', count: 4, conds: [
+           { id: 1, field: 'Status', op: 'is', v: 'Overdue' },
+           { id: 2, field: 'GRN reference', op: 'is blank', v: '' }
+         ] },
+         { id: 'big', name: 'Above ₹5,00,000', count: 23, conds: [
+           { id: 1, field: 'Order value', op: 'is over', v: '5,00,000' }
+         ] },
+         { id: 'all', name: 'All orders', count: 1438, conds: [] }
+       ],
+       draft: [],
+       init() { this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       get current() { return this.views.find(v => v.id === this.view) },
+       get dirty() { return JSON.stringify(this.draft) !== JSON.stringify(this.current.conds) },
+       pick(id) { this.view = id; this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       reset() { this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       save() { this.current.conds = JSON.parse(JSON.stringify(this.draft)) }
+     }">
+
+  <nav aria-label="Saved views">
+    <ul role="list" class="flex flex-wrap items-center gap-1.5">
+      <template x-for="v in views" :key="v.id">
+        <li>
+          <button type="button" @click="pick(v.id)" :aria-current="v.id === view ? 'true' : 'false'"
+                  class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="v.id === view ? 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300' : 'text-zinc-600'">
+            <span x-text="v.name"></span>
+            <span class="tabular-nums text-zinc-500" x-text="v.count.toLocaleString('en-IN')"></span>
+            <span x-show="v.id === view && dirty" x-cloak class="text-[12px]/4 font-medium text-zinc-600">· edited</span>
+          </button>
+        </li>
+      </template>
+    </ul>
+  </nav>
+
+  <div x-show="dirty" x-cloak role="status"
+       class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <p class="min-w-0 text-[13px]/5 text-zinc-600">
+      <span class="font-medium text-zinc-900" x-text="current.name"></span> has been changed and the change is not saved.
+    </p>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <button type="button" @click="save()"
+              class="inline-flex h-8 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save to this view</button>
+      <button type="button"
+              class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save as a new view</button>
+      <button type="button" @click="reset()"
+              class="rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</button>
+    </div>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions in <span x-text="current.name"></span></h3>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="current.count.toLocaleString('en-IN') + ' orders when this view was saved'"></p>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in draft" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>Status</option>
+                <option>Raised by</option>
+                <option>Order value</option>
+                <option>GRN reference</option>
+                <option>Plant</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>is</option>
+                <option>is not</option>
+                <option>is over</option>
+                <option>is blank</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <template x-if="c.op === 'is blank'">
+              <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+            </template>
+            <template x-if="c.op !== 'is blank'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="c.v" :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+          </div>
+
+          <button type="button" @click="draft.splice(i, 1)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + c.field + ' ' + c.op + ' ' + c.v"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+
+      <p x-show="!draft.length" x-cloak class="px-3 py-4 text-[13px]/5 text-zinc-500">
+        This view holds no conditions. It is the whole register.
+      </p>
+    </div>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="draft.push({ id: Date.now(), field: 'Status', op: 'is', v: '' })"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'apply', name: 'A draft, and an explicit Apply', code: `<!-- Nothing reaches the register until Apply. This is the right default on any
+     register the server pages, because every keystroke in the value cell would
+     otherwise be a query, and a user halfway through typing 2,00,000 has for
+     one keystroke asked for every order over two rupees.
+
+     The draft is the hard part, not the footer. It is reseeded from the applied
+     set every time the builder opens, so a panel abandoned mid-edit cannot
+     commit an edit the user walked away from — and the applied set is the only
+     thing the count line and the register ever read.
+
+     The footer says what would change and not merely that something has. "2
+     changed, 1 added, 1 removed" is the sentence that stops somebody applying a
+     condition they cannot see because it is three rows down; "Apply" with a dot
+     beside it is not.
+
+     Apply is disabled only while nothing has changed, which is a state the
+     keyboard cannot be thrown out of because a user who has changed nothing has
+     not been typing in here. The invalid variant is the other case and it uses
+     aria-disabled instead, for the opposite reason.
+
+     Reset is a link and not a second filled button. Two filled buttons in a
+     footer is two primaries, and the destructive one wins by being on the left.
+
+     The footer strip is bg-zinc-100 inside the white panel, so the panel is not
+     overflow-hidden and the strip is what keeps the tint off the rounded
+     corner. -->
+<div data-kui="filter-builder/apply" class="max-w-3xl"
+     x-data="{
+       applied: [
+         { id: 1, field: 'Status', op: 'is', v: 'Open' },
+         { id: 2, field: 'Plant', op: 'is', v: 'Silvassa' },
+         { id: 3, field: 'Order value', op: 'is over', v: '2,00,000' }
+       ],
+       draft: [],
+       matched: 24, total: 1438,
+       init() { this.reseed() },
+       reseed() { this.draft = JSON.parse(JSON.stringify(this.applied)) },
+       key(c) { return c.field + '|' + c.op + '|' + c.v },
+       get changed() {
+         const a = new Map(this.applied.map(c => [c.id, this.key(c)]));
+         const d = new Map(this.draft.map(c => [c.id, this.key(c)]));
+         let edited = 0, added = 0, removed = 0;
+         d.forEach((v, k) => { if (!a.has(k)) added++; else if (a.get(k) !== v) edited++ });
+         a.forEach((v, k) => { if (!d.has(k)) removed++ });
+         return { edited: edited, added: added, removed: removed, any: edited + added + removed };
+       },
+       get summary() {
+         const c = this.changed, parts = [];
+         if (c.edited) parts.push(c.edited + ' changed');
+         if (c.added) parts.push(c.added + ' added');
+         if (c.removed) parts.push(c.removed + ' removed');
+         return parts.length ? parts.join(', ') + ' since this was applied' : 'Nothing has changed since this was applied';
+       },
+       apply() { this.applied = JSON.parse(JSON.stringify(this.draft)); this.matched = 18 + this.applied.length * 3 },
+       add() {
+         const c = { id: Date.now(), field: 'Vendor', op: 'is', v: '' };
+         this.draft.push(c);
+         this.$nextTick(() => document.getElementById('fb-a-f-' + c.id).focus());
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="applied.length ? matched + ' of ' + total.toLocaleString('en-IN') + ' orders on screen' : total.toLocaleString('en-IN') + ' orders on screen'"></p>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in draft" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-a-f-' + c.id" x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>Status</option>
+                <option>Vendor</option>
+                <option>Plant</option>
+                <option>Order value</option>
+                <option>Delivery date</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>is</option>
+                <option>is not</option>
+                <option>is over</option>
+                <option>is under</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="draft.splice(i, 1)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + c.field + ' ' + c.op + ' ' + c.v"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="summary"></p>
+      <div class="ml-auto flex items-center gap-3">
+        <button type="button" @click="reseed()" :disabled="!changed.any"
+                class="rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 disabled:text-zinc-400 disabled:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</button>
+        <button type="button" @click="apply()" :disabled="!changed.any"
+                class="inline-flex h-9 items-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-300 disabled:text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'live', name: 'Debounced, with no Apply at all', code: `<!-- No footer, no commit, and the count is the only thing that answers. This
+     is correct where the filtering happens in the browser or behind a request
+     that costs nothing — a register of a few hundred rows already on the page.
+     On a server-paged register it is wrong and apply is the variant to take.
+
+     300ms of debounce, and a row whose value is still empty is skipped rather
+     than run. Without the second rule the register empties itself the instant
+     Add condition is pressed, because a brand new row is Status is nothing and
+     nothing matches it — which reads as a filter that broke on being created.
+
+     The debounce is visible while it is pending. "Working…" beside the count is
+     not decoration: without it the 300ms between the last keystroke and the new
+     figure is 300ms in which the count on screen is about the previous query,
+     and a user comparing two numbers cannot tell which one they are reading.
+
+     The count is a role="status" in the document from first paint, outside
+     every block that can disappear. Put the live region inside the empty state
+     and it arrives with its message already in it, which is not a change and is
+     announced to nobody. The pending marker is aria-hidden and is for the eye —
+     announcing "Working" and then the count talks over the answer.
+
+     Nothing here disables a control while the debounce is pending. The user is
+     typing in it. -->
+<div data-kui="filter-builder/live" class="max-w-3xl"
+     x-data="{
+       pending: false, timer: null,
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'vname', op: 'contains', v: 'Guj' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', vname: 'Gujarat Polymers Ltd', status: 'open', amount: 1842000 },
+         { po: 'PO-24-1191', vname: 'Sharma Extrusions', status: 'open', amount: 468500 },
+         { po: 'PO-24-1194', vname: 'Gujarat Polymers Ltd', status: 'overdue', amount: 2710400 },
+         { po: 'PO-24-1199', vname: 'Nashik Steel Traders', status: 'open', amount: 132900 },
+         { po: 'PO-24-1203', vname: 'Gujarat Polymers Ltd', status: 'open', amount: 967500 },
+         { po: 'PO-24-1207', vname: 'Konkan Chemicals Pvt Ltd', status: 'closed', amount: 5460000 },
+         { po: 'PO-24-1211', vname: 'Gujarat Polymers Ltd', status: 'approved', amount: 2143000 },
+         { po: 'PO-24-1218', vname: 'Sharma Extrusions', status: 'open', amount: 1290500 }
+       ],
+       applied: [],
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       name: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       init() { this.settle() },
+       nudge() {
+         this.pending = true;
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => this.settle(), 300);
+       },
+       settle() { this.pending = false; this.applied = this.conds.filter(c => c.v.trim()).map(c => ({ field: c.field, op: c.op, v: c.v.trim() })) },
+       hit(o, c) {
+         const val = String(o[c.field]).toLowerCase(), q = c.v.toLowerCase();
+         return c.op === 'is' ? val === q : val.includes(q);
+       },
+       get rows() { return this.orders.filter(o => this.applied.every(c => this.hit(o, c))) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions apply as they are typed</h3>
+      <p class="flex items-center gap-2">
+        <span x-show="pending" x-cloak aria-hidden="true" class="text-[12px]/4 text-zinc-500">Working…</span>
+        <span role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+              x-text="applied.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></span>
+      </p>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" @change="c.v = ''; nudge()" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="status">Status</option>
+                <option value="vname">Vendor</option>
+                <option value="po">PO number</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" @change="nudge()" :aria-label="'Condition ' + (i + 1) + ', operator'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="contains">contains</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" @input="nudge()" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value'"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1); nudge()"
+                  :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="conds.push({ id: Date.now(), field: 'status', op: 'is', v: '' })"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">
+        A row with no value yet is not run. <span x-text="conds.length - applied.length"></span> of <span x-text="conds.length"></span> are waiting on one.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+    <template x-for="o in rows" :key="o.po">
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2.5">
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="o.po"></p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500" x-text="o.vname"></p>
+        </div>
+        <div class="flex shrink-0 items-center gap-2.5">
+          <span class="text-[13px]/5 tabular-nums" x-text="money(o.amount)"></span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full" :class="dot[o.status]" aria-hidden="true"></span><span x-text="name[o.status]"></span>
+          </span>
+        </div>
+      </div>
+    </template>
+    <p x-show="!rows.length" x-cloak class="px-4 py-6 text-center text-[13px]/5 tabular-nums text-zinc-500">No order matches. Widen one condition and the eight come back.</p>
+  </div>
+</div>` },
+
+    {
+      id: 'empty', name: 'No conditions yet', code: `<!-- An unfiltered register and a builder with nothing in it, which is the
+     state the component opens in on a screen nobody has saved a view for.
+
+     It is the empty-state shape and not a bare Add condition button, because
+     the question the user has at this moment is not "how do I add a row" — the
+     button says that — but "what can I ask about". So the well, the sentence
+     and then three conditions a buyer actually writes, each of which composes
+     itself when pressed and lands focus in the row it made.
+
+     The count line says the whole register rather than a fraction of itself.
+     "1,438 of 1,438 orders" reads as a filter that is still on and somebody
+     will go looking for it.
+
+     There is no create action here in any state. A register with no conditions
+     is showing everything, and a New order button under a screen somebody is
+     about to filter is how the same order gets raised twice — the same rule
+     empty-state draws for a filtered register, and it is sharper here because
+     the builder is on screen precisely when nothing is known yet.
+
+     The suggested conditions are buttons and not links: they compose a query in
+     place, they do not navigate, and each one names the count it would produce
+     so pressing one is not a guess. -->
+<div data-kui="filter-builder/empty" class="max-w-3xl"
+     x-data="{
+       conds: [],
+       total: 1438,
+       suggestions: [
+         { label: 'Open orders over ₹1,00,000', count: 212, cond: { field: 'Order value', op: 'is over', v: '1,00,000' } },
+         { label: 'Overdue at Silvassa', count: 17, cond: { field: 'Status', op: 'is', v: 'Overdue' } },
+         { label: 'Raised by me this quarter', count: 46, cond: { field: 'Raised by', op: 'is', v: 'A Prabhu' } }
+       ],
+       use(s) {
+         const c = Object.assign({ id: Date.now() }, s.cond);
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-e-f-' + c.id).focus());
+       },
+       add() {
+         const c = { id: Date.now(), field: 'Status', op: 'is', v: '' };
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-e-f-' + c.id).focus());
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="conds.length ? 'Conditions are being written — nothing is applied yet' : total.toLocaleString('en-IN') + ' orders, nothing filtered'"></p>
+    </div>
+
+    <div x-show="!conds.length" class="px-6 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="list-filter" class="size-5 text-zinc-600"></i>
+      </span>
+      <h4 class="mt-3 text-[16px]/6 font-semibold">No conditions yet</h4>
+      <p class="mx-auto mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+        The register is showing all 1,438 purchase orders across Silvassa, Nashik and Vadodara. A condition is a field, an operator and a value; add as many as the question needs.
+      </p>
+
+      <div class="mt-4 flex justify-center">
+        <button type="button" @click="add()"
+                class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>Add a condition
+        </button>
+      </div>
+
+      <div class="mx-auto mt-6 max-w-md border-t border-zinc-100 pt-4">
+        <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Or start from one of these</p>
+        <ul role="list" class="mt-2 space-y-1">
+          <template x-for="s in suggestions" :key="s.label">
+            <li>
+              <button type="button" @click="use(s)"
+                      class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 truncate" x-text="s.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="s.count + ' orders'"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+    <div x-show="conds.length" x-cloak>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-e-f-' + c.id" x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>Status</option>
+                <option>Vendor</option>
+                <option>Order value</option>
+                <option>Raised by</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>is</option>
+                <option>is not</option>
+                <option>is over</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+
+      <div class="border-t border-zinc-200 px-3 py-2.5">
+        <button type="button" @click="add()"
+                class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+        </button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'invalid', name: 'A value that does not fit its operator', code: `<!-- Three ways a row goes wrong and one way out of all of them. A date typed
+     into a number field, an operator that needs a value against an empty cell,
+     and a between whose floor is above its ceiling — the last is the one nobody
+     catches by eye, because both boxes are full and both figures are numbers.
+
+     Apply carries aria-disabled and not disabled. A real disabled attribute
+     takes the button out of the tab order, and the browser blurs a focused
+     element the moment it is disabled — so a user who tabbed to Apply and then
+     broke a value in the row above is thrown to the body with nothing on screen
+     saying why. aria-disabled leaves it reachable, and pressing it moves focus
+     to the first row that is wrong, which is also the only way a screen reader
+     user finds out which of five rows is the problem.
+
+     The summary is a role="alert" and its entries are buttons rather than
+     links. There is nothing to navigate to — the cell is on this screen — and a
+     link that only moves focus is a link the browser will offer to open in a
+     new tab.
+
+     The message is under the row and the red is the wrapper's border plus the
+     sentence. Nothing inside the enclosure turns red: a red ₹ reads as a
+     negative amount, and a red unit reads as the wrong unit.
+
+     aria-invalid goes on the control that holds the bad value, and for the
+     between it goes on both boxes, because the fault is a property of the pair
+     and reporting it under whichever one was touched last puts the same mistake
+     in two places on two visits. -->
+<div data-kui="filter-builder/invalid" class="max-w-3xl"
+     x-data="{
+       announce: '',
+       conds: [
+         { id: 1, field: 'Status', type: 'text', op: 'is', v: 'Open', v2: '' },
+         { id: 2, field: 'Line count', type: 'number', op: 'is more than', v: '31/08/2026', v2: '' },
+         { id: 3, field: 'Vendor', type: 'text', op: 'is', v: '', v2: '' },
+         { id: 4, field: 'Order value', type: 'number', op: 'is between', v: '5,00,000', v2: '1,00,000' }
+       ],
+       num(s) { const n = Number(String(s).replace(/,/g, '')); return Number.isFinite(n) ? n : null },
+       fault(c) {
+         if (c.op === 'is between') {
+           if (this.num(c.v) === null || this.num(c.v2) === null) return 'Both ends of a between have to be numbers.';
+           if (this.num(c.v) > this.num(c.v2)) return 'The floor is above the ceiling, so nothing can match. ₹' + c.v + ' is more than ₹' + c.v2 + '.';
+           return '';
+         }
+         if (!String(c.v).trim()) return 'This operator needs a value and the cell is empty.';
+         if (c.type === 'number' && this.num(c.v) === null) return 'Line count is a whole number, and 31/08/2026 is a date.';
+         return '';
+       },
+       get problems() { return this.conds.map((c, i) => ({ c: c, i: i, msg: this.fault(c) })).filter(p => p.msg) },
+       apply() {
+         if (!this.problems.length) { this.announce = 'Applied. 24 of 1,438 orders match.'; return }
+         const first = this.problems[0];
+         this.announce = this.problems.length + ' conditions cannot be applied.';
+         document.getElementById('fb-i-v-' + first.c.id).focus();
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+            <div class="min-w-0 flex-1 basis-36">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option>Status</option>
+                  <option>Vendor</option>
+                  <option>Line count</option>
+                  <option>Order value</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1 basis-32">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option>is</option>
+                  <option>is more than</option>
+                  <option>is between</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1 basis-48">
+              <template x-if="c.op === 'is between'">
+                <div class="flex items-stretch rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                     :class="fault(c) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+                  <span aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                  <input :id="'fb-i-v-' + c.id" inputmode="numeric" x-model="c.v"
+                         :aria-label="'Condition ' + (i + 1) + ', lowest order value'"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                  <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                  <input inputmode="numeric" x-model="c.v2"
+                         :aria-label="'Condition ' + (i + 1) + ', highest order value'"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </template>
+              <template x-if="c.op !== 'is between'">
+                <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                     :class="fault(c) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+                  <input :id="'fb-i-v-' + c.id" type="text" x-model="c.v" placeholder="Type a value"
+                         :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+                </div>
+              </template>
+            </div>
+
+            <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                    class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4"></i>
+            </button>
+          </div>
+
+          <p :id="'fb-i-m-' + c.id" x-show="fault(c)" x-cloak class="mt-1.5 pl-16 text-[12px]/4">
+            <span class="flex items-start gap-1.5 font-medium text-red-600">
+              <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+              <span class="tabular-nums" x-text="fault(c)"></span>
+            </span>
+          </p>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="problems.length" x-cloak role="alert"
+         class="border-t border-zinc-200 px-3 py-2.5">
+      <p class="flex items-start gap-2 text-[13px]/5 font-medium">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <span class="tabular-nums"><span x-text="problems.length"></span> conditions cannot be applied</span>
+      </p>
+      <ul role="list" class="mt-1.5 space-y-0.5 pl-6">
+        <template x-for="p in problems" :key="p.c.id">
+          <li>
+            <button type="button" @click="document.getElementById('fb-i-v-' + p.c.id).focus()"
+                    class="rounded-sm text-left text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Condition <span x-text="p.i + 1"></span>, <span x-text="p.c.field"></span> — <span x-text="p.msg"></span>
+            </button>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600"
+         x-text="problems.length ? 'Fix ' + problems.length + ' conditions before this can run' : 'Every condition is complete'"></p>
+      <button type="button" @click="apply()" :aria-disabled="problems.length ? 'true' : 'false'"
+              class="inline-flex h-9 items-center rounded-lg px-4 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="problems.length ? 'bg-zinc-300 text-zinc-600' : 'bg-zinc-700 text-white hover:bg-zinc-800'">
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="announce"></p>
+</div>` },
+
+    {
+      id: 'sheet', name: 'The builder in a bottom sheet at 390px', code: `<!-- A row of three controls does not survive a 390px screen and stacking them
+     in place does not save it: what a row is for is reading the condition left
+     to right as a sentence, and a stack of three unlabelled boxes is not a
+     sentence.
+
+     So below sm the builder stops being rows and becomes blocks. Each condition
+     is a bordered card carrying the sentence in words at the top — "Order value
+     is over ₹2,00,000" — and its three controls under it, full width, at 40px
+     rather than 34px because a thumb and a mouse do not need the same target.
+     The sentence is the row; the controls are how it is edited.
+
+     A bottom sheet rather than the right-hand one: this is a form to fill in
+     and the thumb is at the bottom of the screen, which is also where Apply
+     has to be. It is the one place in the component where the count and the
+     commit are the same control — "Show 24 orders" — because there is no room
+     for a count line and a button, and the button saying what it will do is
+     worth more than a number sitting above it.
+
+     The sheet is capped short of the viewport and the condition list is what
+     scrolls; the header and the footer do not, so Apply is reachable with six
+     conditions in the list.
+
+     The preview frame here is a bounded box so the sheet can be seen in the
+     gallery. As a real screen the layer is fixed inset-0 and the frame goes.
+
+     The sheet renders shut and the trigger carries the number of conditions in
+     force. A focus trap that is open at first paint traps whatever page the
+     component is pasted into, which on a gallery of components makes every
+     other entry on it unreachable. -->
+<div data-kui="filter-builder/sheet" class="relative mx-auto h-[600px] w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+     x-data="{
+       open: false,
+       conds: [
+         { id: 1, field: 'Status', op: 'is', v: 'Open' },
+         { id: 2, field: 'Order value', op: 'is over', v: '2,00,000' },
+         { id: 3, field: 'Delivery date', op: 'is before', v: '31 Aug 2026' }
+       ],
+       matched: 24,
+       sentence(c) { return c.field + ' ' + c.op + ' ' + (c.v || 'nothing yet') },
+       add() {
+         const c = { id: Date.now(), field: 'Vendor', op: 'is', v: '' };
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-s-f-' + c.id).focus());
+       }
+     }">
+
+  <div class="px-4 py-4">
+    <h3 class="text-[20px]/7 font-semibold tracking-tight">Purchase orders</h3>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">24 of 1,438 orders on screen</p>
+    <button type="button" x-ref="trigger" @click="open = true"
+            class="mt-3 flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Conditions
+      <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="conds.length"></span>
+    </button>
+  </div>
+
+  <div x-show="open" x-cloak x-trap="open"
+       @keydown.escape.window="if (open) { open = false; $refs.trigger.focus() }"
+       @click.self="open = false; $refs.trigger.focus()"
+       class="absolute inset-0 z-40 flex items-end bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="fb-s-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100%-3rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-4 pt-2 pb-3">
+        <h4 id="fb-s-title" class="text-[16px]/6 font-semibold">Conditions</h4>
+        <button type="button" @click="open = false; $refs.trigger.focus()" aria-label="Close"
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
+        <template x-for="(c, i) in conds" :key="c.id">
+          <div class="rounded-xl border border-zinc-200 bg-white p-3">
+            <div class="flex items-start justify-between gap-2">
+              <p class="min-w-0 text-[13px]/5 tabular-nums">
+                <span class="text-zinc-500" x-text="i === 0 ? 'Where ' : 'and '"></span><span class="font-medium" x-text="sentence(c)"></span>
+              </p>
+              <button type="button" @click="conds.splice(i, 1)"
+                      :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(c)"
+                      class="-mt-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-4"></i>
+              </button>
+            </div>
+
+            <div class="mt-2 space-y-2">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select :id="'fb-s-f-' + c.id" x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+                  <option>Status</option>
+                  <option>Vendor</option>
+                  <option>Order value</option>
+                  <option>Delivery date</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-4"></i>
+                </span>
+              </div>
+
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+                  <option>is</option>
+                  <option>is not</option>
+                  <option>is over</option>
+                  <option>is before</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-4"></i>
+                </span>
+              </div>
+
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="c.v" placeholder="Type a value"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                       class="block w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <button type="button" @click="add()"
+                class="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-300 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+        </button>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+        <button type="button" @click="conds = []"
+                class="inline-flex h-11 items-center rounded-lg px-3 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        <button type="button" @click="open = false; $refs.trigger.focus()"
+                class="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white tabular-nums hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Show <span class="px-1" x-text="matched"></span> orders
+        </button>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'count', name: 'The count, and a query that narrowed nothing', code: `<!-- The count is the only feedback this component gives and it is worthless
+     unless it says what it is counting out of. "24 orders" after an Apply does
+     not tell a buyer whether the query was sharp or whether the register is
+     quiet this month; "24 of 1,438 orders" does.
+
+     With no conditions in force the line stops being a fraction. "1,438 of
+     1,438" reads as a filter still on and somebody goes looking for it.
+
+     The third state is the one that has to be drawn separately: a result larger
+     than the register will ever put on screen. 18,204 rows behind a page of 50
+     is a query that has narrowed nothing, and reporting it in the same sentence
+     as a working count is how a user reads a broken filter as a good one. The
+     line says both figures, names the condition that is not cutting anything,
+     and offers the two narrowings the register knows how to suggest.
+
+     The warning mark is amber-700 because it is a 1.5px stroke and not a disc —
+     a 6px dot at that meaning is amber-500, and the two shades are the same
+     meaning at two weights. Nothing here takes a tinted field behind the text:
+     the alert rule holds, and a full-width amber band over a count shouts
+     louder than the count deserves.
+
+     All three lines are the same role="status" element rather than three that
+     appear and disappear. A live region that is rendered when its message
+     changes has not changed and is announced to nobody. -->
+<div data-kui="filter-builder/count" class="max-w-3xl space-y-3"
+     x-data="{
+       state: 'narrow',
+       total: 1438, page: 50,
+       counts: { none: 1438, narrow: 24, wide: 18204 },
+       get n() { return this.counts[this.state] },
+       get line() {
+         if (this.state === 'none') return this.total.toLocaleString('en-IN') + ' orders';
+         return this.n.toLocaleString('en-IN') + ' of ' + this.total.toLocaleString('en-IN') + ' orders match';
+       }
+     }">
+
+  <div role="group" aria-label="Preview a result size" class="flex flex-wrap items-center gap-2">
+    <button type="button" @click="state = 'none'" :aria-pressed="state === 'none'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nothing filtered</button>
+    <button type="button" @click="state = 'narrow'" :aria-pressed="state === 'narrow'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">A sharp query</button>
+    <button type="button" @click="state = 'wide'" :aria-pressed="state === 'wide'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">A query across every plant</button>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Purchase order register</h3>
+      <p role="status" class="text-[12px]/4 font-medium tabular-nums text-zinc-700" x-text="line"></p>
+    </div>
+
+    <div class="px-3 py-2.5">
+      <p x-show="state === 'none'" x-cloak class="text-[13px]/5 tabular-nums text-zinc-600">
+        Every order across Silvassa, Nashik and Vadodara, in FY 2026–27. Add a condition to cut it.
+      </p>
+
+      <p x-show="state === 'narrow'" class="text-[13px]/5 tabular-nums text-zinc-600">
+        Three conditions in force. The register draws all 24 on one page, so what is on screen is the whole answer.
+      </p>
+
+      <div x-show="state === 'wide'" x-cloak class="flex items-start gap-2.5">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums">18,204 orders match and the register draws 50 at a time</p>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            That is more rows than there are in FY 2026–27, so the conditions are reaching back through earlier years. <span class="font-medium text-zinc-900">Delivery date is after 01 Apr 2020</span> is not cutting anything — every open order passes it.
+          </p>
+          <div class="mt-2.5 flex flex-wrap items-center gap-2">
+            <button type="button"
+                    class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Add: raised in FY 2026–27 <span class="pl-1.5 text-zinc-500">1,438</span>
+            </button>
+            <button type="button"
+                    class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Add: plant is Silvassa <span class="pl-1.5 text-zinc-500">612</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">
+        An export of this query writes every matching row, not the 50 on screen. The count above is what it will contain.
+      </p>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'url', name: 'The query serialised to the query string', code: `<!-- The applied set lives in the URL or it does not exist. A buyer who has
+     spent four conditions working out which receipts are actually late sends
+     that screen to the plant head, and a builder holding its state in Alpine
+     sends a link to the unfiltered register.
+
+     It is also what makes Back work between two answers, what lets an export
+     carry the same query the screen is showing, and what makes a saved view
+     nothing more cunning than a stored query string with a name on it.
+
+     One parameter per condition, not one comma-joined list, because every
+     vendor name in this register has a comma in it and a value with a
+     separator inside it is how a query silently becomes two. Each parameter is
+     field, operator and value on colons, with the value percent-encoded; the
+     joiner is one parameter of its own.
+
+     The form is a GET and its inputs are hidden ones written from the applied
+     set, so pressing the browser's own submit produces exactly the URL the
+     builder would have pushed. There is no second serialiser anywhere — the
+     link, the form and the export all read the same array.
+
+     The link is a real anchor carrying the query, not a button that copies. A
+     buyer sends it by right-clicking, and a copy button is the version of that
+     which cannot be dragged into an email.
+
+     The URL is wrapping text and not a one-line box, and that is the fix for a
+     390px overflow rather than a preference. Percent-encoding removes every
+     space, so f=vendor:any:Gujarat%20Polymers%20Ltd%2CSharma%20Extrusions is a
+     single token with nowhere to break; min-w-0 lets the flex item shrink but
+     the content has no break opportunity to shrink to, so it held its intrinsic
+     width and took the document to 471px. break-all is what gives it one. A
+     readonly input would not overflow — it scrolls inside itself — but it shows
+     thirty of a hundred and twenty characters and the rest is behind a drag,
+     which is the wrong trade for a string whose entire purpose is to be read
+     and copied whole. select-all takes the whole URL on one click, so nothing
+     is lost by it not being a control. -->
+<div data-kui="filter-builder/url" class="max-w-3xl"
+     x-data="{
+       joiner: 'and',
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'amount', op: 'gt', v: '200000' },
+         { id: 3, field: 'vendor', op: 'any', v: 'Gujarat Polymers Ltd,Sharma Extrusions' },
+         { id: 4, field: 'due', op: 'before', v: '2026-08-31' }
+       ],
+       labels: { status: 'Status', amount: 'Order value', vendor: 'Vendor', due: 'Delivery date' },
+       opWords: { is: 'is', gt: 'is over', any: 'is any of', before: 'is before' },
+       param(c) { return 'f=' + c.field + ':' + c.op + ':' + encodeURIComponent(c.v) },
+       get query() { return this.conds.map(c => this.param(c)).join('&') + '&join=' + this.joiner },
+       get href() { return '/orders/?' + this.query },
+       sentence(c) {
+         const w = this.labels[c.field] + ' ' + this.opWords[c.op] + ' ';
+         if (c.field === 'amount') return w + '₹' + Number(c.v).toLocaleString('en-IN');
+         if (c.field === 'vendor') return w + c.v.split(',').length + ' vendors';
+         return w + c.v;
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">This register at this query</h3>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Four conditions, joined with <span class="font-medium text-zinc-700" x-text="joiner"></span>. Every one of them is in the address bar.</p>
+    </div>
+
+    <form method="get" action="/orders/" class="px-3 py-3">
+      <p class="mb-1.5 text-[12px]/4 font-medium text-zinc-600">The link this screen is at</p>
+      <div class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
+        <p class="font-mono text-[12px]/4 break-all select-all text-zinc-600" x-text="'https://erp.konspec.in' + href"></p>
+        <a :href="href"
+           class="mt-1.5 inline-flex items-center gap-1.5 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="external-link" class="size-3.5 text-zinc-600"></i>Open this query
+        </a>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">
+        One parameter per condition — field, operator, value — because every vendor name here has a comma in it and a comma-joined list turns one condition into two.
+      </p>
+
+      <template x-for="c in conds" :key="c.id">
+        <input type="hidden" name="f" :value="c.field + ':' + c.op + ':' + c.v">
+      </template>
+      <input type="hidden" name="join" :value="joiner">
+    </form>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">What the parameters say</p>
+      <ul role="list" class="mt-1.5 divide-y divide-zinc-100">
+        <template x-for="(c, i) in conds" :key="c.id">
+          <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-1.5">
+            <span class="min-w-0 font-mono text-[12px]/4 break-all text-zinc-600" x-text="param(c)"></span>
+            <span class="min-w-0 text-[13px]/5 tabular-nums" x-text="sentence(c)"></span>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">Back returns to the previous query, not to the unfiltered register.</p>
+      <a :href="'/orders/export/?' + query"
+         class="shrink-0 rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Export these 24 orders
+      </a>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'htmx', name: 'The register re-fetching on apply', code: `<!-- Alpine holds the conditions and htmx fetches the register; neither does
+     the other's job. The builder is local state until Apply, and Apply is one
+     GET carrying the serialised set.
+
+     hx-include picks up the hidden inputs the builder writes rather than the
+     three selects — the selects are the editor and the hidden inputs are the
+     applied query, and including the editor is how a half-typed value reaches
+     the server.
+
+     hx-push-url puts the query in the address bar, which is the whole reason
+     this variant is not just an Apply with a fetch behind it: the register is
+     re-fetched and the link is sendable, in one gesture, with no second
+     serialiser.
+
+     The target is the register panel and never the builder. Swapping the
+     builder replaces the selects somebody is still working in, and the request
+     they triggered looks from the outside like it worked.
+
+     hx-sync="this:replace" abandons a request already in flight, so pressing
+     Apply twice does not race two answers into the same target — and the button
+     is not disabled while it runs, because a browser blurs a disabled element
+     to the body and the keyboard user who pressed it is thrown to the top of
+     the document.
+
+     The rows that are already up stay up and are marked inert. Blanking the
+     register back to skeletons on every Apply is the cheapest way to make a
+     fast screen feel slow. The count line is the wait: it is already a
+     role="status", it already says the answer, and a second region saying
+     "Loading" talks over it. -->
+<div data-kui="filter-builder/htmx" class="max-w-3xl"
+     x-data="{
+       busy: false,
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'amount', op: 'gt', v: '200000' }
+       ],
+       labels: { status: 'Status', amount: 'Order value', vendor: 'Vendor', due: 'Delivery date' },
+       add() { this.conds.push({ id: Date.now(), field: 'vendor', op: 'is', v: '' }) }
+     }"
+     @htmx:before-request.camel="busy = true"
+     @htmx:after-request.camel="busy = false">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" @change="c.v = ''" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="status">Status</option>
+                <option value="vendor">Vendor</option>
+                <option value="amount">Order value</option>
+                <option value="due">Delivery date</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + labels[c.field]"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="not">is not</option>
+                <option value="gt">is over</option>
+                <option value="before">is before</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value for ' + labels[c.field]"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div id="fb-h-applied" class="hidden">
+      <template x-for="c in conds" :key="c.id">
+        <input type="hidden" name="f" :value="c.field + ':' + c.op + ':' + c.v">
+      </template>
+      <input type="hidden" name="join" value="and">
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <button type="button" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <button type="button"
+              hx-get="/orders/register/" hx-include="#fb-h-applied input" hx-target="#fb-h-register"
+              hx-swap="outerHTML" hx-sync="this:replace" hx-push-url="true"
+              class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span x-show="busy" x-cloak aria-hidden="true" class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <div id="fb-h-register" :aria-busy="busy ? 'true' : 'false'"
+       class="mt-3 rounded-xl border border-zinc-200 bg-white transition-opacity motion-reduce:transition-none"
+       :class="busy && 'opacity-60'">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h4 class="text-[13px]/5 font-medium">Matching orders</h4>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500">24 of 1,438 orders match</p>
+    </div>
+    <div class="divide-y divide-zinc-100">
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1187</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Gujarat Polymers Ltd · Silvassa</span>
+        <span class="text-[13px]/5 tabular-nums">₹18,42,000</span>
+      </div>
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1211</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Sharma Extrusions · Silvassa</span>
+        <span class="text-[13px]/5 tabular-nums">₹21,43,000</span>
+      </div>
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1218</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Nashik Steel Traders · Nashik</span>
+        <span class="text-[13px]/5 tabular-nums">₹12,90,500</span>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+    {
+      id: 'django', name: 'Rendered server-side from GET params', code: `<!-- The applied set arrives as repeated f parameters and the view parses them
+     into a list of condition objects before anything is rendered. The template
+     draws what the view understood, which is the only version of this that
+     cannot disagree with the queryset: a template that re-reads request.GET
+     itself is a second parser, and the two drift the first time somebody adds
+     an operator.
+
+     A parameter the view does not recognise is dropped and counted, never
+     raised. A link somebody sent from an older deployment, or a hand-edited
+     query string, should return a register rather than a 500 — and the line
+     under the chips says how many were dropped, so a result that looks wrong
+     can be explained.
+
+     The tags below are named in words rather than written with braces, because
+     Django compiles the whole file and does not know what an HTML comment is: a
+     block tag written as prose inside one opens a real block and swallows the
+     template.
+
+     views.py
+         OPS = {"is": "exact", "not": "exact", "gt": "gt", "lt": "lt",
+                "before": "lt", "after": "gt", "contains": "icontains"}
+         FIELDS = {"status": "status", "vendor": "vendor__name",
+                   "amount": "total", "due": "delivery_date"}
+
+         def parse(request):
+             out, dropped = [], 0
+             for raw in request.GET.getlist("f"):
+                 field, _, rest = raw.partition(":")
+                 op, _, value = rest.partition(":")
+                 if field not in FIELDS or op not in OPS:
+                     dropped += 1
+                     continue
+                 out.append(Condition(field, op, value))
+             return out, dropped
+
+     The condition's own sentence comes off the object as label, op_word and
+     display, so the chip, the row and the audit log read identically. Building
+     that sentence in the template is how one screen says "is over" and another
+     says "greater than" for the same query. display is the summarised value and
+     never the raw one — "3 vendors", not the three names joined with commas —
+     because the chip it lands in is whitespace-nowrap and a pill that cannot
+     wrap takes the page past 390px with it.
+
+     Every remove link carries the whole query string minus its own parameter,
+     built in the view as c.drop_url. A remove that posts is a remove that
+     breaks the Back button, and a filter is a GET. -->
+{% load humanize %}
+<div data-kui="filter-builder/django" class="max-w-3xl rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+    <h3 class="text-[13px]/5 font-medium">{{ register_name }}</h3>
+    <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500">
+      {% if conditions %}{{ matched|intcomma }} of {{ total|intcomma }} orders match{% else %}{{ total|intcomma }} orders{% endif %}
+    </p>
+  </div>
+
+  {% if conditions %}
+    <div role="group" aria-label="Conditions in force" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-3 py-2">
+      {% for c in conditions %}
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">
+          {% if not forloop.first %}<span aria-hidden="true" class="text-zinc-500">{{ join_word }}</span>{% endif %}
+          {{ c.label }} {{ c.op_word }} {{ c.display }}
+          <a href="{{ c.drop_url }}" aria-label="Remove the condition {{ c.label }} {{ c.op_word }} {{ c.display }}"
+             class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-3"></i>
+          </a>
+        </span>
+      {% endfor %}
+      <a href="{{ request.path }}" class="ml-auto rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</a>
+    </div>
+  {% endif %}
+
+  <form method="get" action="{{ request.path }}">
+    {% for c in conditions %}
+      <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5">
+        <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500">{% if forloop.first %}Where{% else %}{{ join_word }}{% endif %}</span>
+
+        <div class="min-w-0 flex-1 basis-36">
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select name="field_{{ forloop.counter }}" aria-label="Condition {{ forloop.counter }}, field"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+              {% for f in fields %}
+                <option value="{{ f.id }}" {% if f.id == c.field %}selected{% endif %}>{{ f.label }}</option>
+              {% endfor %}
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0 flex-1 basis-28">
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select name="op_{{ forloop.counter }}" aria-label="Condition {{ forloop.counter }}, operator for {{ c.label }}"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+              {% for o in c.operators %}
+                <option value="{{ o.id }}" {% if o.id == c.op %}selected{% endif %}>{{ o.word }}</option>
+              {% endfor %}
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0 flex-1 basis-44">
+          {% if c.takes_value %}
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" name="v_{{ forloop.counter }}" value="{{ c.value }}"
+                     aria-label="Condition {{ forloop.counter }}, value for {{ c.label }}"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+            </div>
+          {% else %}
+            <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+          {% endif %}
+        </div>
+
+        <a href="{{ c.drop_url }}" aria-label="Remove condition {{ forloop.counter }}, {{ c.label }} {{ c.op_word }} {{ c.display }}"
+           class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </a>
+      </div>
+    {% empty %}
+      <p class="border-b border-zinc-100 px-3 py-4 text-[13px]/5 tabular-nums text-zinc-500">
+        No conditions. The register is showing all {{ total|intcomma }} orders.
+      </p>
+    {% endfor %}
+
+    <input type="hidden" name="join" value="{{ join_word }}">
+    <input type="hidden" name="rows" value="{{ conditions|length }}">
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <a href="{{ add_url }}" class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </a>
+      <div class="ml-auto flex items-center gap-3">
+        <a href="{{ request.path }}" class="rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</a>
+        <button type="submit" class="inline-flex h-9 items-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+      </div>
+    </div>
+  </form>
+
+  {% if dropped %}
+    <p class="border-t border-zinc-200 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">
+      {{ dropped }} parameters in this link were not recognised and were ignored. The register below is the rest of the query.
+    </p>
+  {% endif %}
+</div>` }
+  ]
+}
 );

@@ -1,0 +1,72 @@
+<!-- A history that is newest first has one place the future can go, and it
+     is above the present. The two entries at the top have not happened: the
+     second approver has not signed and the order has not been sent. Drawing
+     them there is what makes the strip answer "what happens next" as well as
+     "what happened", which is the question a reader on an approval screen
+     actually has.
+
+     The mark is hollow — a size-2 circle with a zinc-400 border and no fill —
+     and that is six pixels of ring and nothing at all to a screen reader, so
+     each one opens with an sr-only "Not yet". The entry currently with
+     somebody carries aria-current="step"; the ones behind it carry nothing,
+     because "next but one" is not a state anybody acts on.
+
+     Pending entries are excluded from the count in the header. The strip that
+     shipped saying "12 entries" with two of them unsigned was quoted in a
+     dispute, and the two that had not happened were read as two that had.
+
+     The rail runs through them in the same zinc-200 it uses everywhere else.
+     Dashing it above the present looks like a good idea for exactly as long
+     as it takes somebody to ask what a dashed rail means on a printout. -->
+<div data-kui="timeline/pending" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">IND-2026-0731 · approval route</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">4 entries · 2 steps still to come</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-2 rounded-full border border-zinc-400 bg-white"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums text-zinc-500"><span class="sr-only">Not yet — </span>The order is raised against the approved indent and sent to the vendor.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Not yet · purchase</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0" aria-current="step">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-2 rounded-full border border-zinc-400 bg-white"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 font-medium tabular-nums"><span class="sr-only">Not yet — </span>Waiting on Nilesh Patil for level 2, the value being above ₹20,00,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">With him since <time datetime="2026-09-03T17:06+05:30">03 Sep 2026, 17:06</time> · 21 hours</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Ritu Deshpande</span> approved level 1 at ₹26,84,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T17:05+05:30">03 Sep 2026, 17:05</time> · yesterday · purchase lead</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Sanjay Rane</span> raised the indent for 45 MT of MS plate against the September rolling plan.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T09:18+05:30">02 Sep 2026, 09:18</time> · 2 days ago · works, Silvassa</p>
+      </div>
+    </li>
+  </ol>
+</div>

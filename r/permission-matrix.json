@@ -1,0 +1,179 @@
+{
+  "id": "permission-matrix",
+  "name": "Permission matrix",
+  "category": "data",
+  "markup": "No html in this file. Each variant below carries the path to its own markup at r/permission-matrix/<variant>.html — fetch the one you need.",
+  "description": "A grid of roles down one axis and permissions down the other, with the granted cell as a real checkbox. The screen an admin uses to say who may approve a purchase order over ₹5,00,000.",
+  "when_to_use": "The screen where who-may-do-what is both read and changed in one place — a deployment being set up, a new joiner being given a role, an auditor asking why a store keeper could reverse a GRN. Reach for it when the question needs every role and every permission on one grid, because the answer is comparative: the point of the shape is that one glance down a column says what a role can do and one glance across a row says who can do a thing. If the grid is three or four columns and drops into a form you are already writing, that is checkbox/matrix and it costs nothing — this entry is the screen around it, and it only earns its keep once there are enough roles that the axes have to be pinned, enough permissions that they group by module, and a save that can come back an error. If nothing on it is editable, it is a table with ticks and dashes in it, not this. If the screen is the settings section it lives in — the nav down one side, the h1, the Save that belongs to the section — that is settings-page, and this is what goes inside it. And a single flag that takes effect the moment it is touched is a toggle, not a cell in a grid: everything here is a pending change until Save.",
+  "rules": [
+    "Every box carries an aria-label naming both axes in the same words that are on screen — \"Approve over ₹5,00,000 — Purchase officer\". Headers are announced when a screen reader walks a table and not when it tabs the controls in one, which is how everybody fills this screen in, so a cell gives its box no name at all. The first version shortened the labels to codes, \"approve_over — PO\", and it broke voice control before it broke anything else: voice control matches on the words that are visible, so \"click Approve over five lakh\" found nothing while the column heading it was reading sat two inches away.",
+    "A disabled box posts nothing, and absence in a POST is indistinguishable from unticked, so the form has to name the columns it is authoritative for in a hidden field. This shipped without one. An admin who held five of the six roles opened the grid, changed one cell and pressed Save, and the server diffed the POST against all six and stripped every permission the sixth role had — the locked column was on screen the whole time, ticked, and the save quietly disagreed with it.",
+    "A module roll-up is a control over the module and not a field in the form, and it went wrong at both ends. indeterminate is a JS property with no matching attribute, so a module with two of its five permissions granted came back from the server reading as plainly off, and three people in a row ticked it to \"turn the module on\" and granted the other three without meaning to — it is bound with x-effect on the box itself, never on the component root, where $refs is not populated at init. It also carries no name and no value, because mixed changes nothing about what is submitted: the half-granted module whose roll-up had a name posted exactly as though the whole module had been ticked, with the leaves it was summarising posting underneath it. The leaves are what post; the roll-up only moves them.",
+    "Never paint the row from one cell. has-[:checked] on the tr is the register pattern and it is wrong here — a matrix row is not a selected row, it holds one answer per role, and a row tinted because the Purchase officer has a permission reads as the whole row being on. The hover band is the only thing allowed to cross the row, because its job is carrying the eye to the far column and not saying anything about the record.",
+    "Two kinds of disabled box sit on this grid for two different reasons and grey says neither. One comes with the role and is not set here; one belongs to a role the person reading may not grant. Both were drawn as a plain disabled tick and the support ticket was the same both times — \"why can I not untick this\" — so the reason now lives in the cell caption and in the box's accessible name, and the column that cannot be granted says so in its heading, which is the one thing announced alongside every cell under it.",
+    "Revoking something a role inherits is a value, not an absence. An unticked inheriting cell was posted as simply not-granted, the parent role was edited a fortnight later, and the permission came back — because nothing had ever recorded that somebody had taken it away on purpose. An explicit revoke is its own hidden field with its own name, and the cell says \"Revoked here\" in words so the next person can see it is a decision rather than a gap.",
+    "A width utility on a table cell is a preference the table overrules, and the floor underneath it is the widest unbreakable word in the column. The default grid was written with four role columns at w-28 and a browser sweep measured them at 80, 69, 83 and 82 pixels — \"Purchase\" in a heading and ₹5,00,000 in a row label are what set those — which put the document at 405px inside a 390px viewport, and the audit view, whose cells carry a date under every mark, at 423px. Tightening the padding moved the total by four pixels a column and never crossed the line, because none of it touched the floor. There are only two honest ways out and this entry takes one each: the default grid dropped a column, so the claim in its own comment that it fits on screen whole is true again, and the audit view went inside a scroller and took rule 14 with it.",
+    "Past four or five roles the grid has to scroll sideways inside its own box, and rule 14 is the whole price: relative on the scroller, role=\"region\" with tabindex=\"0\" and a name, and a sentence underneath saying it scrolls. The relative is the one that gets dropped, and dropping it is invisible — the sr-only caption inside the scroller resolves against the document from a cell several hundred pixels past the right edge of the panel, and the page grows a horizontal scrollbar whose cause cannot be seen because the element causing it cannot be seen.",
+    "border-separate border-spacing-0 before anything sticks. Preflight collapses the borders onto the table, and a collapsed border belongs to the table rather than to the cell, so it stays behind when the cell travels: the head floats over the boxes with no rule under it and the permission column slides across them with no edge to stop at. Every sticky plane then needs an opaque fill, and because that fill is opaque it stops taking the row hover — put back with group-hover on the frozen cell, or hovering a row lights six columns of boxes and leaves the permission white, which reads as the row ending where its name starts.",
+    "The phone arrangement is role-first and it is a separate variant, never a media query on the wide one. Capability-first — who may approve over ₹5,00,000 — is the audit question, and it is read rather than edited; somebody editing is setting a role up and has to see everything that one role may do before they save. Rendering both arrangements into one DOM with one of them display:none posts every permission twice, because a display:none checkbox still submits, and the two copies can disagree.",
+    "The unsaved bar counts changes, not ticks. It read \"11 permissions\" on a grid where 11 were already granted and two had been touched, which is a number that is true and answers nothing. It says how many cells differ from what was stored and splits them into granted and revoked, because those are the two things somebody wants to check before pressing Save on a screen that decides who can spend money. The bar is also always on screen and only its text changes: a strip that materialises when the form goes dirty adds 52px under a pointer that is already moving towards a cell.",
+    "A save that half-applied showed a confirmation. Eleven changes went up, three came back refused because those permissions are held by an approval policy rather than by the role, and the screen said \"Saved\" and left all eleven cells looking granted. The failure state now reverts the three cells to what is actually stored, marks each of them where it sits, and names them again above the grid — the grid is the record of what is true, so a cell that did not apply cannot be allowed to keep showing the value somebody asked for.",
+    "A cell that writes on change swaps itself, and swapping the element the user is standing on drops focus to the body. The returned cell keeps the same id as the one it replaces, which is what makes htmx put focus back; without it a keyboard user working down a column lost their place on every tick. hx-sync=\"this:replace\" keeps two quick writes in order, and there is no hx-disabled-elt, because disabling the focused box costs the same focus the swap was already threatening.",
+    "The audit view has no inputs in it at all. It was first drawn as the same grid with every box disabled, and it read as the editable screen with something broken rather than as a different screen — people kept clicking the boxes and then asking who had locked them. A tick is an icon and a blank is an em dash with sr-only words behind it, and neither of them is graphite-on-white by accident: a granted permission is a fact about the record, not a success, so it takes no emerald."
+  ],
+  "anatomy": [
+    {
+      "part": "Panel",
+      "description": "A bordered white card holding the whole grid, its heading and whatever strip carries Save. overflow-hidden only where nothing inside it opens a menu."
+    },
+    {
+      "part": "Permission column",
+      "description": "The row header, a th scope=\"row\" carrying the permission in the words a buyer would use and the money limit it applies to. It is the column that pays for every role added, so it is the one that gets frozen."
+    },
+    {
+      "part": "Role heading",
+      "description": "A th scope=\"col\" with the role name and, under it, how many people hold it. Where the role cannot be granted by the person reading, the reason goes here as well."
+    },
+    {
+      "part": "Cell",
+      "description": "A native checkbox, size-4 accent-zinc-700, in a centred td, carrying an aria-label naming both axes. No wrapper, no appearance-none, no substitute."
+    },
+    {
+      "part": "Module row",
+      "description": "A recessed bg-zinc-50 band opening a tbody, naming the module and holding one roll-up per role. It is a row, not a heading, so it stays inside the table."
+    },
+    {
+      "part": "Roll-up box",
+      "description": "The module summary for one role. No name and no value; checked when every leaf under it is, indeterminate when some are, and written back with x-effect on the element."
+    },
+    {
+      "part": "Cell caption",
+      "description": "The 11px line under a box that has to say why it is the way it is — from the role, set here, revoked here, not saved. A fixed min height so a caption appearing does not move the row."
+    },
+    {
+      "part": "Frozen permission column",
+      "description": "Past four or five roles the row header sticks left with an opaque fill of its own and takes group-hover, and the cell above it is sticky on both axes at z-20 against the z-10 of the two planes."
+    },
+    {
+      "part": "Scroller",
+      "description": "The div the wide grid lives in: relative, role=\"region\", tabindex=\"0\", a name, and a sentence under it saying it scrolls. The table never scrolls itself."
+    },
+    {
+      "part": "Scope field",
+      "description": "A hidden input naming the role columns this form is authoritative for, so a server diffing the POST cannot revoke the ones it was never shown."
+    },
+    {
+      "part": "Change bar",
+      "description": "The strip at the foot of the panel, on screen at all times, carrying either when the grid was last saved or how many cells differ from it, split into granted and revoked, with Discard and Save."
+    },
+    {
+      "part": "Change mark",
+      "description": "A 6px amber dot in a fixed-width slot beside a box whose value differs from what is stored. The slot is there whether the dot is or not, so nothing moves when it appears."
+    },
+    {
+      "part": "Audit mark",
+      "description": "What replaces the box where nothing is editable — a check icon or an em dash, each with sr-only words behind it, in graphite rather than in a status colour."
+    }
+  ],
+  "behaviour": [
+    "Every cell is a pending change until Save. Nothing on the grid writes on touch, which is the difference between this and a column of toggles, and it is why the panel can afford a Discard at all.",
+    "A module roll-up reads three states off the leaves under it — none, some, all — and ticking it grants every permission in that module for that one role, while unticking it releases only those. It never reaches across to another role's column.",
+    "The roll-up is a summary and not a subscription: it means the permissions in the module today, so a permission added to the module in October does not quietly join a role somebody set up in August.",
+    "Permissions that come with the role are ticked and locked, and the server does not read them off this form. A role column the current user may not grant stays on the grid, locked, rather than being dropped, because a grid missing it reads as that role having no permissions at all.",
+    "An inheriting column shows what it gets from its parent as a locked tick, what has been added on top of it as a live tick, and what has been taken away as a live empty box with the words to say so — and that last one posts a value of its own rather than nothing.",
+    "The change bar is on screen from first paint. Before anything is touched it says when the grid was last saved and by whom; once a cell differs from what is stored it says how many cells differ, how many of those are grants and how many are revocations, and Discard puts every one of them back.",
+    "Discard restores the stored values without a round trip, because nothing has left the browser yet. It never asks for confirmation on its own — the count beside it is what makes the button legible.",
+    "A save that comes back an error keeps the grid on screen, reverts only the cells the server refused, marks each of them where it sits and lists them once above the grid with the reason. The cells that did apply stay applied and stop being counted as changes.",
+    "Where a cell writes on its own the request goes per cell and the answer replaces that cell, carrying the saved state and the time it was recorded. Two ticks a second apart cannot overtake each other, and a refused one puts the box back and says so in the cell rather than in a toast.",
+    "Below the width at which it clips, the grid scrolls in both axes inside its own box and the page behind it does not move. The head stays while the permissions scroll and the permission column stays while the roles are panned.",
+    "At 390px the grid is gone entirely and one role is on screen at a time, its permissions as a list grouped by module. Switching roles reloads the pane, so the switch is held while there are unsaved changes and the reason is text beside the control.",
+    "The audit view is the same axes with nothing to press: ticks, dashes, and the date each grant was made. Nothing on that screen writes, and it carries no form at all rather than a form with everything disabled."
+  ],
+  "accessibility": [
+    "Every box has an aria-label naming its permission and its role in the visible words of both, because a table cell gives its control neither and voice control matches on what is on screen.",
+    "The permission is a th scope=\"row\" and the role is a th scope=\"col\", so a screen reader walking the grid announces both axes on arrival at a cell even though the box inside carries them itself.",
+    "The mixed state on a module roll-up is the indeterminate property on a native input, which already maps to mixed. Nothing here writes aria-checked — an attribute set once outlives a property that keeps changing, which is how a roll-up ends up announced as mixed long after the module was fully granted.",
+    "Locked cells use the disabled attribute, which takes them out of the Tab order and out of the POST, and each one says in its own name which kind of locked it is — comes with the role, or a role you may not grant.",
+    "The scroller takes role=\"region\", tabindex=\"0\" and an accessible name. Chromium will not give keyboard focus to an overflow container, so without it a keyboard user reaches every box in the grid and cannot move it one pixel to see which column they are standing in. Firefox focuses scrollable regions on its own, which is how this passes review on one machine and fails on the next.",
+    "The scroller also takes relative, or the sr-only caption inside it resolves against the document, escapes the clip and widens the whole page.",
+    "The caption on a wide grid says out loud what the shape is — permissions down the rows, roles across the columns, and which column is locked — because that orientation is free to the eye and expensive to everybody else.",
+    "The change count is a role=\"status\" in the bar, not a live region wrapped round the grid. It announces the new count once when it changes rather than announcing a box that has already announced itself.",
+    "A refused save puts its reason in a role=\"status\" that is inserted with the answer, so it is announced on arrival; the revert underneath it is script writing checked, and a programmatic change announces nothing at all.",
+    "On the phone arrangement the boxes carry no aria-label and need none: each has visible words of its own, and the role is the legend on the fieldset, announced on the way in. aria-label belongs to a box a table cell has left nameless.",
+    "The audit view puts real words behind every mark — sr-only \"Granted\" behind the tick and \"Not granted\" behind the dash — because an icon with no text and an em dash both read as nothing.",
+    "The grid still loading is aria-busy on the panel with one sr-only role=\"status\" naming what is loading, and the grey squares under it are aria-hidden, or a screen reader walks a table of sixty empty cells and is never told why."
+  ],
+  "related": [
+    "checkbox",
+    "table",
+    "settings-page",
+    "toggle"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Roles across permissions",
+      "markup": "r/permission-matrix/default.html"
+    },
+    {
+      "id": "scroll",
+      "name": "Seven roles, both axes pinned",
+      "markup": "r/permission-matrix/scroll.html"
+    },
+    {
+      "id": "groups",
+      "name": "Grouped by module, with a roll-up",
+      "markup": "r/permission-matrix/groups.html"
+    },
+    {
+      "id": "inherited",
+      "name": "Comes with the role, and the override",
+      "markup": "r/permission-matrix/inherited.html"
+    },
+    {
+      "id": "readonly",
+      "name": "The audit view",
+      "markup": "r/permission-matrix/readonly.html"
+    },
+    {
+      "id": "compare",
+      "name": "Two roles side by side",
+      "markup": "r/permission-matrix/compare.html"
+    },
+    {
+      "id": "dirty",
+      "name": "What changed, and not saved yet",
+      "markup": "r/permission-matrix/dirty.html"
+    },
+    {
+      "id": "phone",
+      "name": "One role at a time on a phone",
+      "markup": "r/permission-matrix/phone.html"
+    },
+    {
+      "id": "empty",
+      "name": "No roles defined yet",
+      "markup": "r/permission-matrix/empty.html"
+    },
+    {
+      "id": "loading",
+      "name": "The grants still loading",
+      "markup": "r/permission-matrix/loading.html"
+    },
+    {
+      "id": "failed",
+      "name": "The save came back an error",
+      "markup": "r/permission-matrix/failed.html"
+    },
+    {
+      "id": "htmx",
+      "name": "A cell that saves itself",
+      "markup": "r/permission-matrix/htmx.html"
+    },
+    {
+      "id": "django",
+      "name": "The Django loop",
+      "markup": "r/permission-matrix/django.html"
+    }
+  ]
+}

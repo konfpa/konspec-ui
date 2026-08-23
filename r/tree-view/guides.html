@@ -1,0 +1,190 @@
+<!-- A chart of accounts is four levels deep and every level looks like the one
+     above it, so the indent alone stops carrying the structure: by 1113 the eye
+     has to count spaces backwards to work out which parent the row belongs to.
+     Rules and elbows answer that without asking anybody to count.
+
+     They are borders on empty spans, not an image and not a background. A
+     repeating background would have to be positioned against an indent step
+     that is written in the markup, so the two would drift the first time
+     somebody changed w-6 to w-5; drawn as boxes inside the same indent columns
+     the row already has, the rail is by construction in the middle of the
+     column it belongs to.
+
+     Each indent column is 24px wide and the rail sits at its midpoint — a w-3
+     box carrying border-r — so the rail lands under the centre of the parent's
+     chevron rather than under its left edge. The elbow is the same rail cut at
+     18px, which is half of the 36px row, with a 12px border-b running from it
+     to the row's own chevron. Both halves are the row height, so a row that
+     wraps keeps its elbow on the first line where the chevron is.
+
+     The rail above a last child stops at the elbow: the continuation span is
+     simply not rendered. A rail that runs past the last row of a branch points
+     at nothing, and in a deep tree it reads as a sibling that failed to load.
+
+     An ancestor that was itself a last child contributes a blank column, not a
+     rail. That is the whole rule — a column carries a rail when the ancestor at
+     that level still has a sibling below it — and it is why the guides have to
+     be rendered from the node's ancestry rather than from its depth.
+
+     All of it is aria-hidden. The structure is already in the nesting and in
+     aria-expanded; the guides are the picture of it for the eye. -->
+<div data-kui="tree-view/guides" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { a: true, ca: true, inv: true, bank: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Chart of accounts — Konspec Polymers Pvt Ltd</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">As at 31 Mar 2026</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.a = !open.a" :aria-expanded="open.a" aria-controls="tv-g-a"
+                aria-label="Accounts under 1000 Assets"
+                class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.a && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1000</span> <span class="font-medium">Assets</span></span>
+        <span class="ml-3 shrink-0 self-center tabular-nums">₹18,42,10,600</span>
+      </div>
+
+      <ul role="list" id="tv-g-a" x-show="open.a" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="flex w-6 shrink-0">
+              <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+              <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+            </span>
+            <button type="button" @click="open.ca = !open.ca" :aria-expanded="open.ca" aria-controls="tv-g-ca"
+                    aria-label="Accounts under 1100 Current assets"
+                    class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.ca && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1100</span> <span class="text-zinc-600">Current assets</span></span>
+            <span class="ml-3 shrink-0 self-center tabular-nums">₹11,08,74,200</span>
+          </div>
+
+          <ul role="list" id="tv-g-ca" x-show="open.ca" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <button type="button" @click="open.inv = !open.inv" :aria-expanded="open.inv" aria-controls="tv-g-inv"
+                        aria-label="Accounts under 1110 Inventory"
+                        class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="flex transition-transform motion-reduce:transition-none" :class="open.inv && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                </button>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1110</span> <span class="text-zinc-600">Inventory</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums">₹7,64,29,800</span>
+              </div>
+
+              <ul role="list" id="tv-g-inv" x-show="open.inv" x-collapse.duration.200ms>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1111</span> <span class="text-zinc-600">Raw material — Vasai plant</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹4,18,60,400</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1112</span> <span class="text-zinc-600">Work in progress</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹1,12,84,000</span>
+                  </div>
+                </li>
+                <li>
+                  <!-- last child of 1110: the elbow has no continuation below it -->
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1113</span> <span class="text-zinc-600">Finished goods</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹2,32,85,400</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span><span class="flex-1 border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1120</span> <span class="text-zinc-600">Trade receivables</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹2,84,12,900</span>
+              </div>
+            </li>
+
+            <li>
+              <!-- last child of 1100, and a branch: rail stops, chevron stays -->
+              <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                <span aria-hidden="true" class="flex w-6 shrink-0">
+                  <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                  <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                </span>
+                <button type="button" @click="open.bank = !open.bank" :aria-expanded="open.bank" aria-controls="tv-g-bank"
+                        aria-label="Accounts under 1130 Bank accounts"
+                        class="flex size-6 shrink-0 items-center justify-center self-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="flex transition-transform motion-reduce:transition-none" :class="open.bank && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                </button>
+                <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1130</span> <span class="text-zinc-600">Bank accounts</span></span>
+                <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹60,31,500</span>
+              </div>
+              <ul role="list" id="tv-g-bank" x-show="open.bank" x-cloak x-collapse.duration.200ms>
+                <li>
+                  <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+                    <span aria-hidden="true" class="flex w-6 shrink-0"><span class="w-3 border-r border-zinc-200"></span></span>
+                    <span aria-hidden="true" class="w-6 shrink-0"></span>
+                    <span aria-hidden="true" class="flex w-6 shrink-0">
+                      <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+                      <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+                    </span>
+                    <span aria-hidden="true" class="size-6 shrink-0"></span>
+                    <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1131</span> <span class="text-zinc-600">HDFC Bank — CC 00120340001188</span></span>
+                    <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹60,31,500</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <!-- last child of 1000 -->
+          <div class="flex min-h-9 items-stretch pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="flex w-6 shrink-0">
+              <span class="flex w-3 flex-col"><span class="h-[18px] border-r border-zinc-200"></span></span>
+              <span class="h-[18px] w-3 self-start border-b border-zinc-200"></span>
+            </span>
+            <span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 self-center truncate"><span class="font-medium tabular-nums">1200</span> <span class="text-zinc-600">Plant and machinery, net of depreciation</span></span>
+            <span class="ml-3 shrink-0 self-center tabular-nums text-zinc-600">₹7,33,36,400</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

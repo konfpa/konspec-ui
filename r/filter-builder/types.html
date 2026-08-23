@@ -1,0 +1,279 @@
+<!-- The whole difficulty of the component is one cell. A field type decides
+     which operators exist, and the operator decides how many values the row
+     takes — none, one, or two in a single enclosure — so the value cell is the
+     only part of the row that is not a select.
+
+     Text takes contains, is, starts with and the two blank tests. A number
+     takes the comparisons and a between. An amount is a number wearing its ₹
+     inside the enclosure, so the symbol sits inside the focus outline rather
+     than beside it. A date is chosen from presets first, because nobody clicks
+     their way to the end of the month, and the picker only appears when the
+     preset is the one that says a date will be picked. A status is a short
+     fixed list, so it is a select. A vendor is a register of records, so it is
+     combobox/filter's trigger-and-panel shape and not a select with four
+     hundred options in it.
+
+     Changing the field discards the value without asking. Order value is over
+     200000, switched to Delivery date, once left the 200000 behind and asked
+     the server for every order due after the year 200000 — which is every
+     order, and nothing on screen said so.
+
+     Changing the operator only discards when the shape changes. is over to is
+     under keeps the figure, is over to is between keeps the floor and empties
+     the ceiling, and anything to is blank drops both.
+
+     An operator that takes no value leaves grey text and not a disabled box. A
+     greyed input beside "is blank" reads as a value the user is not permitted
+     to set, and three people in a fortnight asked what to type in it. -->
+<div data-kui="filter-builder/types" class="max-w-4xl"
+     x-data="{
+       next: 8, openPanel: null,
+       fields: [
+         { id: 'po', label: 'PO number', type: 'text' },
+         { id: 'grn', label: 'GRN reference', type: 'text' },
+         { id: 'lines', label: 'Line count', type: 'number' },
+         { id: 'amount', label: 'Order value', type: 'amount' },
+         { id: 'due', label: 'Delivery date', type: 'date' },
+         { id: 'status', label: 'Status', type: 'status' },
+         { id: 'vendor', label: 'Vendor', type: 'record' }
+       ],
+       ops: {
+         text: [['contains', 'contains'], ['is', 'is'], ['starts', 'starts with'], ['empty', 'is blank'], ['filled', 'is not blank']],
+         number: [['eq', 'is'], ['gt', 'is more than'], ['lt', 'is less than'], ['between', 'is between']],
+         amount: [['gt', 'is over'], ['lt', 'is under'], ['between', 'is between'], ['eq', 'is exactly']],
+         date: [['before', 'is before'], ['after', 'is after'], ['between', 'is between'], ['empty', 'has no date']],
+         status: [['is', 'is'], ['not', 'is not']],
+         record: [['any', 'is any of'], ['none', 'is none of']]
+       },
+       statuses: [['open', 'Open'], ['approved', 'Approved'], ['overdue', 'Overdue'], ['closed', 'Closed']],
+       presets: [['week', 'the end of this week'], ['month', 'the end of this month'], ['quarter', 'the end of this quarter'], ['fy', 'the end of the financial year'], ['pick', 'a date I pick']],
+       vendors: [
+         { id: 'gujarat', label: 'Gujarat Polymers Ltd', orders: 12 },
+         { id: 'sharma', label: 'Sharma Extrusions', orders: 8 },
+         { id: 'nashik-steel', label: 'Nashik Steel Traders', orders: 6 },
+         { id: 'deccan', label: 'Deccan Fasteners Pvt Ltd', orders: 5 },
+         { id: 'konkan', label: 'Konkan Chemicals Pvt Ltd', orders: 4 }
+       ],
+       rows: [
+         { id: 1, field: 'po', op: 'starts', v: 'PO-24-', v2: '', sel: [] },
+         { id: 2, field: 'lines', op: 'between', v: '4', v2: '20', sel: [] },
+         { id: 3, field: 'amount', op: 'gt', v: '2,00,000', v2: '', sel: [] },
+         { id: 4, field: 'due', op: 'before', v: 'month', v2: '2026-08-31', sel: [] },
+         { id: 5, field: 'status', op: 'is', v: 'open', v2: '', sel: [] },
+         { id: 6, field: 'vendor', op: 'any', v: '', v2: '', sel: ['gujarat', 'sharma', 'nashik-steel'] },
+         { id: 7, field: 'grn', op: 'empty', v: '', v2: '', sel: [] }
+       ],
+       f(id) { return this.fields.find(x => x.id === id) },
+       opsFor(r) { return this.ops[this.f(r.field).type] },
+       opLabel(r) { const o = this.opsFor(r).find(x => x[0] === r.op); return o ? o[1] : '' },
+       arity(r) { return (r.op === 'empty' || r.op === 'filled') ? 0 : (r.op === 'between' ? 2 : 1) },
+       setField(r, id) {
+         r.field = id;
+         const list = this.ops[this.f(id).type];
+         if (!list.some(o => o[0] === r.op)) r.op = list[0][0];
+         r.v = ''; r.v2 = ''; r.sel = [];
+       },
+       setOp(r, op) { const was = this.arity(r); r.op = op; const now = this.arity(r); if (now === 0) { r.v = ''; r.v2 = '' } else if (now !== was) { r.v2 = '' } },
+       statusLabel(v) { const s = this.statuses.find(x => x[0] === v); return s ? s[1] : 'nothing yet' },
+       presetLabel(v) { const p = this.presets.find(x => x[0] === v); return p ? p[1] : 'nothing yet' },
+       money(v) { return v ? '₹' + v : 'nothing yet' },
+       sentence(r) {
+         const t = this.f(r.field).type, head = this.f(r.field).label + ' ' + this.opLabel(r);
+         if (this.arity(r) === 0) return head;
+         if (this.arity(r) === 2) return head + ' ' + (r.v || '—') + ' and ' + (r.v2 || '—');
+         if (t === 'status') return head + ' ' + this.statusLabel(r.v);
+         if (t === 'record') return head + ' ' + (r.sel.length || 'no') + ' vendors';
+         if (t === 'amount') return head + ' ' + this.money(r.v);
+         if (t === 'date') return head + ' ' + (r.v === 'pick' ? (r.v2 || 'a date not yet chosen') : this.presetLabel(r.v));
+         return head + ' ' + (r.v || 'nothing yet');
+       },
+       add() {
+         const r = { id: this.next++, field: 'po', op: 'contains', v: '', v2: '', sel: [] };
+         this.rows.push(r);
+         this.$nextTick(() => document.getElementById('fb-t-f-' + r.id).focus());
+       },
+       remove(i) { this.rows.splice(i, 1) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Every field type the order register has</h3>
+    </div>
+
+    <div>
+      <template x-for="(r, i) in rows" :key="r.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-t-f-' + r.id" :value="r.field" @change="setField(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="f in fields" :key="f.id">
+                  <option :value="f.id" x-text="f.label"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-32">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :value="r.op" @change="setOp(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', operator for ' + f(r.field).label"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="o in opsFor(r)" :key="o[0]">
+                  <option :value="o[0]" x-text="o[1]"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-56">
+
+            <template x-if="arity(r) === 0">
+              <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+            </template>
+
+            <template x-if="arity(r) === 2 && f(r.field).type === 'date'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="date" x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', earliest delivery date'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-[13px]/5 tabular-nums outline-none">
+                <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                <input type="date" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', latest delivery date'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 2 && f(r.field).type !== 'date'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span x-show="f(r.field).type === 'amount'" x-cloak aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                <input inputmode="numeric" x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', lowest ' + f(r.field).label"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                <input inputmode="numeric" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', highest ' + f(r.field).label"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'text'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="r.v" placeholder="Type a value"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + f(r.field).label"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'number'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input inputmode="numeric" x-model="r.v" placeholder="0"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + f(r.field).label"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'amount'">
+              <div class="flex items-stretch rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <span aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                <input inputmode="numeric" x-model="r.v" placeholder="0"
+                       :aria-label="'Condition ' + (i + 1) + ', order value in rupees'"
+                       class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'date'">
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="relative min-w-0 flex-1 basis-40 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', delivery date'"
+                          class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                    <option value="">Choose a date</option>
+                    <template x-for="p in presets" :key="p[0]">
+                      <option :value="p[0]" x-text="p[1]"></option>
+                    </template>
+                  </select>
+                  <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                    <i data-lucide="chevron-down" class="size-3.5"></i>
+                  </span>
+                </div>
+                <div x-show="r.v === 'pick'" x-cloak class="min-w-0 flex-1 basis-36 rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                  <input type="date" x-model="r.v2" :aria-label="'Condition ' + (i + 1) + ', the delivery date picked'"
+                         class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'status'">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', status'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option value="">Choose a status</option>
+                  <template x-for="s in statuses" :key="s[0]">
+                    <option :value="s[0]" x-text="s[1]"></option>
+                  </template>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </template>
+
+            <template x-if="arity(r) === 1 && f(r.field).type === 'record'">
+              <div class="relative" @click.outside="if (openPanel === r.id) openPanel = null">
+                <button type="button" @click="openPanel = openPanel === r.id ? null : r.id"
+                        :aria-expanded="openPanel === r.id" :aria-controls="'fb-t-p-' + r.id"
+                        :aria-label="'Condition ' + (i + 1) + ', vendors, ' + r.sel.length + ' chosen'"
+                        class="flex w-full items-center gap-1.5 rounded-lg border border-zinc-200 bg-white py-1.5 pr-2 pl-2.5 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <span class="min-w-0 flex-1 truncate" x-text="r.sel.length ? r.sel.length + ' vendors' : 'Choose vendors'"></span>
+                  <i data-lucide="chevron-down" class="size-3.5 shrink-0 text-zinc-600"></i>
+                </button>
+                <div :id="'fb-t-p-' + r.id" x-show="openPanel === r.id" x-cloak
+                     @keydown.escape="$event.stopPropagation(); openPanel = null; $el.previousElementSibling.focus()"
+                     class="absolute top-full left-0 z-30 mt-1 w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white py-1 shadow-lg">
+                  <template x-for="v in vendors" :key="v.id">
+                    <label class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 hover:bg-zinc-100">
+                      <input type="checkbox" :value="v.id" x-model="r.sel" class="size-4 shrink-0 accent-zinc-700">
+                      <span class="min-w-0 flex-1 truncate" x-text="v.label"></span>
+                      <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="v.orders"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <button type="button" @click="remove(i)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(r)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2.5">
+    <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">The query these rows read as</p>
+    <ol role="list" class="mt-1.5 space-y-0.5">
+      <template x-for="(r, i) in rows" :key="r.id">
+        <li class="text-[13px]/5 tabular-nums text-zinc-700">
+          <span class="text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+          <span x-text="sentence(r)"></span>
+        </li>
+      </template>
+    </ol>
+  </div>
+</div>

@@ -1169,6 +1169,219 @@
       "detail": "r/spinner.json"
     },
     {
+      "id": "timeline",
+      "name": "Timeline",
+      "category": "data",
+      "description": "What happened to one record, in order — the history strip on a purchase order, the audit trail on a vendor master, the QC events on a batch. Each entry is an actor, a verb, a time, and where it matters what the value was before.",
+      "related": [
+        "audit-page",
+        "marker",
+        "avatar",
+        "record-page"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "The rail down one record's history"
+        },
+        {
+          "id": "dense",
+          "name": "A long history in a drawer"
+        },
+        {
+          "id": "grouped",
+          "name": "Today, Yesterday, and then the date"
+        },
+        {
+          "id": "changes",
+          "name": "What the field was before"
+        },
+        {
+          "id": "status",
+          "name": "The record moving between states"
+        },
+        {
+          "id": "comment",
+          "name": "A note somebody wrote, with the paperwork on it"
+        },
+        {
+          "id": "system",
+          "name": "What the system did, without a colour"
+        },
+        {
+          "id": "pending",
+          "name": "The step that has not been taken"
+        },
+        {
+          "id": "load-more",
+          "name": "The 18 entries that are not drawn"
+        },
+        {
+          "id": "filter",
+          "name": "Narrowing the trail to one kind of event"
+        },
+        {
+          "id": "inline",
+          "name": "The strip in a record's sidebar"
+        },
+        {
+          "id": "empty",
+          "name": "Two different nothings"
+        },
+        {
+          "id": "loading",
+          "name": "The rail before the entries land"
+        },
+        {
+          "id": "htmx",
+          "name": "A new event arriving at the top"
+        },
+        {
+          "id": "django",
+          "name": "Rendered from the event table"
+        }
+      ],
+      "detail": "r/timeline.json"
+    },
+    {
+      "id": "permission-matrix",
+      "name": "Permission matrix",
+      "category": "data",
+      "description": "A grid of roles down one axis and permissions down the other, with the granted cell as a real checkbox. The screen an admin uses to say who may approve a purchase order over ₹5,00,000.",
+      "related": [
+        "checkbox",
+        "table",
+        "settings-page",
+        "toggle"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Roles across permissions"
+        },
+        {
+          "id": "scroll",
+          "name": "Seven roles, both axes pinned"
+        },
+        {
+          "id": "groups",
+          "name": "Grouped by module, with a roll-up"
+        },
+        {
+          "id": "inherited",
+          "name": "Comes with the role, and the override"
+        },
+        {
+          "id": "readonly",
+          "name": "The audit view"
+        },
+        {
+          "id": "compare",
+          "name": "Two roles side by side"
+        },
+        {
+          "id": "dirty",
+          "name": "What changed, and not saved yet"
+        },
+        {
+          "id": "phone",
+          "name": "One role at a time on a phone"
+        },
+        {
+          "id": "empty",
+          "name": "No roles defined yet"
+        },
+        {
+          "id": "loading",
+          "name": "The grants still loading"
+        },
+        {
+          "id": "failed",
+          "name": "The save came back an error"
+        },
+        {
+          "id": "htmx",
+          "name": "A cell that saves itself"
+        },
+        {
+          "id": "django",
+          "name": "The Django loop"
+        }
+      ],
+      "detail": "r/permission-matrix.json"
+    },
+    {
+      "id": "tree-view",
+      "name": "Tree view",
+      "category": "data",
+      "description": "Records that nest, drawn as rows that expand to reveal the rows underneath them. A bill of material exploded into its sub-assemblies, a chart of accounts, a plant broken down to the bin — every row still a record with its own code and its own figures.",
+      "related": [
+        "accordion",
+        "table",
+        "sidebar",
+        "checkbox"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Default"
+        },
+        {
+          "id": "guides",
+          "name": "Indent guides"
+        },
+        {
+          "id": "expand-all",
+          "name": "Opening the whole tree at once"
+        },
+        {
+          "id": "keyboard",
+          "name": "The tree widget, walked with the keyboard"
+        },
+        {
+          "id": "selection",
+          "name": "Boxes that cascade down and read back up"
+        },
+        {
+          "id": "columns",
+          "name": "A tree table with figures that roll up"
+        },
+        {
+          "id": "lazy",
+          "name": "Children fetched the first time a branch opens"
+        },
+        {
+          "id": "search",
+          "name": "Filtering without losing the hierarchy"
+        },
+        {
+          "id": "actions",
+          "name": "A menu on the row"
+        },
+        {
+          "id": "status",
+          "name": "A state on the row, and on the branch above it"
+        },
+        {
+          "id": "empty",
+          "name": "Nothing to draw, and branches with nothing under them"
+        },
+        {
+          "id": "phone",
+          "name": "At 390px"
+        },
+        {
+          "id": "htmx",
+          "name": "The open set on the server, in the URL"
+        },
+        {
+          "id": "django",
+          "name": "Server-rendered, one partial that includes itself"
+        }
+      ],
+      "detail": "r/tree-view.json"
+    },
+    {
       "id": "alert",
       "name": "Alert",
       "category": "feedback",
@@ -2801,6 +3014,78 @@
         }
       ],
       "detail": "r/questionnaire.json"
+    },
+    {
+      "id": "filter-builder",
+      "name": "Filter builder",
+      "category": "forms",
+      "description": "Conditions composed into a query over a register — one row carrying a field, an operator and a value, added and removed until the list on screen is the list somebody asked for. The control a buyer uses to ask for open orders over ₹2,00,000, from three vendors, due before the end of the month.",
+      "related": [
+        "data-table",
+        "select",
+        "combobox",
+        "input-group",
+        "badge"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Conditions over a register"
+        },
+        {
+          "id": "types",
+          "name": "The value cell swapping per field type"
+        },
+        {
+          "id": "chips",
+          "name": "The applied set as chips over the register"
+        },
+        {
+          "id": "groups",
+          "name": "One level of AND / OR nesting"
+        },
+        {
+          "id": "saved",
+          "name": "Saved views, and one that has been edited"
+        },
+        {
+          "id": "apply",
+          "name": "A draft, and an explicit Apply"
+        },
+        {
+          "id": "live",
+          "name": "Debounced, with no Apply at all"
+        },
+        {
+          "id": "empty",
+          "name": "No conditions yet"
+        },
+        {
+          "id": "invalid",
+          "name": "A value that does not fit its operator"
+        },
+        {
+          "id": "sheet",
+          "name": "The builder in a bottom sheet at 390px"
+        },
+        {
+          "id": "count",
+          "name": "The count, and a query that narrowed nothing"
+        },
+        {
+          "id": "url",
+          "name": "The query serialised to the query string"
+        },
+        {
+          "id": "htmx",
+          "name": "The register re-fetching on apply"
+        },
+        {
+          "id": "django",
+          "name": "Rendered server-side from GET params"
+        }
+      ],
+      "detail": "r/filter-builder.json"
     },
     {
       "id": "container",

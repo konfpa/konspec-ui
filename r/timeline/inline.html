@@ -1,0 +1,65 @@
+<!-- The form the rail takes in a 288px rail beside a record, where it is one
+     of four blocks and not the thing the reader came for. Four entries, one
+     line each, and the whole of it is a pointer at the full trail.
+
+     What goes first is the diff. A rate change written out as an old value
+     and a new one needs the width to put them on one line, and wrapped into a
+     rail it becomes four lines of small type that nobody reads and everybody
+     has to scroll past. The entry says a field changed; the record page's own
+     activity section says what it changed from.
+
+     The second line keeps the time and the person and drops everything else —
+     the gate, the vehicle, the mailbox. Those are facts about the event and
+     this is a list of which events there were.
+
+     "See all 22" is a real link with the figure in it. A count that does
+     nothing is the most-clicked dead element in any internal application, and
+     a link that says only "See all" is one nobody can judge before pressing. -->
+<aside data-kui="timeline/inline" class="w-72 rounded-xl border border-zinc-300 bg-white p-4">
+  <h2 class="text-[13px]/5 font-semibold">Recent activity</h2>
+
+  <ol role="list" class="mt-3">
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Receipt GRN-4821 posted in full.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:55+05:30">04 Sep, 08:55</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Rate on line 3 amended.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T14:22+05:30">04 Sep, 14:22</time> · Ritu Deshpande</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Approved at level 2 of 2.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T17:05+05:30">03 Sep, 17:05</time> · Nilesh Patil</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-3 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">Order raised against RC-2026-0042.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T10:31+05:30">02 Sep, 10:31</time> · Ritu Deshpande</p>
+      </div>
+    </li>
+  </ol>
+
+  <a href="#" class="mt-1 inline-block rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all 22 entries</a>
+</aside>

@@ -1,0 +1,120 @@
+<!-- What the screen shows almost all of the time. The builder is three
+     controls per condition and it is worth that only while somebody is
+     composing; once the query is applied, the thing the register owes the user
+     is a sentence per condition and a way to drop one.
+
+     Each chip is the whole condition — "Order value is over ₹2,00,000", not
+     "Order value" — because a chip that names only the field says which
+     controls are set and not what they are set to, and the usual reason a
+     register looks empty is a figure somebody typed last Tuesday.
+
+     Every chip's remove button is named for the condition it drops. Six buttons
+     called Remove is what gets read out otherwise.
+
+     Clear all is a link beside them rather than a second filled button. It is
+     the blunt answer, and it throws away the four conditions that were right
+     along with the one that was not.
+
+     The chip band is bg-zinc-100 inside the white panel, so the chips keep a
+     fill of their own at bg-zinc-200 and the x inside a chip steps to zinc-300
+     — hovering to the fill of the pill it sits in is the one hover that makes a
+     control less visible than it was at rest.
+
+     Edit conditions reopens the builder with exactly this set in it, which is
+     the whole contract: chips are a rendering of the applied query and never a
+     second copy of it. -->
+<div data-kui="filter-builder/chips" class="max-w-3xl"
+     x-data="{
+       joiner: 'and',
+       conds: [
+         { id: 1, text: 'Status is Open', field: 'status', v: 'open' },
+         { id: 2, text: 'Order value is over ₹2,00,000', field: 'amount', v: 200000 },
+         { id: 3, text: 'Vendor is any of 3', field: 'vendor', v: ['gujarat', 'sharma', 'nashik-steel'] },
+         { id: 4, text: 'Delivery date is before 31 Aug 2026', field: 'due', v: '2026-08-31' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 1842000, due: '2026-08-28' },
+         { po: 'PO-24-1191', vname: 'Sharma Extrusions', vendor: 'sharma', status: 'open', amount: 468500, due: '2026-08-19' },
+         { po: 'PO-24-1194', vname: 'Nashik Steel Traders', vendor: 'nashik-steel', status: 'overdue', amount: 2710400, due: '2026-08-02' },
+         { po: 'PO-24-1199', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 132900, due: '2026-08-05' },
+         { po: 'PO-24-1203', vname: 'Konkan Chemicals Pvt Ltd', vendor: 'konkan', status: 'open', amount: 967500, due: '2026-08-27' },
+         { po: 'PO-24-1207', vname: 'Sharma Extrusions', vendor: 'sharma', status: 'closed', amount: 5460000, due: '2026-08-30' },
+         { po: 'PO-24-1211', vname: 'Gujarat Polymers Ltd', vendor: 'gujarat', status: 'open', amount: 2143000, due: '2026-09-04' },
+         { po: 'PO-24-1218', vname: 'Nashik Steel Traders', vendor: 'nashik-steel', status: 'open', amount: 1290500, due: '2026-08-08' }
+       ],
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       name: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       hit(o, c) {
+         if (c.field === 'status') return o.status === c.v;
+         if (c.field === 'amount') return o.amount > c.v;
+         if (c.field === 'vendor') return c.v.includes(o.vendor);
+         return o.due < c.v;
+       },
+       get rows() { return this.orders.filter(o => this.conds.every(c => this.hit(o, c))) },
+       drop(id) { this.conds = this.conds.filter(c => c.id !== id) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-200 px-3 py-2.5">
+      <button type="button"
+              class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Edit conditions
+        <span x-show="conds.length" x-cloak aria-hidden="true"
+              class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="conds.length"></span>
+      </button>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="conds.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></p>
+    </div>
+
+    <div x-show="conds.length" role="group" aria-label="Conditions in force"
+         class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-3 py-2">
+      <template x-for="(c, i) in conds" :key="c.id">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">
+          <span x-show="i > 0" x-cloak aria-hidden="true" class="text-zinc-500" x-text="joiner"></span>
+          <span x-text="c.text"></span>
+          <button type="button" @click="drop(c.id)" :aria-label="'Remove the condition ' + c.text"
+                  class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-3"></i>
+          </button>
+        </span>
+      </template>
+      <button type="button" @click="conds = []"
+              class="ml-auto rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+    </div>
+
+    <table x-show="rows.length" class="w-full text-[13px]/5">
+      <thead>
+        <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-3 py-2 font-medium whitespace-nowrap">PO number</th>
+          <th scope="col" class="hidden px-3 py-2 font-medium sm:table-cell">Vendor</th>
+          <th scope="col" class="px-3 py-2 font-medium">Status</th>
+          <th scope="col" class="px-3 py-2 text-right font-medium">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="o in rows" :key="o.po">
+          <tr class="border-b border-zinc-100 last:border-0 hover:bg-zinc-100">
+            <td class="px-3 py-2 font-medium whitespace-nowrap tabular-nums" x-text="o.po"></td>
+            <td class="hidden px-3 py-2 text-zinc-600 sm:table-cell" x-text="o.vname"></td>
+            <td class="px-3 py-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+                <span class="size-1.5 shrink-0 rounded-full" :class="dot[o.status]" aria-hidden="true"></span><span x-text="name[o.status]"></span>
+              </span>
+            </td>
+            <td class="px-3 py-2 text-right tabular-nums" x-text="money(o.amount)"></td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+
+    <div x-show="!rows.length" x-cloak class="px-6 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="filter-x" class="size-5 text-zinc-600"></i>
+      </span>
+      <p class="mt-3 text-[16px]/6 font-semibold">No order matches all four conditions</p>
+      <p class="mx-auto mt-1 max-w-sm text-[13px]/5 tabular-nums text-zinc-600">Every chip above is in force. Drop one and the register widens; the eight orders are still there.</p>
+    </div>
+  </div>
+</div>

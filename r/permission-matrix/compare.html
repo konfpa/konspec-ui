@@ -1,0 +1,120 @@
+<!-- The question that arrives before a role is retired or a new joiner is
+     slotted into one: what does Store keeper have that Senior store keeper does
+     not. Six columns of grid make that answerable in principle and nobody
+     answers it, because comparing two columns four apart means holding one in
+     your head while your eye travels. Two columns and a verdict beside them
+     turns it into reading.
+
+     The verdict is a word, not a fill. The differing rows do take the recessed
+     bg-zinc-50 band, and that tint is an aid rather than the message: a tint is
+     invisible on a printed sheet, invisible in forced-colours mode and
+     invisible to anybody reading with a screen reader, so what the row actually
+     says is written in the last column. Colour is not carrying it either — a
+     difference between two roles is not a state a record is in, so it takes no
+     dot and no red.
+
+     The count is in the heading and it counts rows, not ticks. "8 permissions"
+     over a comparison is a number that is true and answers nothing; 4 of 12
+     differ is the sentence somebody came for.
+
+     Nothing here is editable, deliberately. Making a difference tickable means
+     deciding which of the two roles a tick lands on, and there is no honest
+     default: the link goes to the role instead. The row order is the grid's
+     order and never sorted with the differences first, because the rows the two
+     roles share are the context that makes a difference legible. -->
+<div data-kui="permission-matrix/compare" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-c-h" class="text-[14px]/5 font-semibold">Store keeper against Senior store keeper</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 of 12 permissions differ · 11 users hold the first, 3 hold the second · Silvassa</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-c-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Senior store keeper</th>
+        <th scope="col" class="w-48 px-4 py-2.5 text-left font-medium">Difference</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Reverse a posted GRN</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Issue material from stores</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Return material to stores</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Adjust stock on a physical count</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Print a bin label</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium">Raise a stock transfer to Vapi</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Receive a stock transfer</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Release a QC hold</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Neither</td>
+      </tr>
+      <tr class="border-b border-zinc-100 bg-zinc-50 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-medium tabular-nums">Write off scrap up to ₹50,000</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 font-medium">Only Senior store keeper</td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">View the purchase register</th>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-2 py-2.5 text-center"><i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Both</td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-2 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        <td class="px-4 py-2.5 text-zinc-500">Neither</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">3 of the 4 differences are permissions only Senior store keeper holds. Nothing on this screen changes either role.</p>
+    <a href="#" class="shrink-0 text-[13px]/5 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open Senior store keeper</a>
+  </div>
+</div>

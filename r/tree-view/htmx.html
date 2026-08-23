@@ -1,0 +1,112 @@
+<!-- No Alpine at all. The shape of the tree is a query parameter, the server
+     renders exactly the rows that are visible, and every toggle is a real link
+     to the tree in its next state.
+
+     Which buys the two things a client-held open set cannot have. The URL is
+     the view, so a buyer can send "the tree open down to rack A11" to a
+     storekeeper in a message; and a reload, a back button and a restored
+     session all land on the tree the user left rather than on the default one.
+     For a plant tree that is walked over an hour, that is the whole difference.
+
+     Every toggle is an <a> with a real href before it is anything to htmx.
+     Middle-click, copy link, and open in a new tab all keep working, and the
+     screen still functions with JavaScript switched off — the same request
+     without hx- attributes just returns the whole page.
+
+     No rotation binding, because there is nothing on the client to animate. The
+     server already knows which way each chevron points and renders
+     chevron-down or chevron-right; the transform in the other variants exists
+     to move a chevron in response to a change the browser made, and here the
+     browser makes none.
+
+     Every toggle carries a stable id minted from the location code. htmx
+     restores focus after a swap by looking the previously focused element up by
+     id, so a toggle rendered without one drops the keyboard to the top of the
+     document on every single expand — which makes the tree unusable from a
+     keyboard while looking perfectly fine with a mouse. tv-h-RK-A11 comes from
+     the record, not from a counter, so it is the same id before and after the
+     swap.
+
+     hx-swap="outerHTML" on the whole tree rather than a per-branch swap. A
+     branch swap has to know where the rows go and what the parent's roll-up now
+     says; the tree is one view of one query and re-rendering it whole is both
+     the simplest and the only one that cannot show a stale subtotal.
+
+     aria-expanded on a link is correct here: it describes the state of the
+     thing the control operates, and the control happens to be a navigation. The
+     group it names is in the response, so aria-controls resolves after the
+     swap as well as before it. -->
+<div data-kui="tree-view/htmx" id="tv-h" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Storage locations — Vasai plant</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">2 of 7 branches open</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <a id="tv-h-PLT-VAS" href="?open=" hx-get="/stores/tree/?open=" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+           aria-expanded="true" aria-controls="tv-h-g-PLT-VAS" aria-label="Collapse PLT-VAS Vasai plant"
+           class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="chevron-down" class="size-4"></i>
+        </a>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PLT-VAS</span> <span class="text-zinc-600">Vasai plant</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹4,18,60,400</span>
+      </div>
+
+      <ul role="list" id="tv-h-g-PLT-VAS">
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <a id="tv-h-ST-A" href="?open=PLT-VAS" hx-get="/stores/tree/?open=PLT-VAS" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+               aria-expanded="true" aria-controls="tv-h-g-ST-A" aria-label="Collapse ST-A Store A"
+               class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-down" class="size-4"></i>
+            </a>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-A</span> <span class="text-zinc-600">Store A — raw material</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹3,02,18,900</span>
+          </div>
+
+          <ul role="list" id="tv-h-g-ST-A">
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <a id="tv-h-RK-A11" href="?open=PLT-VAS,ST-A,RK-A11" hx-get="/stores/tree/?open=PLT-VAS,ST-A,RK-A11" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+                   aria-expanded="false" aria-label="Expand RK-A11 Rack A11"
+                   class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="chevron-right" class="size-4"></i>
+                </a>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,88,40,000</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <a id="tv-h-RK-A12" href="?open=PLT-VAS,ST-A,RK-A12" hx-get="/stores/tree/?open=PLT-VAS,ST-A,RK-A12" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+                   aria-expanded="false" aria-label="Expand RK-A12 Rack A12"
+                   class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                  <i data-lucide="chevron-right" class="size-4"></i>
+                </a>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,13,78,900</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <a id="tv-h-ST-B" href="?open=PLT-VAS,ST-B" hx-get="/stores/tree/?open=PLT-VAS,ST-B" hx-target="#tv-h" hx-swap="outerHTML" hx-push-url="true"
+               aria-expanded="false" aria-label="Expand ST-B Store B"
+               class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="chevron-right" class="size-4"></i>
+            </a>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-B</span> <span class="text-zinc-600">Store B — packing</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p class="border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-500">The address bar holds the shape of this tree, so it can be sent to somebody else and it survives a reload.</p>
+</div>

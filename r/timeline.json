@@ -1,0 +1,188 @@
+{
+  "id": "timeline",
+  "name": "Timeline",
+  "category": "data",
+  "markup": "No html in this file. Each variant below carries the path to its own markup at r/timeline/<variant>.html — fetch the one you need.",
+  "description": "What happened to one record, in order — the history strip on a purchase order, the audit trail on a vendor master, the QC events on a batch. Each entry is an actor, a verb, a time, and where it matters what the value was before.",
+  "when_to_use": "A reader has one record open and is about to decide something about it, and the last thing they need is how it got here — who approved it, when the promised date moved, why the hold was released. This is that strip, and it is the region record-page/activity places: record-page owns the screen and this owns the entries inside it, so the two agree rather than compete — the day bands, the diff well and the rail here are the same shapes that page draws, and the \"See the full trail\" link at the foot of the strip is what opens audit-page/record. Reach for audit-page instead the moment the question stops being about this record: the system trail is queried across records, actors, fields and dates, an auditor starts from a question rather than from a record, and the filter apparatus that makes that possible is a whole screen rather than a strip. Reach for table when the events are records the reader sorts, filters and works from — a GRN register, a rejection log — because a trail has exactly one order and it is time, descending, and a sortable header on it is a promise nothing keeps. Reach for schedule-page when the axis is what is going to happen rather than what did: position there carries meaning and a block twice as wide takes twice as long, where every entry here is the same height whether it took a minute or a fortnight. And reach for progress when the thing being drawn is one linear process with a known total — three of eight steps done — because the rail here is deliberately not a progress bar and colouring the part above the current entry turns it into one with its total written nowhere.",
+  "rules": [
+    "The old value is the entry. \"Ritu Deshpande amended PO-2026-0418\" is a receipt for a history rather than one, and the strip that shipped with only that line was rebuilt within a fortnight of a buyer asking what the rate had been before. Every entry that changed a field renders both values in the recessed well — was ₹4,20,000, now ₹4,55,000 — and an event that cannot produce the old value is a defect in what was written to the table, not a case to design around by drawing a blank.",
+    "The absolute time is the record and the relative one is a gloss written after it, never instead of it. A strip that says \"2 hours ago\" is wrong the moment the tab is left open over lunch, and it is evidence of nothing at all once it has been screenshotted into a ticket or pasted into an email to the vendor — which is the single most common thing anybody does with this region. The <time datetime> carries the offset as well, because a plant in Silvassa and a head office reading the same trail have to agree on 08:55.",
+    "Colour appears in the dot and nowhere else, and this component is where that rule is hardest to hold. Tinting the approval entry green and the rejection entry red is the first thing everybody reaches for, and by the twelfth entry the column reads as a barcode: the eye stops separating the red one from the pattern, which is the exact opposite of what the tint was added to do. Most entries take zinc-500. The palette is spent on the two or three that are worth stopping at.",
+    "A system event is separated by shape and by type, never by a colour of its own. The first attempt tinted automated entries blue, which burned a colour that means nothing in this system and taught readers that the palette is decorative; the second greyed the whole row out, which said the event mattered less than a person's when a failed reminder job is often the reason the order is late. What separates them now is the mark — a size-4 icon instead of a 6px disc — an 11px uppercase System tag, and the source written in mono. All three survive being printed.",
+    "When dots and icons share one column, the column takes a fixed w-4 and both are centred in it. Without that the 6px disc sits at the auto width of its own span and the 16px icon sits at sixteen, so the rail kinks twice in a strip that mixes people and jobs, and the kink is the thing a reviewer notices instead of the content. The rail itself is a flex child of that column rather than an absolutely positioned line, so nothing has a left offset to keep in step by hand.",
+    "The rail stays zinc-200 the whole way down, above the newest entry and below the oldest one alike. Colouring the part above the current entry turns the history into a progress bar with no total written anywhere, and a history has no total — more will happen to this order tomorrow. It also stops at the last entry rather than running past it, which is why it is per-item with group-last:hidden and not one full-height line on the list: the overshoot is the height of the last entry's text, and that height is whatever the wrapping does at 390px.",
+    "A comment is the one entry with a body somebody wrote, and it is the only one that can be changed after the fact. If the application lets a note be edited, the entry has to say so and when — otherwise the strip is append-only in appearance and not in fact, which is worse than a strip that never claimed to be. The attachment on a comment is a link to the document that already exists on the record, not an upload control: a drop target inside a history row competes with the page scroll and a file dropped an inch wide of it navigates the browser away from the record.",
+    "Entries that have not happened yet sit above the present with a hollow dot, and they are never counted in the total. The strip that shipped saying \"12 events\" while two of them were the next two approvers in the route was quoted in a dispute, and the two that had not happened were read as two that had. The word \"Not yet\" goes in the entry as sr-only text as well, because the difference between a filled disc and a hollow one is six pixels of ring and nothing at all to a screen reader.",
+    "Day headings say Today and Yesterday and then the date, and they say the date in both cases. \"Today\" alone is a heading that changes meaning while the page is open, and a trail whose headings depend on when it was read is not something anyone can cite. The heading is a real h3 outside the list, never an li — written as a list item it is announced as item 1 of 6 and every count under it is off by one.",
+    "Truncation states what is hidden as a figure. \"Load more\" on its own hides whether the next press brings three entries or three hundred, and on a vendor master with four years of amendments behind it the difference decides whether the reader presses at all. The control says \"18 older entries\", the count line beside it is a role=\"status\" so each batch is announced, and focus moves to that line when the last batch lands — the button that was pressed has been replaced by a sentence, and a removed element drops focus to the body.",
+    "Older entries append downwards and a polled entry arrives at the top; those are two different movements and only the second one moves the page under the reader. It is allowed here and refused on audit-page for one reason: a record strip is a dozen entries under a heading the reader can still see, so a prepend shifts the content by one row, while an audit page can be forty entries deep into a scroll where the entry somebody is mid-way through is the evidence they are quoting. Take the prepend only where the strip is short.",
+    "The filter strip narrows event kinds and never sorts. Adding a sortable header to a history is a promise that some other order exists, and there is none — the strip is descending time and a reader who reverses it is reading a different component. Where events genuinely are records to be sorted, filtered and worked from, the answer is table and not a rearranged version of this.",
+    "The dense form is a smaller type step, not a tighter one. Dropping to text-[12px]/4 moves the marker box to h-4 with it, because the box height is the leading of the text beside it and the two are written in the same class name so they cannot drift; squeezing the padding while leaving the 20px box behind is how a drawer ends up with its dots a pixel high of every line they belong to.",
+    "Nothing in the marker column is a click target. A 6px disc is 6px of hit area and announces as nothing, so a strip where the dot opens the event and the sentence does not cannot be operated from a keyboard at all. What is a target is the record named inside the sentence — GRN-4821, DN-26-0117 — and those are real links to real screens."
+  ],
+  "anatomy": [
+    {
+      "part": "Panel",
+      "description": "The white rounded-xl card the strip lives in, with the h2 naming the record and the entry count beside it. On a record page it is one section among several and takes that page's gutter; it never draws a border of its own inside another card."
+    },
+    {
+      "part": "List",
+      "description": "A real <ol> carrying role=\"list\", because the order is the record and not the layout, and because preflight has already removed list-style — WebKit reads that as \"not a list\" and drops the count."
+    },
+    {
+      "part": "Entry",
+      "description": "group flex gap-3 pb-4 last:pb-0. The bottom padding is what the rail bridges, so the gap between two marks and the gap after the last one are the same measurement written once."
+    },
+    {
+      "part": "Marker column",
+      "description": "flex shrink-0 flex-col items-center, aria-hidden end to end. It takes a fixed w-4 the moment icons and dots share it, so the rail runs one straight edge."
+    },
+    {
+      "part": "Dot",
+      "description": "The 6px disc from marker, centred in a box one line tall — h-5 for text-[13px]/5, h-4 for the dense 12px form. zinc-500 unless the entry has a state, and then one of the five locked colours and never a sixth."
+    },
+    {
+      "part": "Hollow dot",
+      "description": "What an entry that has not happened yet takes: a size-2 circle with a zinc-400 border and no fill. The words say the same thing, because the ring is six pixels of information."
+    },
+    {
+      "part": "Rail",
+      "description": "w-px flex-1 bg-zinc-200 below the mark, hidden on the last entry with group-last:hidden. One colour the whole way down — it says these entries are one sequence and nothing else."
+    },
+    {
+      "part": "Timestamp",
+      "description": "A <time datetime> carrying the local date, time and offset, with the relative gloss written after it and never in place of it. tabular-nums, so a column of times reads down the day."
+    },
+    {
+      "part": "Actor",
+      "description": "The person's name in font-medium at the head of the sentence, or avatar's circle in the marker column where the note is something they wrote. The circle is aria-hidden when the name is written beside it."
+    },
+    {
+      "part": "Diff well",
+      "description": "A <dl> in a rounded-lg bg-zinc-50 band: the field as the <dt>, the old value struck through and the new one as two <dd>s, with an sr-only \"changed to\" between them and the arrow decorative."
+    },
+    {
+      "part": "System tag",
+      "description": "An 11px uppercase chip — bg-zinc-200 with its ring — beside an automated event, with the job or the mailbox that caused it written in mono underneath. No colour of its own."
+    },
+    {
+      "part": "Footer",
+      "description": "The count line and the Load more control, or the link to the full trail. The count is a role=\"status\" with tabindex=\"-1\", so it both reports the new figure and is somewhere to stand."
+    },
+    {
+      "part": "Filter strip",
+      "description": "button-group's latched strip above the list, one member per event kind, with aria-pressed bound and the result count as a role=\"status\" underneath."
+    }
+  ],
+  "behaviour": [
+    "Time is the only order and it is descending. There is no sortable header, no column to reverse and no secondary sort — an entry that arrived later is drawn higher, and that is the whole model.",
+    "Older entries append below the last one and never above it. Load more extends the strip downwards, a batch that begins on a day already drawn joins that day's list rather than opening a second band for it, and nothing already on screen is renumbered or reordered.",
+    "A polled entry is prepended and the count line announces it. That is the one insertion above what is on screen this library allows, and it is allowed because a record strip is short enough that the heading is still visible; the audit screen refuses the same swap for the opposite reason.",
+    "Grouping by day is a heading and a list per day, not a card per day. A record strip draws a handful of days, so the bands stay a recessed strip inside one panel and the column of marks runs unbroken through every one of them.",
+    "A field change renders both values, and the two empties are words. A value that was never set is \"not set\" and a value that was removed is the old value struck through against \"cleared\" — a blank on either side is indistinguishable from an export that dropped the column.",
+    "A state transition names both states and the dot takes the colour of the one the record is in now. Nothing else on the entry is tinted, so the strip stays graphite with two or three marks in it.",
+    "The filter strip narrows which kinds of event are drawn and rewrites the count in place. Filters latch rather than replace each other, because \"approvals and receipts, nothing else\" is the ordinary question, and the count line says what the current set adds up to.",
+    "Pending entries sit above the present, take no hover and no target, and are excluded from every count on the panel. They disappear from that position and reappear in sequence once they have actually happened.",
+    "Nothing in the strip edits anything. There is no row menu, no delete and no inline edit, and no control is drawn disabled to stand in for one — an event happened, and the only thing that can be done to it is to read it.",
+    "At 390px the timestamp moves above the sentence rather than beside it, the diff well stacks its field and its two values, and a change touching more than three fields collapses to a count with a disclosure. Nothing scrolls sideways.",
+    "The skeleton draws the same rail, the same dot positions and the same two lines per entry, so the strip does not move when the entries land. The dots are zinc-300 rather than a status colour, because the state is not known yet and guessing one is a claim."
+  ],
+  "accessibility": [
+    "The list is an <ol> with role=\"list\". The order is the record rather than a presentation choice, so it belongs in the markup; role=\"list\" is put back because Tailwind preflight sets list-style to none and WebKit then stops treating it as a list at all, which deletes the item count.",
+    "Every part of the marker column is aria-hidden — the dot, the hollow dot, the icon and the rail. The rail is a picture of the entries being one sequence and the dates already say that in words; a dot is a summary of a sentence written beside it.",
+    "A state carried by a dot is repeated in the entry as text. Where the only thing separating \"Failed inspection\" from \"Passed\" is the colour of a disc, the entry opens with an sr-only word, because colour is never the sole carrier of anything in this system.",
+    "The timestamp is a real <time> whose datetime attribute carries the full local date, time and UTC offset, so what is read out of the markup is unambiguous even when the visible text is shortened to 08:55 under a day heading that says the rest.",
+    "A relative time never appears without its absolute one. \"2 hours ago\" is a convenience for a reader glancing at the strip and it is written after the date rather than in place of it, so a screen reader and a printout both still carry the fact.",
+    "The diff is a <dl>: the field name is the <dt> and the two values are two <dd>s under it, which is what keeps them one unit. An sr-only \"changed to\" closes the old value and the arrow is aria-hidden, so the pair is announced as \"Order value, four lakh twenty thousand, changed to four lakh fifty-five thousand\" rather than as two figures and no direction.",
+    "line-through is decoration. Some screen readers announce it as deleted text and most announce nothing, so the strike is never the only thing saying which value is the old one.",
+    "Day headings are real headings — h3 under the panel's h2 — sitting outside the lists, and each day's list points back at its heading with aria-labelledby. A heading written as an li is counted as an entry; one dropped between two lis without an li round it is lifted out of the list by the parser.",
+    "The count line is role=\"status\" with tabindex=\"-1\". It reports each appended batch, and it is where focus goes when the last batch lands and the Load more button is replaced by a sentence, so the keyboard user is not dropped back at the top of the document.",
+    "A polled entry announces itself through a live region that was in the document before the swap and is not itself replaced. htmx swapping the region node produces a brand new live region holding a message that was already inside it, which announces nothing while measuring as correct.",
+    "Entries that have not happened yet carry an sr-only \"Not yet — \" at the head of the line, and the entry currently with somebody carries aria-current=\"step\". The hollow dot is the visual half of the same fact and does nothing on its own.",
+    "The filter strip is role=\"group\" with aria-pressed bound on each member rather than a radiogroup, because several kinds are on at once and there is no single value for a roving tabindex to follow."
+  ],
+  "related": [
+    "audit-page",
+    "marker",
+    "avatar",
+    "record-page"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "The rail down one record's history",
+      "markup": "r/timeline/default.html"
+    },
+    {
+      "id": "dense",
+      "name": "A long history in a drawer",
+      "markup": "r/timeline/dense.html"
+    },
+    {
+      "id": "grouped",
+      "name": "Today, Yesterday, and then the date",
+      "markup": "r/timeline/grouped.html"
+    },
+    {
+      "id": "changes",
+      "name": "What the field was before",
+      "markup": "r/timeline/changes.html"
+    },
+    {
+      "id": "status",
+      "name": "The record moving between states",
+      "markup": "r/timeline/status.html"
+    },
+    {
+      "id": "comment",
+      "name": "A note somebody wrote, with the paperwork on it",
+      "markup": "r/timeline/comment.html"
+    },
+    {
+      "id": "system",
+      "name": "What the system did, without a colour",
+      "markup": "r/timeline/system.html"
+    },
+    {
+      "id": "pending",
+      "name": "The step that has not been taken",
+      "markup": "r/timeline/pending.html"
+    },
+    {
+      "id": "load-more",
+      "name": "The 18 entries that are not drawn",
+      "markup": "r/timeline/load-more.html"
+    },
+    {
+      "id": "filter",
+      "name": "Narrowing the trail to one kind of event",
+      "markup": "r/timeline/filter.html"
+    },
+    {
+      "id": "inline",
+      "name": "The strip in a record's sidebar",
+      "markup": "r/timeline/inline.html"
+    },
+    {
+      "id": "empty",
+      "name": "Two different nothings",
+      "markup": "r/timeline/empty.html"
+    },
+    {
+      "id": "loading",
+      "name": "The rail before the entries land",
+      "markup": "r/timeline/loading.html"
+    },
+    {
+      "id": "htmx",
+      "name": "A new event arriving at the top",
+      "markup": "r/timeline/htmx.html"
+    },
+    {
+      "id": "django",
+      "name": "Rendered from the event table",
+      "markup": "r/timeline/django.html"
+    }
+  ]
+}

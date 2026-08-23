@@ -1,0 +1,123 @@
+{% comment %} templates/bom/_node.html — one file. It renders one node, then
+   includes itself for every child, and at depth zero it also draws the card
+   around the whole thing.
+
+   One file rather than a wrapper plus a partial, because a template is compiled
+   per file: split them and the money library has to be loaded in both, and the
+   failure of forgetting it is a TemplateSyntaxError raised only on the
+   recursive file, which nothing sees until a bill is deep enough to render one.
+
+   Six things the server settles that the browser cannot.
+
+   1. The recursion. A tree of unknown depth is a partial that includes itself,
+      which Django supports because it resolves the template by name on every
+      pass — there is no compile-time cycle for it to object to. That is also
+      the danger, and it is why point 2 exists.
+
+   2. The depth guard. A part that appears inside its own bill — an assembly
+      reused as a component of itself, which is a data entry mistake and not an
+      impossible one — recurses until Python's recursion limit or the request
+      timeout ends it, and what the user gets is a 500 with nothing in it that
+      names the part. The guard caps the render and prints a row saying the tree
+      was cut off, so somebody can see the defect. It is the last line of
+      defence and not the fix: the fix is a cycle check where the bill is saved.
+
+   3. The context. The include takes the "only" keyword, so each node renders
+      against the four values it needs rather than against the whole page
+      context. Without it every one of four hundred nodes re-pushes the request,
+      the user, the messages and whatever else the view left lying about.
+
+   4. The indent. A Django template has no range, so the run of spacer spans
+      loops over a string of depth spaces built with the ljust filter. Passing a
+      range down from the view instead puts the view in charge of how far the
+      markup indents, and the two then have to be changed together for ever.
+
+   5. The ids. Minted from the bill's primary key and the node's code, never
+      from a loop counter. Two bills on one comparison screen both have a node
+      called SA-1140, and a counter-derived id has the second tree's chevron
+      opening a branch in the first.
+
+   6. Which branches start open. It comes down as a list of codes, so a reload
+      lands on the tree the user left. x-cloak goes only on the branches that
+      start closed — on one that starts open it holds the branch hidden until
+      Alpine boots, which is the exact flash x-cloak exists to prevent. And
+      aria-expanded is written twice on purpose, once as a literal matching the
+      seed and once bound: a bound attribute does not exist until Alpine boots,
+      so the literal is what a reader hitting the page mid-load is given.
+
+   views.py
+       def bom_tree(request, pk):
+           bom = get_object_or_404(Bill, pk=pk)
+           return render(request, "bom/_node.html", {
+               "node": bom.root,
+               "depth": 0,
+               "bom": bom,
+               "open_ids": request.GET.get("open", "").split(","),
+           })
+{% endcomment %}
+
+{% load money %}
+{% if depth == 0 %}
+  <div data-kui="tree-view/django" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+      <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Bill of material — {{ bom.item.code }} {{ bom.item.name }}</h3>
+      <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Rev {{ bom.revision }} · {{ bom.line_count }} line{{ bom.line_count|pluralize }} · {{ bom.total_cost|rupees }}</p>
+    </div>
+    <ul role="list" class="py-1">
+{% endif %}
+
+  <li x-data="{ open: {% if node.code in open_ids %}true{% else %}false{% endif %} }">
+    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+      {% for _ in ""|ljust:depth %}<span aria-hidden="true" class="w-6 shrink-0"></span>{% endfor %}
+
+      {% if node.children_count %}
+        <button type="button" @click="open = !open"
+                aria-expanded="{% if node.code in open_ids %}true{% else %}false{% endif %}" :aria-expanded="open"
+                aria-controls="tv-dj-{{ bom.pk }}-{{ node.code }}"
+                aria-label="Components under {{ node.code }} {{ node.name }}"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+      {% else %}
+        <span aria-hidden="true" class="size-6 shrink-0"></span>
+      {% endif %}
+
+      <span class="ml-2 min-w-0 flex-1 truncate">
+        <span class="font-medium tabular-nums">{{ node.code }}</span> <span class="text-zinc-600">{{ node.name }}</span>
+      </span>
+      {% if node.status %}
+        <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600">
+          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full {{ node.status_dot }}"></span>{{ node.get_status_display }}
+        </span>
+      {% endif %}
+      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">{{ node.qty }} {{ node.uom }}</span>
+      <span class="ml-3 hidden shrink-0 tabular-nums sm:inline">{{ node.rolled_cost|rupees }}</span>
+    </div>
+
+    {% if node.children_count %}
+      <ul role="list" id="tv-dj-{{ bom.pk }}-{{ node.code }}"
+          x-show="open" {% if node.code not in open_ids %}x-cloak{% endif %} x-collapse.duration.200ms>
+        {% if depth < 6 %}
+          {% for child in node.children %}
+            {% include "bom/_node.html" with node=child depth=depth|add:1 bom=bom open_ids=open_ids only %}
+          {% empty %}
+            <li>
+              <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">Nothing is defined under {{ node.code }} yet, so nothing under it is planned or costed.</p>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>
+            <p class="flex min-h-9 items-center gap-2 py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-600">
+              <i data-lucide="alert-triangle" class="size-4 shrink-0 text-amber-700"></i>
+              This bill is nested more than six levels deep under {{ node.code }} and has been cut off here. A bill that reaches this row usually contains itself — check the components on {{ node.code }}.
+            </p>
+          </li>
+        {% endif %}
+      </ul>
+    {% endif %}
+  </li>
+
+{% if depth == 0 %}
+    </ul>
+  </div>
+{% endif %}

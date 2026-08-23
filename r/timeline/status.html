@@ -1,0 +1,112 @@
+<!-- A history of one field: the state. Every entry is a transition, so the
+     entry says both states and the dot takes the colour of the one the record
+     was in afterwards.
+
+     The colours are the locked five and there is no sixth. On hold is not in
+     the status table as a dot of its own — it takes Approved's amber-500,
+     because its meaning is exactly the one amber carries, waiting on a
+     person; Cancelled would take Draft's zinc-400, the inert shade, because
+     it is over and that is not good news.
+
+     The pills are both the same graphite shape. It is tempting to fill the
+     Overdue pill red and the Closed pill green so a transition reads as a
+     change of colour, and that is the traffic-light column the badge rule
+     exists to prevent: what separates two states is the 6px dot inside an
+     otherwise identical pill.
+
+     The transition reads left to right and the arrow between them is
+     decoration, so an sr-only "changed to" carries the direction — the same
+     mechanism the diff well uses, because a state change is a field change
+     with two words instead of two figures. -->
+<div data-kui="timeline/status" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · state</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 transitions between 02 Sep 2026 and 04 Sep 2026</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Closed
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums">All 9 lines received and the last receipt matched the order.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:56+05:30">04 Sep 2026, 08:56</time> · 2 hours ago · closed by the system on GRN-4821</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>On hold
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> released the QC hold after the mill certificate for heat 8841 arrived.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:41+05:30">04 Sep 2026, 08:41</time> · 2 hours ago · lab, Silvassa</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-500" aria-hidden="true"></span>Open
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>On hold
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> held the receipt pending the mill test certificate.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:14+05:30">04 Sep 2026, 08:14</time> · 2 hours ago · held 27 minutes</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-1.5 text-[13px]/5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-zinc-400" aria-hidden="true"></span>Draft
+          </span>
+          <span class="sr-only">changed to</span>
+          <i data-lucide="arrow-right" class="size-3 shrink-0 text-zinc-500" aria-hidden="true"></i>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Pending
+          </span>
+        </p>
+        <p class="mt-1 text-[13px]/5 tabular-nums"><span class="font-medium">Ritu Deshpande</span> submitted the order for approval at ₹26,84,000.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-02T10:44+05:30">02 Sep 2026, 10:44</time> · 2 days ago · route: value above ₹20,00,000</p>
+      </div>
+    </li>
+  </ol>
+</div>

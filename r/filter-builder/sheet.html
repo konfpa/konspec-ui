@@ -1,0 +1,147 @@
+<!-- A row of three controls does not survive a 390px screen and stacking them
+     in place does not save it: what a row is for is reading the condition left
+     to right as a sentence, and a stack of three unlabelled boxes is not a
+     sentence.
+
+     So below sm the builder stops being rows and becomes blocks. Each condition
+     is a bordered card carrying the sentence in words at the top — "Order value
+     is over ₹2,00,000" — and its three controls under it, full width, at 40px
+     rather than 34px because a thumb and a mouse do not need the same target.
+     The sentence is the row; the controls are how it is edited.
+
+     A bottom sheet rather than the right-hand one: this is a form to fill in
+     and the thumb is at the bottom of the screen, which is also where Apply
+     has to be. It is the one place in the component where the count and the
+     commit are the same control — "Show 24 orders" — because there is no room
+     for a count line and a button, and the button saying what it will do is
+     worth more than a number sitting above it.
+
+     The sheet is capped short of the viewport and the condition list is what
+     scrolls; the header and the footer do not, so Apply is reachable with six
+     conditions in the list.
+
+     The preview frame here is a bounded box so the sheet can be seen in the
+     gallery. As a real screen the layer is fixed inset-0 and the frame goes.
+
+     The sheet renders shut and the trigger carries the number of conditions in
+     force. A focus trap that is open at first paint traps whatever page the
+     component is pasted into, which on a gallery of components makes every
+     other entry on it unreachable. -->
+<div data-kui="filter-builder/sheet" class="relative mx-auto h-[600px] w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+     x-data="{
+       open: false,
+       conds: [
+         { id: 1, field: 'Status', op: 'is', v: 'Open' },
+         { id: 2, field: 'Order value', op: 'is over', v: '2,00,000' },
+         { id: 3, field: 'Delivery date', op: 'is before', v: '31 Aug 2026' }
+       ],
+       matched: 24,
+       sentence(c) { return c.field + ' ' + c.op + ' ' + (c.v || 'nothing yet') },
+       add() {
+         const c = { id: Date.now(), field: 'Vendor', op: 'is', v: '' };
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-s-f-' + c.id).focus());
+       }
+     }">
+
+  <div class="px-4 py-4">
+    <h3 class="text-[20px]/7 font-semibold tracking-tight">Purchase orders</h3>
+    <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">24 of 1,438 orders on screen</p>
+    <button type="button" x-ref="trigger" @click="open = true"
+            class="mt-3 flex items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Conditions
+      <span class="rounded-full bg-zinc-200 px-1.5 text-[11px]/4 tabular-nums text-zinc-700 ring-1 ring-inset ring-zinc-300" x-text="conds.length"></span>
+    </button>
+  </div>
+
+  <div x-show="open" x-cloak x-trap="open"
+       @keydown.escape.window="if (open) { open = false; $refs.trigger.focus() }"
+       @click.self="open = false; $refs.trigger.focus()"
+       class="absolute inset-0 z-40 flex items-end bg-zinc-900/40">
+    <div role="dialog" aria-modal="true" aria-labelledby="fb-s-title"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-200 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:enter-start="translate-y-full"
+         x-transition:leave="transition ease-in duration-150 motion-reduce:transition-none motion-reduce:duration-0"
+         x-transition:leave-end="translate-y-full"
+         class="flex max-h-[calc(100%-3rem)] w-full flex-col rounded-t-2xl border-t border-zinc-200 bg-white shadow-lg">
+
+      <div class="flex shrink-0 justify-center pt-2.5 pb-1">
+        <div class="h-1 w-9 rounded-full bg-zinc-300" aria-hidden="true"></div>
+      </div>
+
+      <div class="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 px-4 pt-2 pb-3">
+        <h4 id="fb-s-title" class="text-[16px]/6 font-semibold">Conditions</h4>
+        <button type="button" @click="open = false; $refs.trigger.focus()" aria-label="Close"
+                class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </button>
+      </div>
+
+      <div class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
+        <template x-for="(c, i) in conds" :key="c.id">
+          <div class="rounded-xl border border-zinc-200 bg-white p-3">
+            <div class="flex items-start justify-between gap-2">
+              <p class="min-w-0 text-[13px]/5 tabular-nums">
+                <span class="text-zinc-500" x-text="i === 0 ? 'Where ' : 'and '"></span><span class="font-medium" x-text="sentence(c)"></span>
+              </p>
+              <button type="button" @click="conds.splice(i, 1)"
+                      :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(c)"
+                      class="-mt-1 -mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="x" class="size-4"></i>
+              </button>
+            </div>
+
+            <div class="mt-2 space-y-2">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select :id="'fb-s-f-' + c.id" x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+                  <option>Status</option>
+                  <option>Vendor</option>
+                  <option>Order value</option>
+                  <option>Delivery date</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-4"></i>
+                </span>
+              </div>
+
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-2 pr-9 pl-3 text-[14px]/5 outline-none">
+                  <option>is</option>
+                  <option>is not</option>
+                  <option>is over</option>
+                  <option>is before</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-4"></i>
+                </span>
+              </div>
+
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="c.v" placeholder="Type a value"
+                       :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                       class="block w-full min-w-0 bg-transparent px-3 py-2 text-[14px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <button type="button" @click="add()"
+                class="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-zinc-300 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+        </button>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+        <button type="button" @click="conds = []"
+                class="inline-flex h-11 items-center rounded-lg px-3 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</button>
+        <button type="button" @click="open = false; $refs.trigger.focus()"
+                class="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white tabular-nums hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          Show <span class="px-1" x-text="matched"></span> orders
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

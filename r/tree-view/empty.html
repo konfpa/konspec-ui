@@ -1,0 +1,92 @@
+<!-- Three different nothings, and the whole job here is saying which one it is.
+
+     A tree with no root at all is a record that has never been built: this item
+     has no bill of material yet. It takes the empty-state shape — a well, a
+     line saying what is missing, and the action that fixes it — and it does not
+     draw a header row over an empty panel, because a header with nothing under
+     it reads as a tree that failed to load.
+
+     A branch with nothing under it is a different fact and belongs on a row,
+     indented where its children would have been. The row is the answer, not a
+     gap: an empty branch that renders nothing leaves a chevron that opens onto
+     four pixels of white and reads as broken every time, and the user clicks it
+     twice to make sure.
+
+     And a node with no children at all is not an empty branch. A bought-out
+     part has no explosion and never will, so it has no chevron — only the empty
+     size-6 box that keeps its description in the same column as its siblings'.
+     Giving it a disabled chevron instead says the branch exists and is refused,
+     which is a third thing again and not true here.
+
+     The difference between the last two comes from the server. A child count of
+     zero on a row that CAN have children draws the branch and its one line; no
+     child capability at all draws the spacer. The client cannot tell them
+     apart, and a tree that guesses gets it wrong on exactly the rows somebody
+     is querying. -->
+<div data-kui="tree-view/empty" class="space-y-4">
+  <div class="rounded-xl border border-zinc-300 bg-white px-6 py-10 text-center">
+    <span aria-hidden="true" class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+      <i data-lucide="git-branch" class="size-5 text-zinc-600"></i>
+    </span>
+    <h3 class="mt-3 text-[14px]/5 font-medium">FG-2260 has no bill of material</h3>
+    <p class="mx-auto mt-1 max-w-md text-[13px]/5 text-zinc-600">Nothing can be planned or costed for this item until one exists. Copy the bill from a similar tank, or build it a line at a time.</p>
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Build a bill of material
+      </button>
+      <button type="button" class="inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-4 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Copy from FG-2200
+      </button>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5" x-data="{ open: { fg: true, kit: true } }">
+    <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+      <h3 class="min-w-0 truncate text-[13px]/5 font-medium">FG-2205 Water tank 500 L — rev 1</h3>
+      <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 lines</p>
+    </div>
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-e-fg"
+                  aria-label="Components of FG-2205 Water tank 500 L"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2205</span> <span class="text-zinc-600">Water tank 500 L</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+        </div>
+
+        <ul role="list" id="tv-e-fg" x-show="open.fg" x-collapse.duration.200ms>
+          <li>
+            <!-- a branch the item master says CAN hold components, holding none -->
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="open.kit = !open.kit" :aria-expanded="open.kit" aria-controls="tv-e-kit"
+                      aria-label="Components of SA-1170 Fitting kit, none defined"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="open.kit && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1170</span> <span class="text-zinc-600">Fitting kit</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+            </div>
+            <ul role="list" id="tv-e-kit" x-show="open.kit" x-collapse.duration.200ms>
+              <li>
+                <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">This sub-assembly has no components on it yet, so nothing under it is planned or costed.</p>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <!-- a bought-out part: no children, no chevron, only the spacer -->
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in — bought out</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>

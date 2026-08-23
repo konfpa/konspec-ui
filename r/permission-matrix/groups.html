@@ -1,0 +1,163 @@
+<!-- Fourteen permissions in one flat list is a screen people scroll rather
+     than read, so they are grouped by the module they belong to and each module
+     opens with a band naming it. The band is a row inside the table, not a
+     heading above one: a heading between two tables breaks the grid into three
+     grids, and a screen reader walking it loses the column headers at every
+     break. One tbody per module is what keeps it one table.
+
+     The band carries a roll-up per role — the module summary, and the reason
+     this variant needs Alpine at all. indeterminate is a JS property with no
+     matching attribute, so a module with two of its four permissions granted
+     cannot be rendered mixed by the server: it comes back reading as plainly
+     off, and somebody ticks it to turn the module on and grants the other two
+     without meaning to. x-effect writes it, and it sits on the box itself
+     rather than on the root, where refs are not populated at init.
+
+     The roll-up has no name and no value. It is a control over the module and
+     not a field in the form — mixed changes nothing about what is submitted, so
+     a half-granted module whose roll-up carried a name posted exactly as though
+     the whole module had been ticked, with its own leaves underneath it. The
+     leaves post; the roll-up only moves them.
+
+     A ticked roll-up also means the permissions in the module today and not a
+     standing subscription to it, so a permission added to Goods receipt in
+     October does not quietly join a role somebody set up in August. If the
+     intent really is everything under here for ever, that is a value of its own
+     with a name on it.
+
+     The band is bg-zinc-50 — a recessed band inside a white surface, the same
+     step a table header takes — and it does not hover, because it is a label
+     rather than something the eye follows across. -->
+<form data-kui="permission-matrix/groups" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        mods: {
+          po: ['raise', 'approve5', 'approveover', 'cancel'],
+          grn: ['post', 'reverse'],
+          qc: ['record', 'release'],
+          vm: ['create', 'rate']
+        },
+        sel: ['po.raise:purchase', 'po.approve5:purchase', 'po.cancel:purchase', 'vm.rate:purchase', 'grn.post:stores', 'qc.record:qc', 'qc.release:qc'],
+        keys(m, r) { return this.mods[m].map(p => m + '.' + p + ':' + r) },
+        full(m, r) { return this.keys(m, r).every(k => this.sel.includes(k)) },
+        part(m, r) { const k = this.keys(m, r); return k.some(x => this.sel.includes(x)) && !k.every(x => this.sel.includes(x)) },
+        toggle(m, r, on) { const k = this.keys(m, r); this.sel = on ? [...new Set([...this.sel, ...k])] : this.sel.filter(x => !k.includes(x)) }
+      }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-g-h" class="text-[14px]/5 font-semibold">Role permissions by module</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 modules · 10 permissions · 3 roles · a module box grants everything in that module today, not what is added to it later</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-g-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="border-b border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Purchase orders</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'purchase')" x-effect="$el.indeterminate = part('po', 'purchase')" @change="toggle('po', 'purchase', $event.target.checked)" aria-label="All 4 purchase order permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'stores')" x-effect="$el.indeterminate = part('po', 'stores')" @change="toggle('po', 'stores', $event.target.checked)" aria-label="All 4 purchase order permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('po', 'qc')" x-effect="$el.indeterminate = part('po', 'qc')" @change="toggle('po', 'qc', $event.target.checked)" aria-label="All 4 purchase order permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" x-model="sel" aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" x-model="sel" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" x-model="sel" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" x-model="sel" aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:stores" x-model="sel" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:qc" x-model="sel" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" x-model="sel" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:stores" x-model="sel" aria-label="Approve over ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" x-model="sel" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:purchase" x-model="sel" aria-label="Cancel an approved order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:stores" x-model="sel" aria-label="Cancel an approved order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:qc" x-model="sel" aria-label="Cancel an approved order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Goods receipt</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'purchase')" x-effect="$el.indeterminate = part('grn', 'purchase')" @change="toggle('grn', 'purchase', $event.target.checked)" aria-label="Both goods receipt permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'stores')" x-effect="$el.indeterminate = part('grn', 'stores')" @change="toggle('grn', 'stores', $event.target.checked)" aria-label="Both goods receipt permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('grn', 'qc')" x-effect="$el.indeterminate = part('grn', 'qc')" @change="toggle('grn', 'qc', $event.target.checked)" aria-label="Both goods receipt permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" x-model="sel" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" x-model="sel" aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" x-model="sel" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Reverse a posted GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:purchase" x-model="sel" aria-label="Reverse a posted GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:stores" x-model="sel" aria-label="Reverse a posted GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.reverse:qc" x-model="sel" aria-label="Reverse a posted GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Quality</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'purchase')" x-effect="$el.indeterminate = part('qc', 'purchase')" @change="toggle('qc', 'purchase', $event.target.checked)" aria-label="Both quality permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'stores')" x-effect="$el.indeterminate = part('qc', 'stores')" @change="toggle('qc', 'stores', $event.target.checked)" aria-label="Both quality permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('qc', 'qc')" x-effect="$el.indeterminate = part('qc', 'qc')" @change="toggle('qc', 'qc', $event.target.checked)" aria-label="Both quality permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" x-model="sel" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" x-model="sel" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" x-model="sel" aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Release a QC hold</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:purchase" x-model="sel" aria-label="Release a QC hold — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:stores" x-model="sel" aria-label="Release a QC hold — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.release:qc" x-model="sel" aria-label="Release a QC hold — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+
+    <tbody>
+      <tr class="border-y border-zinc-200 bg-zinc-50">
+        <th scope="row" class="px-4 py-2 text-left text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase">Vendor master</th>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'purchase')" x-effect="$el.indeterminate = part('vm', 'purchase')" @change="toggle('vm', 'purchase', $event.target.checked)" aria-label="Both vendor master permissions — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'stores')" x-effect="$el.indeterminate = part('vm', 'stores')" @change="toggle('vm', 'stores', $event.target.checked)" aria-label="Both vendor master permissions — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2 text-center"><input type="checkbox" :checked="full('vm', 'qc')" x-effect="$el.indeterminate = part('vm', 'qc')" @change="toggle('vm', 'qc', $event.target.checked)" aria-label="Both vendor master permissions — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Create a vendor</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:purchase" x-model="sel" aria-label="Create a vendor — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:stores" x-model="sel" aria-label="Create a vendor — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.create:qc" x-model="sel" aria-label="Create a vendor — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 pl-8 text-left font-normal">Change a rate contract</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:purchase" x-model="sel" aria-label="Change a rate contract — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:stores" x-model="sel" aria-label="Change a rate contract — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="vm.rate:qc" x-model="sel" aria-label="Change a rate contract — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500" x-text="sel.length + ' of 30 cells granted across these 3 roles'">7 of 30 cells granted across these 3 roles</p>
+  </div>
+</form>

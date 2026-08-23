@@ -1,0 +1,81 @@
+<!-- On a record that has been open for six weeks the history is mostly
+     receipts, and the question is usually about something else. The strip
+     narrows by kind of event and by nothing else — there is no sort control,
+     because a history has exactly one order and offering to reverse it is a
+     promise nothing keeps.
+
+     The filters latch rather than replace each other: "approvals and
+     amendments, nothing else" is the ordinary question. That makes it
+     role="group" with aria-pressed on each member and not a radiogroup —
+     several are on at once, so there is no single value for a roving tabindex
+     to follow, and giving it the radiogroup treatment leaves the keyboard
+     able to reach only the last thing switched on.
+
+     aria-pressed is bound rather than written, because Alpine keeps
+     aria-pressed on the element when it resolves to false and strips every
+     other aria-* attribute that does. A latching button with no aria-pressed
+     is announced as an ordinary one and nobody is told it latches.
+
+     The latched fill is the chip token against the strip's white and the
+     status colour stays in the dot, so a filter bar cannot turn into a
+     traffic light. And the result line is a role="status": a filter that only
+     changes which rows are drawn tells a screen-reader user nothing at all. -->
+<div data-kui="timeline/filter" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       on: ['approval', 'amendment'],
+       kinds: { approval: 'Approvals', amendment: 'Amendments', receipt: 'Receipts', note: 'Notes' },
+       toggle(k) {
+         const i = this.on.indexOf(k);
+         i === -1 ? this.on.push(k) : this.on.splice(i, 1);
+       },
+       entries: [
+         { id: 'f1', kind: 'amendment', dot: 'bg-zinc-500', who: 'Ritu Deshpande', what: 'amended the rate on line 3 from ₹56.00 to ₹60.65.', at: '04 Sep 2026, 14:22', iso: '2026-09-04T14:22+05:30', rel: '2 hours ago' },
+         { id: 'f2', kind: 'receipt', dot: 'bg-emerald-600', who: 'Suresh Kadam', what: 'posted GRN-4821 against lines 1 and 3 — 12.480 MT.', at: '04 Sep 2026, 08:55', iso: '2026-09-04T08:55+05:30', rel: '8 hours ago' },
+         { id: 'f3', kind: 'note', dot: 'bg-zinc-500', who: 'Sanjay Rane', what: 'wrote a note about the despatch plan for 08 Sep.', at: '03 Sep 2026, 16:40', iso: '2026-09-03T16:40+05:30', rel: 'yesterday' },
+         { id: 'f4', kind: 'approval', dot: 'bg-amber-500', who: 'Nilesh Patil', what: 'approved the order at ₹27,10,400, level 2 of 2.', at: '03 Sep 2026, 17:05', iso: '2026-09-03T17:05+05:30', rel: 'yesterday' },
+         { id: 'f5', kind: 'approval', dot: 'bg-zinc-500', who: 'Ritu Deshpande', what: 'approved level 1 and sent the order on to the plant head.', at: '03 Sep 2026, 11:20', iso: '2026-09-03T11:20+05:30', rel: 'yesterday' },
+         { id: 'f6', kind: 'amendment', dot: 'bg-zinc-500', who: 'Meena Iyer', what: 'removed the advance of ₹2,68,400 under the revised terms.', at: '03 Sep 2026, 10:36', iso: '2026-09-03T10:36+05:30', rel: 'yesterday' }
+       ],
+       get visible() { return this.on.length ? this.entries.filter(e => this.on.includes(e.kind)) : this.entries }
+     }">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+
+    <div role="group" aria-label="Filter the history by kind of event" class="mt-2 inline-flex h-9 items-stretch rounded-lg border border-zinc-300 bg-white">
+      <button type="button" @click="toggle('approval')" :aria-pressed="on.includes('approval')"
+              class="inline-flex items-center gap-2 rounded-l-[7px] px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('approval') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Approvals</button>
+      <button type="button" @click="toggle('amendment')" :aria-pressed="on.includes('amendment')"
+              class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('amendment') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Amendments</button>
+      <button type="button" @click="toggle('receipt')" :aria-pressed="on.includes('receipt')"
+              class="inline-flex items-center gap-2 border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('receipt') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Receipts</button>
+      <button type="button" @click="toggle('note')" :aria-pressed="on.includes('note')"
+              class="inline-flex items-center gap-2 rounded-r-[7px] border-l border-zinc-200 px-3 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="on.includes('note') ? 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'">Notes</button>
+    </div>
+
+    <p role="status" class="mt-2 text-[12px]/4 tabular-nums text-zinc-500"
+       x-text="on.length ? visible.length + ' of 22 entries · ' + on.map(k => kinds[k]).join(', ').toLowerCase() : 'No filter — showing all 22 entries'"></p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <template x-for="e in visible" :key="e.id">
+      <li class="group flex gap-3 pb-4 last:pb-0">
+        <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+          <span class="flex h-5 items-center"><span class="size-1.5 rounded-full" :class="e.dot"></span></span>
+          <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 tabular-nums">
+            <span class="font-medium" x-text="e.who"></span><span x-text="' ' + e.what"></span>
+          </p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <time :datetime="e.iso" x-text="e.at"></time><span x-text="' · ' + e.rel"></span>
+          </p>
+        </div>
+      </li>
+    </template>
+  </ol>
+</div>

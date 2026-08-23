@@ -1,0 +1,163 @@
+<!-- Picking what goes on a material issue slip. The leaves are the answer —
+     they are the rows that post — and every box above them is a shortcut for
+     ticking them, with no name and no value of its own.
+
+     Each branch reads its LEAF descendants and not its direct children. Written
+     against the children it works perfectly at two levels and breaks silently
+     at three: the top box goes fully checked as soon as its two sub-assemblies
+     report checked, and stays checked when a part under one of them is
+     unticked, because the branch it is asking has by then gone indeterminate
+     rather than clear. The under map holds the flattened leaves for every
+     branch, so a grandparent and a parent are answering the same question
+     against the same list.
+
+     indeterminate is a property with no matching attribute, so it cannot be
+     rendered by the server and cannot be written as a class. x-effect on the
+     box itself writes it on every render — on the root instead, $refs is not
+     populated when the component initialises and the first paint is wrong.
+     checkbox/nested does the same thing one level down and this is that logic
+     with the depth taken off.
+
+     The row is not a <label>. The chevron is inside it, so labelling the whole
+     row means a click on the chevron ticks the box as well, and opening a
+     sub-assembly to look at it silently puts every part under it on the slip.
+     The label wraps the description only, tied to the box with for and id.
+
+     What a ticked branch means is these parts, now. It is not a standing rule
+     about the assembly, so a part added to SA-1140 next month does not quietly
+     join a slip somebody raised today. Where the intent really is everything
+     under here for ever, that is a value of its own with a name, not a parent
+     box read back off its leaves.
+
+     Ticking a branch does not open it. Selection and disclosure are two
+     different questions and one gesture may not answer both — but the count on
+     a shut branch has to move, or the user has no way of telling that anything
+     happened. -->
+<form data-kui="tree-view/selection" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+      x-data="{
+        open: { fg: true, shell: true, lid: false },
+        under: {
+          fg:    ['rm01', 'rm02', 'pt71', 'pt02', 'pt18', 'hw01'],
+          shell: ['rm01', 'rm02', 'pt71'],
+          lid:   ['pt02', 'pt18']
+        },
+        sel: ['rm01', 'rm02'],
+        every(k) { return this.under[k].every(v => this.sel.includes(v)) },
+        some(k) { return this.under[k].some(v => this.sel.includes(v)) && !this.every(k) },
+        set(k, on) { const rest = this.sel.filter(v => !this.under[k].includes(v)); this.sel = on ? [...rest, ...this.under[k]] : rest },
+        picked(k) { return this.under[k].filter(v => this.sel.includes(v)).length }
+      }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Issue material against WO-2026-0412</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="sel.length + ' of 6 parts'">2 of 6 parts</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-s-fg"
+                aria-label="Sub-assemblies of FG-2200 Water tank 1000 L"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <input type="checkbox" id="tv-s-all" class="ml-2 size-4 shrink-0 accent-zinc-700"
+               :checked="every('fg')" x-effect="$el.indeterminate = some('fg')" @change="set('fg', $event.target.checked)">
+        <label for="tv-s-all" class="ml-2.5 min-w-0 flex-1 truncate font-medium">FG-2200 — everything on this bill</label>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('fg') + ' of 6'">2 of 6</span>
+      </div>
+
+      <ul role="list" id="tv-s-fg" x-show="open.fg" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-s-shell"
+                    aria-label="Parts under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <input type="checkbox" id="tv-s-shell-box" class="ml-2 size-4 shrink-0 accent-zinc-700"
+                   :checked="every('shell')" x-effect="$el.indeterminate = some('shell')" @change="set('shell', $event.target.checked)">
+            <label for="tv-s-shell-box" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('shell') + ' of 3'">2 of 3</span>
+          </div>
+
+          <ul role="list" id="tv-s-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-rm01" name="part" value="rm01" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-rm01" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-rm02" name="part" value="rm02" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-rm02" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1.250 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt71" name="part" value="pt71" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt71" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-s-lid"
+                    aria-label="Parts under SA-1155 Lid and gasket assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <input type="checkbox" id="tv-s-lid-box" class="ml-2 size-4 shrink-0 accent-zinc-700"
+                   :checked="every('lid')" x-effect="$el.indeterminate = some('lid')" @change="set('lid', $event.target.checked)">
+            <label for="tv-s-lid-box" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="picked('lid') + ' of 2'">0 of 2</span>
+          </div>
+          <ul role="list" id="tv-s-lid" x-show="open.lid" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt02" name="part" value="pt02" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt02" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <input type="checkbox" id="tv-s-pt18" name="part" value="pt18" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+                <label for="tv-s-pt18" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></label>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <input type="checkbox" id="tv-s-hw01" name="part" value="hw01" x-model="sel" class="ml-2 size-4 shrink-0 accent-zinc-700">
+            <label for="tv-s-hw01" class="ml-2.5 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></label>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="flex flex-wrap items-center gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-600">The slip is raised for the ticked parts as they stand today, not for whatever the assembly holds later.</p>
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      Raise issue slip
+    </button>
+  </div>
+</form>

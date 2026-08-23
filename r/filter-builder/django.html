@@ -1,0 +1,148 @@
+<!-- The applied set arrives as repeated f parameters and the view parses them
+     into a list of condition objects before anything is rendered. The template
+     draws what the view understood, which is the only version of this that
+     cannot disagree with the queryset: a template that re-reads request.GET
+     itself is a second parser, and the two drift the first time somebody adds
+     an operator.
+
+     A parameter the view does not recognise is dropped and counted, never
+     raised. A link somebody sent from an older deployment, or a hand-edited
+     query string, should return a register rather than a 500 — and the line
+     under the chips says how many were dropped, so a result that looks wrong
+     can be explained.
+
+     The tags below are named in words rather than written with braces, because
+     Django compiles the whole file and does not know what an HTML comment is: a
+     block tag written as prose inside one opens a real block and swallows the
+     template.
+
+     views.py
+         OPS = {"is": "exact", "not": "exact", "gt": "gt", "lt": "lt",
+                "before": "lt", "after": "gt", "contains": "icontains"}
+         FIELDS = {"status": "status", "vendor": "vendor__name",
+                   "amount": "total", "due": "delivery_date"}
+
+         def parse(request):
+             out, dropped = [], 0
+             for raw in request.GET.getlist("f"):
+                 field, _, rest = raw.partition(":")
+                 op, _, value = rest.partition(":")
+                 if field not in FIELDS or op not in OPS:
+                     dropped += 1
+                     continue
+                 out.append(Condition(field, op, value))
+             return out, dropped
+
+     The condition's own sentence comes off the object as label, op_word and
+     display, so the chip, the row and the audit log read identically. Building
+     that sentence in the template is how one screen says "is over" and another
+     says "greater than" for the same query. display is the summarised value and
+     never the raw one — "3 vendors", not the three names joined with commas —
+     because the chip it lands in is whitespace-nowrap and a pill that cannot
+     wrap takes the page past 390px with it.
+
+     Every remove link carries the whole query string minus its own parameter,
+     built in the view as c.drop_url. A remove that posts is a remove that
+     breaks the Back button, and a filter is a GET. -->
+{% load humanize %}
+<div data-kui="filter-builder/django" class="max-w-3xl rounded-xl border border-zinc-300 bg-white">
+
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+    <h3 class="text-[13px]/5 font-medium">{{ register_name }}</h3>
+    <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500">
+      {% if conditions %}{{ matched|intcomma }} of {{ total|intcomma }} orders match{% else %}{{ total|intcomma }} orders{% endif %}
+    </p>
+  </div>
+
+  {% if conditions %}
+    <div role="group" aria-label="Conditions in force" class="flex flex-wrap items-center gap-2 border-b border-zinc-200 bg-zinc-100 px-3 py-2">
+      {% for c in conditions %}
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 py-0.5 pr-1 pl-2.5 text-[12px]/4 font-medium whitespace-nowrap text-zinc-700 tabular-nums ring-1 ring-inset ring-zinc-300">
+          {% if not forloop.first %}<span aria-hidden="true" class="text-zinc-500">{{ join_word }}</span>{% endif %}
+          {{ c.label }} {{ c.op_word }} {{ c.display }}
+          <a href="{{ c.drop_url }}" aria-label="Remove the condition {{ c.label }} {{ c.op_word }} {{ c.display }}"
+             class="flex size-4 items-center justify-center rounded-full text-zinc-600 hover:bg-zinc-300 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-3"></i>
+          </a>
+        </span>
+      {% endfor %}
+      <a href="{{ request.path }}" class="ml-auto rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Clear all</a>
+    </div>
+  {% endif %}
+
+  <form method="get" action="{{ request.path }}">
+    {% for c in conditions %}
+      <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5">
+        <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500">{% if forloop.first %}Where{% else %}{{ join_word }}{% endif %}</span>
+
+        <div class="min-w-0 flex-1 basis-36">
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select name="field_{{ forloop.counter }}" aria-label="Condition {{ forloop.counter }}, field"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+              {% for f in fields %}
+                <option value="{{ f.id }}" {% if f.id == c.field %}selected{% endif %}>{{ f.label }}</option>
+              {% endfor %}
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0 flex-1 basis-28">
+          <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+            <select name="op_{{ forloop.counter }}" aria-label="Condition {{ forloop.counter }}, operator for {{ c.label }}"
+                    class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+              {% for o in c.operators %}
+                <option value="{{ o.id }}" {% if o.id == c.op %}selected{% endif %}>{{ o.word }}</option>
+              {% endfor %}
+            </select>
+            <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+              <i data-lucide="chevron-down" class="size-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="min-w-0 flex-1 basis-44">
+          {% if c.takes_value %}
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" name="v_{{ forloop.counter }}" value="{{ c.value }}"
+                     aria-label="Condition {{ forloop.counter }}, value for {{ c.label }}"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+            </div>
+          {% else %}
+            <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+          {% endif %}
+        </div>
+
+        <a href="{{ c.drop_url }}" aria-label="Remove condition {{ forloop.counter }}, {{ c.label }} {{ c.op_word }} {{ c.display }}"
+           class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="x" class="size-4"></i>
+        </a>
+      </div>
+    {% empty %}
+      <p class="border-b border-zinc-100 px-3 py-4 text-[13px]/5 tabular-nums text-zinc-500">
+        No conditions. The register is showing all {{ total|intcomma }} orders.
+      </p>
+    {% endfor %}
+
+    <input type="hidden" name="join" value="{{ join_word }}">
+    <input type="hidden" name="rows" value="{{ conditions|length }}">
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <a href="{{ add_url }}" class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </a>
+      <div class="ml-auto flex items-center gap-3">
+        <a href="{{ request.path }}" class="rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</a>
+        <button type="submit" class="inline-flex h-9 items-center rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Apply</button>
+      </div>
+    </div>
+  </form>
+
+  {% if dropped %}
+    <p class="border-t border-zinc-200 px-3 py-2 text-[12px]/4 tabular-nums text-zinc-500">
+      {{ dropped }} parameters in this link were not recognised and were ignored. The register below is the rest of the query.
+    </p>
+  {% endif %}
+</div>

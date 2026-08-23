@@ -1,0 +1,134 @@
+<!-- The same axes with nothing to press. This screen was first drawn as the
+     editable grid with every box disabled and it read as the editable grid with
+     something broken — people clicked the boxes, got nothing, and asked who had
+     locked the page. There is no form here and there are no inputs: a tick is
+     an icon, a blank is an em dash, and both carry real words behind them,
+     because an icon with no text and a dash both read as nothing.
+
+     Neither mark takes a status colour. A granted permission is a fact about
+     the record and not a good outcome, so the tick is graphite; emerald here
+     would mean the same thing as emerald on a Closed dot, which is not what is
+     being said. What does take colour is the one row that is a state — a
+     permission granted outside the role by a standing exception, which is
+     waiting on a review date and takes the amber dot the table gives it.
+
+     The date under each mark is when the grant was made, because that is the
+     question an auditor arrives with, and it is why this grid is wider than the
+     editable one: a read-only cell can afford to say more than a 16px box can.
+     It is also why it scrolls. Four role columns each carrying a date put the
+     document at 423px in a browser sweep, and no class fixes that — a width
+     utility on a table cell is a preference the table overrules, and the floor
+     is the widest unbreakable word in the column, here the words under the
+     mark. So the grid takes rule 14 in full: relative, role="region",
+     tabindex="0", a name, and a line of text saying it scrolls, because there
+     is no gradient, no fade and no arrow in this system.
+
+     Panning rather than restacking, and that is the decision worth arguing.
+     Rule 14 names a comparison matrix as the thing allowed to scroll in its own
+     box, and this is one: the whole value of the audit view is reading down a
+     column and across a row, which a stack of one role at a time destroys —
+     that arrangement answers the editing question and already exists as the
+     phone variant. Nothing here is typed, so panning costs an auditor a thumb
+     and costs them nothing else.
+
+     The permission column does not freeze. A frozen column is what the scroll
+     variant pays for at seven roles, where the far column is a screen and a
+     half from its label; at four the whole grid is inside one short pan, and a
+     sticky plane means border-separate, an opaque fill and the row hover put
+     back by hand on every frozen cell. Not earned here. -->
+<div data-kui="permission-matrix/readonly" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-r-h" class="text-[14px]/5 font-semibold">Who may do what — as on 23 Aug 2026</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">4 roles · 6 permissions · 29 users · read-only. Changes are made on Settings, Users and roles, and every one of them is in the audit trail.</p>
+  </div>
+
+  <div role="region" aria-labelledby="pm-r-h" tabindex="0"
+       class="relative max-h-[26rem] overflow-auto overscroll-contain focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table class="w-full min-w-[46rem] table-fixed text-[13px]/5">
+      <caption class="sr-only">What each of four roles may do as on 23 August 2026. Permissions down the rows, roles across the columns, and the date each grant was made under the mark. Nothing on this screen is editable.</caption>
+      <thead>
+        <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="w-56 px-4 py-2.5 text-left font-medium">Permission</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Purchase officer</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Store keeper</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">QC inspector</th>
+          <th scope="col" class="w-32 px-3 py-2.5 font-medium">Accounts</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">17 Jun 2026</span>
+          </td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Reverse a posted GRN</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <span class="mx-auto flex items-center justify-center gap-1.5">
+              <span class="size-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true"></span>
+              <i data-lucide="check" class="size-4 text-zinc-700"></i>
+              <span class="sr-only">Granted by a standing exception that is due for review</span>
+            </span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">Exception, review 30 Sep 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+        <tr class="hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+          <td class="px-3 py-2.5 text-center">
+            <i data-lucide="check" class="mx-auto size-4 text-zinc-700"></i><span class="sr-only">Granted</span>
+            <span class="mt-0.5 block text-[11px]/4 tabular-nums text-zinc-500">04 Apr 2026</span>
+          </td>
+          <td class="px-3 py-2.5 text-center text-zinc-500">—<span class="sr-only">Not granted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 text-zinc-500">
+    The grid scrolls sideways inside this panel; the page behind it does not move at any width.
+  </p>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+    1 of the 8 grants above is a standing exception rather than part of the role. It expires on its review date and is not renewed by anything on this screen.
+  </p>
+</div>

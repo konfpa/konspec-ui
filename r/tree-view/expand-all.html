@@ -1,0 +1,184 @@
+<!-- A location hierarchy is read two ways: down from the plant, looking for the
+     rack a pallet is on, and all at once, when somebody is checking a physical
+     count against the system. One control serves the second reading, and it is
+     one button rather than an Expand all beside a Collapse all, because two of
+     them means one is always the dead one.
+
+     Its label is computed from the open set, never toggled from a flag of its
+     own. Open the last rack by hand and the button has to already say Collapse
+     all; driven by a flag it says Expand all, the press collapses nothing
+     visible, and the control reads as broken. allOpen is derived from the same
+     array the chevrons paint from, so the two cannot drift.
+
+     The label also says how many rows the press produces. Twelve is nothing;
+     the same control over a plant with four hundred bins draws four hundred
+     rows of bindings in one frame on a machine that is also running the ERP in
+     another tab, and a number in the label is the only warning anybody gets
+     before it happens. Count the rows on the server and send it with the tree.
+
+     The button is not aria-expanded. That attribute describes what the control
+     itself opens and this one opens six things, so it takes aria-controls
+     listing all six group ids — that is what the space-separated form is for —
+     and the label carries which way the next press will go.
+
+     Group ids come from the location code through the state, never from a loop
+     index. Two of these trees on one transfer screen both mint the same ids
+     from an index, and the second tree's chevrons then open branches in the
+     first. -->
+<div data-kui="tree-view/expand-all"
+     x-data="{
+       open: ['vas', 'sta'],
+       branches: ['vas', 'sta', 'r11', 'r12', 'stb', 'b21'],
+       rows: 12,
+       has(id) { return this.open.includes(id) },
+       toggle(id) { this.open = this.has(id) ? this.open.filter(x => x !== id) : [...this.open, id] },
+       get allOpen() { return this.open.length === this.branches.length },
+       everything() { this.open = this.allOpen ? [] : [...this.branches] },
+       panels() { return this.branches.map(b => 'tv-x-' + b).join(' ') }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 pb-2">
+    <h3 class="min-w-0 flex-1 text-[16px]/6 font-semibold">Storage locations</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="open.length + ' of ' + branches.length + ' branches open'">2 of 6 branches open</p>
+    <button type="button" @click="everything()" :aria-controls="panels()"
+            class="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <span class="flex transition-transform motion-reduce:transition-none" :class="allOpen && 'rotate-180'">
+        <i data-lucide="chevrons-up-down" class="size-4 text-zinc-600"></i>
+      </span>
+      <span class="tabular-nums" x-text="allOpen ? 'Collapse all' : 'Expand all — ' + rows + ' rows'">Expand all — 12 rows</span>
+    </button>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="toggle('vas')" :aria-expanded="has('vas')" aria-controls="tv-x-vas"
+                  aria-label="Stores in PLT-VAS Vasai plant"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="has('vas') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PLT-VAS</span> <span class="font-medium">Vasai plant</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹4,18,60,400</span>
+        </div>
+
+        <ul role="list" id="tv-x-vas" x-show="has('vas')" x-collapse.duration.200ms>
+          <li>
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="toggle('sta')" :aria-expanded="has('sta')" aria-controls="tv-x-sta"
+                      aria-label="Racks in ST-A Store A, raw material"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="has('sta') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-A</span> <span class="text-zinc-600">Store A — raw material</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹3,02,18,900</span>
+            </div>
+
+            <ul role="list" id="tv-x-sta" x-show="has('sta')" x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('r11')" :aria-expanded="has('r11')" aria-controls="tv-x-r11"
+                          aria-label="Bins on RK-A11 Rack A11"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('r11') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,88,40,000</span>
+                </div>
+                <ul role="list" id="tv-x-r11" x-show="has('r11')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A11-01</span> <span class="text-zinc-600">HDPE M60075 — 42 bags</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,05,00,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A11-02</span> <span class="text-zinc-600">LLDPE film grade — 33 bags</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹83,40,000</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('r12')" :aria-expanded="has('r12')" aria-controls="tv-x-r12"
+                          aria-label="Bins on RK-A12 Rack A12"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('r12') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,13,78,900</span>
+                </div>
+                <ul role="list" id="tv-x-r12" x-show="has('r12')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A12-01</span> <span class="text-zinc-600">Masterbatch blue 2% — 18 drums</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹64,80,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">A12-02</span> <span class="text-zinc-600">Slip additive — 9 drums</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹48,98,900</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-6 shrink-0"></span>
+              <button type="button" @click="toggle('stb')" :aria-expanded="has('stb')" aria-controls="tv-x-stb"
+                      aria-label="Racks in ST-B Store B, packing"
+                      class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="has('stb') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">ST-B</span> <span class="text-zinc-600">Store B — packing</span></span>
+              <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+            </div>
+            <ul role="list" id="tv-x-stb" x-show="has('stb')" x-cloak x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span>
+                  <button type="button" @click="toggle('b21')" :aria-expanded="has('b21')" aria-controls="tv-x-b21"
+                          aria-label="Bins on RK-B21 Rack B21"
+                          class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="has('b21') && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-B21</span> <span class="text-zinc-600">Rack B21 — cartons and liners</span></span>
+                  <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹1,16,41,500</span>
+                </div>
+                <ul role="list" id="tv-x-b21" x-show="has('b21')" x-cloak x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">B21-01</span> <span class="text-zinc-600">Corrugated cartons 5-ply — 1,240 nos</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹74,40,000</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">B21-02</span> <span class="text-zinc-600">PE liners 200 micron — 640 nos</span></span>
+                      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">₹42,01,500</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>

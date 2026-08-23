@@ -1,0 +1,93 @@
+<!-- The one entry with a body a person composed, sitting in the same column
+     as the events the system wrote. The mark changes from a 6px dot to
+     avatar's circle, because a note is somebody speaking and the face is the
+     first thing worth reading; the rail carries on underneath it unchanged,
+     so the column still reads as one sequence.
+
+     The circle is aria-hidden — the name is written beside it, and without
+     that a screen reader announces "RD Ritu Deshpande".
+
+     The note itself goes in a bg-zinc-50 well and the events around it do
+     not. That is the whole visual difference and it is deliberate: a note is
+     content somebody can disagree with, an event is a fact, and the well says
+     which is which without spending a colour on it.
+
+     A note that has been edited says so with the time it was edited. The
+     strip is append-only in appearance, and a body that can change without
+     saying it changed makes that appearance a lie.
+
+     The attachment is a link to a document that already exists on the record,
+     not an upload control. A drop target inside a history row competes with
+     the page scroll, and a file dropped an inch wide of it navigates the
+     browser away from the record. -->
+<div data-kui="timeline/comment" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">DN-26-0117 · notes and events</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Debit note against Sharma Steel &amp; Alloys · ₹34,200</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">RD</span>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">
+          <span class="font-medium">Ritu Deshpande</span> <span class="text-zinc-600">wrote a note</span>
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T15:10+05:30">04 Sep 2026, 15:10</time> · 40 minutes ago · edited <time datetime="2026-09-04T15:22+05:30">15:22</time>
+        </p>
+        <div class="mt-2 rounded-lg bg-zinc-50 px-3 py-2.5">
+          <p class="text-[13px]/5 tabular-nums text-zinc-900">
+            Spoke to Mr Shah at the mill. The 600 kg short is a slitting loss on the last coil and they have accepted the debit note against the September running account rather than a fresh credit. Do not net it off PO-2026-0418 — finance want it visible separately at the quarter.
+          </p>
+          <ul aria-label="Attachments on this note" class="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <li>
+              <a href="#" class="flex max-w-[15rem] items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[12px]/4 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="file-text" class="size-3.5 shrink-0 text-zinc-500" aria-hidden="true"></i>
+                <span class="truncate">sharma-acceptance-04sep.pdf</span>
+                <span class="shrink-0 tabular-nums text-zinc-500">148 KB</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 text-[12px]/4 font-medium text-zinc-600 ring-1 ring-inset ring-zinc-300">MI</span>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5">
+          <span class="font-medium">Meena Iyer</span> <span class="text-zinc-600">wrote a note</span>
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T11:02+05:30">04 Sep 2026, 11:02</time> · 5 hours ago · finance
+        </p>
+        <div class="mt-2 rounded-lg bg-zinc-50 px-3 py-2.5">
+          <p class="text-[13px]/5 tabular-nums text-zinc-900">Held the September payment run for this vendor until the note is accepted in writing. Two invoices affected, ₹9,84,000.</p>
+        </div>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-8 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Suresh Kadam</span> raised the debit note for 600 kg short received against
+          <a href="#" class="rounded text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">GRN-4821</a>.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+          <time datetime="2026-09-04T08:12+05:30">04 Sep 2026, 08:12</time> · 8 hours ago · gate 2
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>

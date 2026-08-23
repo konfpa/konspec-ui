@@ -1,0 +1,110 @@
+<!-- The storekeeper walks the racks with this in one hand, so the tree is drawn
+     at 390px rather than shrunk into it.
+
+     The indent step drops from 24px to 16px. Four levels at 24px spends 72px
+     plus a 32px chevron before the first character of a bin code, out of a
+     content column that is 340px wide — the description then wraps every other
+     word and the tree reads as a column of fragments. At 16px the same four
+     levels cost 48px. Below that the levels stop being distinguishable, so 16px
+     is the floor and a fifth level on a phone is a screen that needs a
+     different answer: a breadcrumb into one rack rather than the whole plant.
+
+     Nothing scrolls sideways. The description truncates and the code does not,
+     because a truncated bin code is not a bin code — the description can be
+     guessed from context and A11-0… cannot.
+
+     The figures move under the label instead of sitting beside it. Kept on the
+     right they compete with the description for the same 200px and both lose;
+     under it they get the full width of the text column and stay in one line.
+
+     The chevron is a 32 by 44 target, not a 24px square. A 24px control between
+     two 24px controls is two mistaps a shift with a glove on, and the row
+     around it is deliberately not the target — the row will carry a link to the
+     bin, and a tree whose rows both navigate and expand does neither reliably
+     under a thumb.
+
+     The row is min-h-11 and grows to two lines rather than changing height
+     between open and shut. A row that gets taller when it opens moves the row
+     under it out from under the thumb that is about to tap it. -->
+<div data-kui="tree-view/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 p-3 text-zinc-900"
+     x-data="{ open: { vas: true, sta: true, r11: true } }">
+  <div class="mb-2">
+    <h2 class="text-[16px]/6 font-semibold">Stock by location</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Vasai plant · counted 21 Aug 2026</p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+    <ul role="list" class="py-1">
+      <li>
+        <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <button type="button" @click="open.vas = !open.vas" :aria-expanded="open.vas" aria-controls="tv-p-vas"
+                  aria-label="Stores in Vasai plant"
+                  class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="open.vas && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </button>
+          <span class="ml-1.5 min-w-0 flex-1 py-2">
+            <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">PLT-VAS</span> Vasai plant</span>
+            <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">2 stores · ₹4,18,60,400</span>
+          </span>
+        </div>
+
+        <ul role="list" id="tv-p-vas" x-show="open.vas" x-collapse.duration.200ms>
+          <li>
+            <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+              <span aria-hidden="true" class="w-4 shrink-0"></span>
+              <button type="button" @click="open.sta = !open.sta" :aria-expanded="open.sta" aria-controls="tv-p-sta"
+                      aria-label="Racks in Store A, raw material"
+                      class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="flex transition-transform motion-reduce:transition-none" :class="open.sta && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+              </button>
+              <span class="ml-1.5 min-w-0 flex-1 py-2">
+                <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">ST-A</span> Store A — raw material</span>
+                <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">4 racks · ₹3,02,18,900</span>
+              </span>
+            </div>
+
+            <ul role="list" id="tv-p-sta" x-show="open.sta" x-collapse.duration.200ms>
+              <li>
+                <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                  <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span>
+                  <button type="button" @click="open.r11 = !open.r11" :aria-expanded="open.r11" aria-controls="tv-p-r11"
+                          aria-label="Bins on rack A11"
+                          class="flex h-11 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-500 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="open.r11 && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </button>
+                  <span class="ml-1.5 min-w-0 flex-1 py-2">
+                    <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">RK-A11</span> Rack A11 — granule</span>
+                    <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">8 bins · ₹1,88,40,000</span>
+                  </span>
+                </div>
+
+                <ul role="list" id="tv-p-r11" x-show="open.r11" x-collapse.duration.200ms>
+                  <li>
+                    <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-8 shrink-0"></span>
+                      <span class="ml-1.5 min-w-0 flex-1 py-2">
+                        <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">A11-01</span> HDPE M60075, natural</span>
+                        <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">42 bags · 1,050.000 kg · ₹1,05,00,000</span>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="flex min-h-11 items-center pr-3 pl-3 hover:bg-zinc-100">
+                      <span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-4 shrink-0"></span><span aria-hidden="true" class="w-8 shrink-0"></span>
+                      <span class="ml-1.5 min-w-0 flex-1 py-2">
+                        <span class="block truncate text-[13px]/5"><span class="font-medium tabular-nums">A11-02</span> LLDPE film grade, natural</span>
+                        <span class="block truncate text-[12px]/4 tabular-nums text-zinc-500">33 bags · 825.000 kg · ₹83,40,000</span>
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">Four levels at a 16px step. A fifth is a rack screen of its own, reached from a breadcrumb.</p>
+</div>

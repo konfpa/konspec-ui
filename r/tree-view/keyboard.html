@@ -1,0 +1,123 @@
+<!-- The real role="tree": one tab stop, a roving tabindex, and the arrow-key
+     contract in full. This is the shape for a tree somebody navigates — a
+     component picker, a location chooser, an account picker — and it is the
+     only variant here that claims the role, because claiming it means owing all
+     of the behaviour below.
+
+     One tab stop. The active row is tabindex="0", every other row is
+     tabindex="-1", and the tab stop follows the active row, so Tab out and back
+     lands where the user was rather than at the top.
+
+     Which is why the chevron is a span with a click handler and not a button. A
+     button inside a treeitem is a second tab stop inside a widget that promised
+     one; the row owns the click and owns the keys. That is the trade every
+     other variant in this entry refuses to make, because a row carrying a link,
+     a checkbox and a menu needs Tab to reach all three.
+
+     The rows are rendered flat rather than nested, because the arrow keys move
+     between visible rows regardless of level and a flat array is that list. The
+     nesting a screen reader would have read out of the DOM has to be written
+     back on: aria-level, and aria-setsize and aria-posinset counted among the
+     node's SIBLINGS, not among the rows on screen — take those from the render
+     index and the tree announces 3 of 9 for the second child of a branch.
+
+     aria-expanded cannot be bound on a leaf. Alpine preserves a falsy aria-*
+     binding instead of removing it, so :aria-expanded="false" on a row with no
+     children renders the attribute set to false, which tells a screen reader
+     the row has children that are hidden — a different and wrong fact. The only
+     way to take it off from a binding is x-effect on the element itself, which
+     is the same reason indeterminate is written that way on a checkbox.
+
+     Focus moves in the next tick, never in the same statement. ArrowRight on a
+     closed branch sets the open state and then moves in; at the moment the
+     handler runs the child rows are not rendered yet and .focus() on an element
+     that is not there is a silent no-op that leaves the keyboard where it was.
+
+     And the tab stop may not disappear. Collapse a branch while the active row
+     is inside it and tabindex="0" is on something that is now display:none, so
+     the whole tree drops out of the tab order; close() moves the active row up
+     to the branch that was collapsed, which is where the user is looking. -->
+<div data-kui="tree-view/keyboard" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{
+       active: 'fg',
+       open: ['fg', 'shell'],
+       picked: '',
+       buf: '',
+       timer: 0,
+       nodes: [
+         { id: 'fg',    parent: null,    code: 'FG-2200', name: 'Water tank 1000 L, roto-moulded', qty: '1 no' },
+         { id: 'shell', parent: 'fg',    code: 'SA-1140', name: 'Tank shell assembly',             qty: '1 no' },
+         { id: 'rm01',  parent: 'shell', code: 'RM-3301', name: 'HDPE, blow moulding grade',       qty: '62.500 kg' },
+         { id: 'rm02',  parent: 'shell', code: 'RM-3312', name: 'Masterbatch, blue 2%',            qty: '1.250 kg' },
+         { id: 'lid',   parent: 'fg',    code: 'SA-1155', name: 'Lid and gasket assembly',         qty: '2 nos' },
+         { id: 'pt02',  parent: 'lid',   code: 'PT-4402', name: 'Lid, moulded, 400 mm',            qty: '1 no' },
+         { id: 'pt18',  parent: 'lid',   code: 'PT-4418', name: 'Gasket, EPDM 3 mm',               qty: '1 no' },
+         { id: 'hw01',  parent: 'fg',    code: 'HW-5501', name: 'Outlet nipple, GI, 1 in',         qty: '1 no' },
+         { id: 'pk20',  parent: 'fg',    code: 'PK-6620', name: 'Stretch film, 23 micron',         qty: '0.180 kg' }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       label(n) { return n.code + ' ' + n.name },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       sibs(n) { return this.nodes.filter(x => x.parent === n.parent) },
+       pos(n) { return this.sibs(n).findIndex(x => x.id === n.id) + 1 },
+       isOpen(n) { return this.open.includes(n.id) },
+       shown(n) { let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent } return true },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       go(id) { this.active = id; this.$nextTick(() => this.$root.querySelector('#tv-k-' + id).focus()) },
+       openIt(n) { if (!this.isOpen(n)) this.open = [...this.open, n.id] },
+       close(n) { this.open = this.open.filter(x => x !== n.id); if (!this.shown(this.by(this.active))) this.go(n.id) },
+       step(d) { const r = this.rows, i = r.findIndex(n => n.id === this.active), j = i + d; if (j >= 0 && j < r.length) this.go(r[j].id) },
+       right(n) { if (!this.kids(n.id).length) return; if (!this.isOpen(n)) { this.openIt(n) } else { this.go(this.kids(n.id)[0].id) } },
+       left(n) { if (this.kids(n.id).length && this.isOpen(n)) { this.close(n) } else if (n.parent) { this.go(n.parent) } },
+       pick(n) { if (this.kids(n.id).length) { this.isOpen(n) ? this.close(n) : this.openIt(n) } else { this.picked = this.label(n) } },
+       type(k) {
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => this.buf = '', 600);
+         this.buf += k.toLowerCase();
+         const r = this.rows, i = r.findIndex(n => n.id === this.active);
+         const order = [...r.slice(i + 1), ...r.slice(0, i + 1)];
+         const found = order.find(n => this.label(n).toLowerCase().startsWith(this.buf));
+         if (found) this.go(found.id);
+       }
+     }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Add a component to WO-2026-0412</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="rows.length + ' rows visible'">4 rows visible</p>
+  </div>
+
+  <ul role="tree" aria-label="Components of FG-2200 Water tank 1000 L" class="py-1"
+      @keydown.down.prevent="step(1)"
+      @keydown.up.prevent="step(-1)"
+      @keydown.right.prevent="right(by(active))"
+      @keydown.left.prevent="left(by(active))"
+      @keydown.home.prevent="go(rows[0].id)"
+      @keydown.end.prevent="go(rows[rows.length - 1].id)"
+      @keydown.enter.prevent="pick(by(active))"
+      @keydown.space.prevent="pick(by(active))"
+      @keydown="$event.key.length === 1 && $event.key !== ' ' && type($event.key)">
+    <template x-for="n in rows" :key="n.id">
+      <li role="treeitem" :id="'tv-k-' + n.id"
+          :tabindex="active === n.id ? 0 : -1"
+          :aria-level="level(n)" :aria-setsize="sibs(n).length" :aria-posinset="pos(n)"
+          x-effect="kids(n.id).length ? $el.setAttribute('aria-expanded', isOpen(n)) : $el.removeAttribute('aria-expanded')"
+          @click="go(n.id)"
+          class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+        <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+        <span aria-hidden="true" @click.stop="pick(n); go(n.id)"
+              class="flex size-6 shrink-0 items-center justify-center text-zinc-500">
+          <template x-if="kids(n.id).length">
+            <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </template>
+        </span>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums" x-text="n.code"></span> <span class="text-zinc-600" x-text="n.name"></span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600" x-text="n.qty"></span>
+      </li>
+    </template>
+  </ul>
+
+  <div class="border-t border-zinc-200 bg-zinc-50 px-4 py-2">
+    <p class="text-[12px]/4 text-zinc-500">Up and down move between visible rows. Right opens a branch, then moves into it; left closes one, or steps out to its parent. Home and End go to the ends. Type a part code to jump to it.</p>
+    <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600" x-show="picked" x-cloak><span class="font-medium">Enter added</span> <span x-text="picked"></span></p>
+  </div>
+</div>

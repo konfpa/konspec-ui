@@ -1,0 +1,79 @@
+<!-- A history on a record somebody keeps open all morning goes stale, and on
+     a receipt being worked at the gate that matters: the QC verdict lands
+     while the buyer is looking at the strip. The list polls and new entries
+     are swapped in at the top.
+
+     hx-swap="afterbegin" on the ol, not on the panel. Swapping the panel
+     replaces the heading, the count and the footer as well, which throws away
+     focus and any menu open over it every thirty seconds on a schedule
+     nobody can see. hx-sync="this:drop" throws away a poll that arrives while
+     one is still in flight, which is what a tab left open on a slow VPN does
+     all afternoon.
+
+     This is the one insertion above what is on screen this library allows,
+     and it is allowed because a record strip is a dozen entries under a
+     heading the reader can still see — a prepend moves the content by one
+     row. The audit page refuses the same swap, because there the reader can
+     be forty entries deep and the entry they are quoting is evidence.
+
+     The live region is the count line, which was in the document before the
+     first poll and is never itself the target of a swap. htmx replacing a
+     live region produces a brand new one holding a message that was already
+     inside it, and a new region announces nothing — the update then measures
+     as correct and is silent.
+
+     The rail is CSS, so the entry that used to be last stops drawing one the
+     moment another arrives below it and the new first entry grows one. A
+     server-side "is this the last row" flag is right on the first render and
+     wrong on every swap after it. Re-run lucide.createIcons() after a swap
+     that brings in icons, guarded on the selector the shell already uses. -->
+<div data-kui="timeline/htmx" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">GRN-4821 · live history</h2>
+    <p id="tl-hx-count" aria-live="polite" class="text-[12px]/4 tabular-nums text-zinc-500">7 entries · updated 14:22</p>
+  </div>
+
+  <ol id="tl-hx-list" role="list" class="px-5 py-4"
+      hx-get="/receipts/4821/events/since/?after=2026-09-04T08%3A56%2B05%3A30"
+      hx-trigger="every 30s, kui:event from:body"
+      hx-swap="afterbegin" hx-sync="this:drop">
+
+    <!-- the server returns li elements only, newest first, and rewrites the count
+         through an out-of-band swap on the paragraph above -->
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> passed lot 26-119 against IS 2062 E250 and released the hold.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:56+05:30">04 Sep 2026, 08:56</time> · just now · lab, Silvassa</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Farida Qureshi</span> held the receipt pending the mill test certificate for heat 8841.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:14+05:30">04 Sep 2026, 08:14</time> · 42 minutes ago · lab, Silvassa</p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums"><span class="font-medium">Suresh Kadam</span> weighed in vehicle GJ-15-AT-4482 at 12.480 MT net.</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:58+05:30">04 Sep 2026, 07:58</time> · an hour ago · gate 2</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="border-t border-zinc-200 px-5 py-2.5">
+    <p class="text-[12px]/4 tabular-nums text-zinc-600">New entries arrive at the top every 30 seconds. Older ones are behind the full trail and are never inserted here.</p>
+  </div>
+</div>

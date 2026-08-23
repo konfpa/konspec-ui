@@ -1,0 +1,90 @@
+<!-- The loop, and the three things that go wrong when a history is rendered
+     from a table rather than assembled by hand.
+
+     The dot comes off the event's own state through the same filter the badge
+     reads. Import it, do not re-declare it: two copies of the mapping is how
+     one screen ends up amber and another green for the same event, and the
+     wrong screen is always the one nobody opened during the review.
+
+     The rail is group-last:hidden and never a forloop.last test. Both are
+     right on a full render and only one survives htmx appending the next
+     batch — forloop.last was true for the row that used to be last, so that
+     row's rail is gone for good and nothing on the page knows to redraw it.
+     The CSS selector recomputes itself on every insertion.
+
+     naturaltime is a gloss and goes after the absolute date, never instead of
+     it, and the datetime attribute carries the ISO value with the offset on
+     it. The humanize library is loaded in this fragment rather than in a base
+     template, because a template is compiled per file and a load elsewhere
+     does nothing here. Amounts go through the project's own inr filter and
+     not intcomma, which groups in thousands and prints 2,710,400 where every
+     other figure on the screen reads 27,10,400.
+
+     The empty case is outside the loop. Django's empty block renders inside
+     the for, which is inside the ol, so "nothing yet" becomes item 1 of a
+     list of 1 and is announced as a list before the sentence saying the list
+     is empty. -->
+{% load humanize %}
+{% load ui %}
+
+{# records/_history.html #}
+<div data-kui="timeline/django" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">{{ record.number }} · history</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">{{ events|length }} of {{ total }} entries · newest first</p>
+  </div>
+
+  {% if events %}
+    <ol role="list" class="px-5 py-4">
+      {% for event in events %}
+        <li class="group flex gap-3 pb-4 last:pb-0">
+          <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+            <span class="flex h-5 items-center"><span class="size-1.5 rounded-full {{ event.state|status_dot }}"></span></span>
+            <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[13px]/5 tabular-nums">
+              <span class="sr-only">{{ event.get_state_display }} — </span>
+              <span class="font-medium">{{ event.actor.get_full_name|default:"System" }}</span> {{ event.summary }}
+            </p>
+            <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+              <time datetime="{{ event.at|date:'c' }}">{{ event.at|date:"d M Y, H:i" }}</time> · {{ event.at|naturaltime }}{% if event.source %} · {{ event.source }}{% endif %}
+            </p>
+
+            {% if event.changes.all %}
+              <dl class="mt-2 space-y-1.5 rounded-lg bg-zinc-50 px-3 py-2 text-[12px]/4">
+                {% for change in event.changes.all %}
+                  <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                    <dt class="w-36 shrink-0 text-zinc-600">{{ change.field_label }}</dt>
+                    <dd class="flex items-baseline gap-1.5 tabular-nums">
+                      {% if change.old %}
+                        <span class="text-zinc-500 line-through">{{ change.old }}</span>
+                      {% else %}
+                        <span class="text-zinc-500 italic">not set</span>
+                      {% endif %}
+                      <span class="sr-only">changed to</span>
+                      <i data-lucide="arrow-right" class="size-3 shrink-0 self-center text-zinc-500" aria-hidden="true"></i>
+                      {% if change.new %}
+                        <span class="font-medium">{{ change.new }}</span>
+                      {% else %}
+                        <span class="font-medium italic">cleared</span>
+                      {% endif %}
+                    </dd>
+                  </div>
+                {% endfor %}
+              </dl>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-5 py-2.5">
+      <p class="text-[13px]/5 tabular-nums text-zinc-600">Order value now ₹{{ record.value|inr }}</p>
+      <a href="{% url 'audit-trail' %}?record={{ record.pk }}"
+         class="rounded text-[12px]/4 font-medium tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">See all {{ total }} entries</a>
+    </div>
+  {% else %}
+    <p class="px-5 py-8 text-center text-[13px]/5 text-zinc-500">Nothing has happened to {{ record.number }} yet.</p>
+  {% endif %}
+</div>

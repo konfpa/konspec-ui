@@ -1,0 +1,133 @@
+<!-- A plant has forty racks and two thousand bins. The tree ships down to the
+     racks and every rack's bins are a query, so the page renders in one round
+     trip and the branches nobody opens cost nothing.
+
+     Alpine does not fetch. It owns open, busy and failed — the three flags the
+     row paints from — and htmx owns the request, the target and the swap. The
+     moment a component reaches for fetch() inside x-data both halves start
+     needing to know about the other.
+
+     hx-trigger="intersect once" on the body inside the branch, not click on the
+     chevron. A display:none element never intersects, so the request goes out
+     the first time the branch is genuinely on screen: nothing is fetched for a
+     rack nobody opens, and the eleventh open of the same rack is not the
+     eleventh request. On the chevron instead it fires while the branch is still
+     shut whenever the open set is restored from a URL or a preference.
+
+     The spinner takes the chevron's place rather than sitting beside it. Added
+     to the row it pushes the code 20px right and back again when it lands,
+     which is a row moving under a pointer that is about to click it.
+
+     The chevron exists because the server sent a child count with the rack. A
+     chevron drawn on every row because the client does not know yet is a
+     control that opens onto nothing, and an empty 200 leaves it spinning and
+     then blank, which reads as a failure rather than as an answer. Rack A12 is
+     the answer: six bins, all of them empty, and the endpoint says so in a row
+     rather than returning nothing.
+
+     A failure leaves a retry inside the branch, and the retry carries its own
+     hx-get, because intersect once has already spent the body's one request.
+     htmx does not swap on a non-2xx, so the placeholder is still underneath and
+     has to be taken off screen — x-show="!failed" on the same element, rather
+     than a second wrapper, so there is one thing to hide and one thing to put
+     back when the retry lands. -->
+<div data-kui="tree-view/lazy" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">ST-A Store A — raw material</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 racks</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li x-data="{ open: false, busy: false, failed: false }"
+        @htmx:before-request="busy = true" @htmx:after-request="busy = false"
+        @htmx:response-error="failed = true" @htmx:send-error="failed = true">
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r11"
+                aria-label="Bins on RK-A11 Rack A11"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-show="!busy" class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin motion-reduce:animate-none"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A11</span> <span class="text-zinc-600">Rack A11 — granule</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">8 bins</span>
+      </div>
+
+      <ul role="list" id="tv-l-r11" x-show="open" x-cloak x-collapse.duration.200ms>
+        <li id="tv-l-r11-body" x-show="!failed"
+            hx-get="/stores/racks/RK-A11/bins/" hx-trigger="intersect once" hx-swap="outerHTML">
+          <div aria-hidden="true" class="animate-pulse motion-reduce:animate-none">
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+          </div>
+          <p role="status" class="sr-only">Loading the bins on rack A11.</p>
+        </li>
+
+        <li x-show="failed" x-cloak>
+          <div class="flex flex-wrap items-center gap-3 py-2 pr-3 pl-[60px]">
+            <p class="flex min-w-0 flex-1 items-start gap-2 text-[13px]/5 text-zinc-600">
+              <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+              The bins on this rack could not be loaded.
+            </p>
+            <button type="button" @click="failed = false"
+                    hx-get="/stores/racks/RK-A11/bins/" hx-target="#tv-l-r11-body" hx-swap="outerHTML"
+                    class="inline-flex h-9 shrink-0 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Try again
+            </button>
+          </div>
+        </li>
+      </ul>
+    </li>
+
+    <li x-data="{ open: true }">
+      <!-- already answered: six bins, none of them holding anything. The branch
+           says so in a row of its own rather than opening onto a gap. -->
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r12"
+                aria-label="Bins on RK-A12 Rack A12"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A12</span> <span class="text-zinc-600">Rack A12 — masterbatch</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">6 bins</span>
+      </div>
+      <ul role="list" id="tv-l-r12" x-show="open" x-collapse.duration.200ms>
+        <li>
+          <p class="flex min-h-9 items-center py-2 pr-3 pl-[60px] text-[12px]/4 text-zinc-500">All six bins on this rack are empty. Last issue was GRN-3288 on 04 Aug 2026.</p>
+        </li>
+      </ul>
+    </li>
+
+    <li x-data="{ open: false, busy: false, failed: false }"
+        @htmx:before-request="busy = true" @htmx:after-request="busy = false"
+        @htmx:response-error="failed = true" @htmx:send-error="failed = true">
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="tv-l-r13"
+                aria-label="Bins on RK-A13 Rack A13"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span x-show="!busy" class="flex transition-transform motion-reduce:transition-none" :class="open && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+          <span x-show="busy" x-cloak class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin motion-reduce:animate-none"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RK-A13</span> <span class="text-zinc-600">Rack A13 — additives and pigment</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">4 bins</span>
+      </div>
+      <ul role="list" id="tv-l-r13" x-show="open" x-cloak x-collapse.duration.200ms>
+        <li id="tv-l-r13-body" x-show="!failed"
+            hx-get="/stores/racks/RK-A13/bins/" hx-trigger="intersect once" hx-swap="outerHTML">
+          <div aria-hidden="true" class="animate-pulse motion-reduce:animate-none">
+            <div class="flex min-h-9 items-center pr-3 pl-3">
+              <span class="w-6 shrink-0"></span><span class="size-6 shrink-0"></span>
+              <span class="ml-2 h-3 w-24 rounded bg-zinc-100"></span><span class="ml-3 h-3 flex-1 rounded bg-zinc-100"></span>
+            </div>
+          </div>
+          <p role="status" class="sr-only">Loading the bins on rack A13.</p>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

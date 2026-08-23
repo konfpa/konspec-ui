@@ -1,0 +1,103 @@
+<!-- The applied set lives in the URL or it does not exist. A buyer who has
+     spent four conditions working out which receipts are actually late sends
+     that screen to the plant head, and a builder holding its state in Alpine
+     sends a link to the unfiltered register.
+
+     It is also what makes Back work between two answers, what lets an export
+     carry the same query the screen is showing, and what makes a saved view
+     nothing more cunning than a stored query string with a name on it.
+
+     One parameter per condition, not one comma-joined list, because every
+     vendor name in this register has a comma in it and a value with a
+     separator inside it is how a query silently becomes two. Each parameter is
+     field, operator and value on colons, with the value percent-encoded; the
+     joiner is one parameter of its own.
+
+     The form is a GET and its inputs are hidden ones written from the applied
+     set, so pressing the browser's own submit produces exactly the URL the
+     builder would have pushed. There is no second serialiser anywhere — the
+     link, the form and the export all read the same array.
+
+     The link is a real anchor carrying the query, not a button that copies. A
+     buyer sends it by right-clicking, and a copy button is the version of that
+     which cannot be dragged into an email.
+
+     The URL is wrapping text and not a one-line box, and that is the fix for a
+     390px overflow rather than a preference. Percent-encoding removes every
+     space, so f=vendor:any:Gujarat%20Polymers%20Ltd%2CSharma%20Extrusions is a
+     single token with nowhere to break; min-w-0 lets the flex item shrink but
+     the content has no break opportunity to shrink to, so it held its intrinsic
+     width and took the document to 471px. break-all is what gives it one. A
+     readonly input would not overflow — it scrolls inside itself — but it shows
+     thirty of a hundred and twenty characters and the rest is behind a drag,
+     which is the wrong trade for a string whose entire purpose is to be read
+     and copied whole. select-all takes the whole URL on one click, so nothing
+     is lost by it not being a control. -->
+<div data-kui="filter-builder/url" class="max-w-3xl"
+     x-data="{
+       joiner: 'and',
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'amount', op: 'gt', v: '200000' },
+         { id: 3, field: 'vendor', op: 'any', v: 'Gujarat Polymers Ltd,Sharma Extrusions' },
+         { id: 4, field: 'due', op: 'before', v: '2026-08-31' }
+       ],
+       labels: { status: 'Status', amount: 'Order value', vendor: 'Vendor', due: 'Delivery date' },
+       opWords: { is: 'is', gt: 'is over', any: 'is any of', before: 'is before' },
+       param(c) { return 'f=' + c.field + ':' + c.op + ':' + encodeURIComponent(c.v) },
+       get query() { return this.conds.map(c => this.param(c)).join('&') + '&join=' + this.joiner },
+       get href() { return '/orders/?' + this.query },
+       sentence(c) {
+         const w = this.labels[c.field] + ' ' + this.opWords[c.op] + ' ';
+         if (c.field === 'amount') return w + '₹' + Number(c.v).toLocaleString('en-IN');
+         if (c.field === 'vendor') return w + c.v.split(',').length + ' vendors';
+         return w + c.v;
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">This register at this query</h3>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">Four conditions, joined with <span class="font-medium text-zinc-700" x-text="joiner"></span>. Every one of them is in the address bar.</p>
+    </div>
+
+    <form method="get" action="/orders/" class="px-3 py-3">
+      <p class="mb-1.5 text-[12px]/4 font-medium text-zinc-600">The link this screen is at</p>
+      <div class="rounded-lg border border-zinc-200 bg-white px-3 py-2">
+        <p class="font-mono text-[12px]/4 break-all select-all text-zinc-600" x-text="'https://erp.konspec.in' + href"></p>
+        <a :href="href"
+           class="mt-1.5 inline-flex items-center gap-1.5 rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="external-link" class="size-3.5 text-zinc-600"></i>Open this query
+        </a>
+      </div>
+      <p class="mt-1.5 text-[12px]/4 text-zinc-500">
+        One parameter per condition — field, operator, value — because every vendor name here has a comma in it and a comma-joined list turns one condition into two.
+      </p>
+
+      <template x-for="c in conds" :key="c.id">
+        <input type="hidden" name="f" :value="c.field + ':' + c.op + ':' + c.v">
+      </template>
+      <input type="hidden" name="join" :value="joiner">
+    </form>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">What the parameters say</p>
+      <ul role="list" class="mt-1.5 divide-y divide-zinc-100">
+        <template x-for="(c, i) in conds" :key="c.id">
+          <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 py-1.5">
+            <span class="min-w-0 font-mono text-[12px]/4 break-all text-zinc-600" x-text="param(c)"></span>
+            <span class="min-w-0 text-[13px]/5 tabular-nums" x-text="sentence(c)"></span>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">Back returns to the previous query, not to the unfiltered register.</p>
+      <a :href="'/orders/export/?' + query"
+         class="shrink-0 rounded-sm text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Export these 24 orders
+      </a>
+    </div>
+  </div>
+</div>

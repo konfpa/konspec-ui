@@ -1,0 +1,179 @@
+<!-- A grid where changing one cell can decide who signs off ₹5,00,000 has to
+     say what is about to happen before it happens, and the bar is where it
+     says it.
+
+     It counts cells that differ from what is stored, not boxes that are ticked.
+     The first version counted ticks and read "11 permissions" on a grid where
+     eleven were already granted and two had been touched — a number that is
+     true and answers nothing. Splitting the count into granted and revoked is
+     the other half: on this screen those two are not the same kind of change,
+     and revoking is the one somebody wants to reread before pressing Save.
+
+     The bar was already there. It does not appear when the form goes dirty —
+     what changes is the line inside it, which swaps the last-saved stamp for
+     the count. A strip that materialises adds 52px under a pointer that is
+     already moving towards a cell, and on a grid the cell it was moving towards
+     is now under something else.
+
+     Each changed cell is marked where it sits, because a count at the bottom of
+     a grid of forty boxes does not say which forty. The mark is a 6px amber dot
+     in a slot that is w-1.5 whether the dot is in it or not — the dot appearing
+     must not shift the box it belongs to, or every tick nudges its own
+     neighbours. Amber because this is waiting on somebody before it can move,
+     which is what the dot table gives that colour, and it is aria-hidden
+     because the count in the bar is the role="status" that speaks.
+
+     Discard restores the stored values without a round trip — nothing has left
+     the browser — and it never asks for confirmation of its own. The count
+     beside it is what makes the button legible. -->
+<form data-kui="permission-matrix/dirty" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+      x-data="{
+        base: ['po.raise:purchase', 'po.approve5:purchase', 'grn.post:stores', 'st.issue:stores', 'qc.record:qc'],
+        now: [],
+        init() { this.now = [...this.base] },
+        chg(k) { return this.base.includes(k) !== this.now.includes(k) },
+        get changed() { return [...new Set([...this.base, ...this.now])].filter(k => this.chg(k)) },
+        get added() { return this.changed.filter(k => this.now.includes(k)).length },
+        get dropped() { return this.changed.length - this.added },
+        discard() { this.now = [...this.base] }
+      }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-dy-h" class="text-[14px]/5 font-semibold">Role permissions — Stores and quality</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 5 permissions · nothing here is written until you press Save</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-dy-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:purchase" checked x-model="now" aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:stores" x-model="now" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.raise:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.raise:qc" x-model="now" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:purchase" checked x-model="now" aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:stores" x-model="now" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('po.approve5:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="po.approve5:qc" x-model="now" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:purchase" x-model="now" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:stores" checked x-model="now" aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('grn.post:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="grn.post:qc" x-model="now" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Issue material from stores</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:purchase" x-model="now" aria-label="Issue material from stores — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:stores" checked x-model="now" aria-label="Issue material from stores — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('st.issue:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="st.issue:qc" x-model="now" aria-label="Issue material from stores — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:purchase')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:purchase" x-model="now" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:stores')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:stores" x-model="now" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="flex w-1.5 shrink-0 justify-center"><span x-show="chg('qc.record:qc')" x-cloak class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span></span>
+            <input type="checkbox" name="perm" value="qc.record:qc" checked x-model="now" aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+    <p role="status" class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">
+      <span x-show="!changed.length">Last saved 12 Jul 2026, 09:41 by Nilesh Patil</span>
+      <span x-show="changed.length" x-cloak class="flex items-center gap-1.5 font-medium text-zinc-900">
+        <i data-lucide="pencil" class="size-3.5 shrink-0 text-zinc-600"></i>
+        <span x-text="changed.length + ' cells changed — ' + added + ' granted, ' + dropped + ' revoked'">2 cells changed — 1 granted, 1 revoked</span>
+      </span>
+    </p>
+    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+      <button type="button" @click="discard()" :disabled="!changed.length"
+              class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 text-[13px]/5 font-medium text-zinc-900 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:text-zinc-400">Discard</button>
+      <button type="submit" class="inline-flex h-9 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,118 @@
+<!-- Somebody is looking for one part in a bill of two hundred lines and does
+     not know which sub-assembly it is under. A flat result list would answer
+     that and throw away the one thing the tree was for — where the part sits —
+     so a hit keeps its ancestors on screen and the path is the answer.
+
+     Those ancestors are scaffolding rather than results. They are drawn at
+     zinc-500 and carry no mark, they are not counted, and the count that is
+     quoted is the count of MARKED rows: a tree that counted the rows it drew
+     reported eleven matches for a query that hit four parts, and the buyer went
+     looking for the other seven. The children of a hit are not results either
+     and are not drawn — the branch keeps its chevron so they can be asked for.
+
+     The filter does not write into the open set. That was the defect: typing a
+     query opened nine branches, clearing it left all nine open, and the shape
+     the user had spent a minute collapsing was gone. While a query is in force
+     the open set is ignored entirely and visibility comes from the matches;
+     clear the query and their own set is still there, untouched.
+
+     Which is why a branch's chevron stops being a button while filtering. It
+     would be a control writing into a value nothing is reading — a click that
+     does nothing, which is worse than a control that is not there. It becomes a
+     plain rotated chevron, aria-hidden, and comes back as a button the moment
+     the field is empty.
+
+     The mark is a real <mark> between two spans, not a string built in
+     JavaScript and handed to x-html. Building it by hand means escaping the
+     value before the tag goes in, and a description carrying an angle bracket —
+     "Gasket <3 mm" — becomes markup the day somebody types one. Three spans and
+     a slice cannot have that bug. It takes the tint and its ring like every
+     other tinted shape, because it is a shape and not a status.
+
+     The rows are flat here because the filter decides what is visible, so there
+     is no group element for a chevron to name: the button carries aria-expanded
+     and no aria-controls at all. An aria-controls pointing at an id that is not
+     in the document is worse than none, because it measures as wired and
+     announces a button that expands nothing.
+
+     A query that matches nothing gets a row saying so rather than an empty
+     panel with a header on it. -->
+<div data-kui="tree-view/search"
+     x-data="{
+       q: 'gasket',
+       open: ['fg', 'shell'],
+       nodes: [
+         { id: 'fg',    parent: null,    label: 'FG-2200 Water tank 1000 L',       qty: '1 no' },
+         { id: 'shell', parent: 'fg',    label: 'SA-1140 Tank shell assembly',     qty: '1 no' },
+         { id: 'rm01',  parent: 'shell', label: 'RM-3301 HDPE, blow moulding',     qty: '62.500 kg' },
+         { id: 'rm02',  parent: 'shell', label: 'RM-3312 Masterbatch, blue 2%',    qty: '1.250 kg' },
+         { id: 'lid',   parent: 'fg',    label: 'SA-1155 Lid and gasket assembly', qty: '2 nos' },
+         { id: 'pt02',  parent: 'lid',   label: 'PT-4402 Lid, moulded, 400 mm',    qty: '1 no' },
+         { id: 'pt18',  parent: 'lid',   label: 'PT-4418 Gasket, EPDM 3 mm',       qty: '1 no' },
+         { id: 'hw01',  parent: 'fg',    label: 'HW-5501 Outlet nipple, GI, 1 in', qty: '1 no' },
+         { id: 'pk20',  parent: 'fg',    label: 'PK-6620 Stretch film, 23 micron', qty: '0.180 kg' }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       term() { return this.q.trim().toLowerCase() },
+       at(n) { return this.term() ? n.label.toLowerCase().indexOf(this.term()) : -1 },
+       hit(n) { return this.at(n) > -1 },
+       pre(n) { const i = this.at(n); return i < 0 ? n.label : n.label.slice(0, i) },
+       mid(n) { const i = this.at(n); return i < 0 ? '' : n.label.slice(i, i + this.term().length) },
+       post(n) { const i = this.at(n); return i < 0 ? '' : n.label.slice(i + this.term().length) },
+       deep(n) { return this.hit(n) || this.kids(n.id).some(k => this.deep(k)) },
+       isOpen(n) { return this.open.includes(n.id) },
+       toggle(n) { this.open = this.isOpen(n) ? this.open.filter(x => x !== n.id) : [...this.open, n.id] },
+       shown(n) {
+         if (this.term()) return this.deep(n);
+         let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent }
+         return true;
+       },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       get hits() { return this.nodes.filter(n => this.hit(n)).length }
+     }">
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pb-2">
+    <label for="tv-f-q" class="sr-only">Search the bill of material</label>
+    <div class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-2.5 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+      <i data-lucide="search" class="size-4 shrink-0 text-zinc-500"></i>
+      <input id="tv-f-q" type="search" x-model="q" placeholder="Part code or description"
+             class="min-w-0 flex-1 bg-transparent text-[13px]/5 outline-none placeholder:text-zinc-500">
+    </div>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-show="term()"
+       x-text="hits + (hits === 1 ? ' part matches' : ' parts match') + ' — shown with the assemblies they sit under'">1 part matches</p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5">
+    <ul role="list" class="py-1">
+      <template x-for="n in rows" :key="n.id">
+        <li class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+          <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+
+          <template x-if="!term() && kids(n.id).length">
+            <button type="button" @click="toggle(n)" :aria-expanded="isOpen(n)"
+                    :aria-label="'Parts under ' + n.label"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+          </template>
+          <template x-if="term() && kids(n.id).length">
+            <span aria-hidden="true" class="flex size-6 shrink-0 rotate-90 items-center justify-center text-zinc-400"><i data-lucide="chevron-right" class="size-4"></i></span>
+          </template>
+          <template x-if="!kids(n.id).length">
+            <span aria-hidden="true" class="size-6 shrink-0"></span>
+          </template>
+
+          <span class="ml-2 min-w-0 flex-1 truncate tabular-nums" :class="term() && !hit(n) && 'text-zinc-500'"><span x-text="pre(n)"></span><mark x-show="hit(n)" class="rounded-sm bg-zinc-200 px-0.5 text-zinc-900 ring-1 ring-inset ring-zinc-300" x-text="mid(n)"></mark><span x-text="post(n)"></span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600" :class="term() && !hit(n) && 'text-zinc-500'" x-text="n.qty"></span>
+        </li>
+      </template>
+
+      <li x-show="term() && hits === 0" x-cloak class="px-4 py-6 text-center">
+        <p class="text-[13px]/5 font-medium">Nothing in this bill matches “<span x-text="q.trim()"></span>”</p>
+        <p class="mt-1 text-[12px]/4 text-zinc-600">The search covers this bill only. A part used on another assembly is found from the item master.</p>
+      </li>
+    </ul>
+  </div>
+</div>

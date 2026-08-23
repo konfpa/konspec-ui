@@ -1,0 +1,192 @@
+{
+  "id": "filter-builder",
+  "name": "Filter builder",
+  "category": "forms",
+  "markup": "No html in this file. Each variant below carries the path to its own markup at r/filter-builder/<variant>.html — fetch the one you need.",
+  "description": "Conditions composed into a query over a register — one row carrying a field, an operator and a value, added and removed until the list on screen is the list somebody asked for. The control a buyer uses to ask for open orders over ₹2,00,000, from three vendors, due before the end of the month.",
+  "when_to_use": "Only where the set of questions is open. The line against data-table/filters is the one that matters and it is not a matter of taste: that entry is a fixed strip of three selects — status, vendor, plant — and the register knows all three at build time, so the user picks values and never picks a field. Two or three fixed filters must NOT become a builder. A strip of selects is one gesture per filter and it reads at rest, because the control says what it is filtering on even when nothing is set; a builder is three gestures per condition and reads as an empty form until somebody fills it in. Reach for this entry at the point where the strip stops working — where the register has fifteen filterable fields and no six of them are the right six for everybody, where the same field has to be asked twice in one query (raised after 1 April AND before 30 June), where the operator is the question rather than the value (is over, is between, is blank), or where a query is worth saving and sending to somebody else. Below that, the strip wins every time. The line against search-page is different again: that page searches every register at once and does not know which one holds the answer, so its narrowing controls are facets — a fixed list of values with a count on each, ticked off. This builds a predicate against one register whose columns are known, so it names fields and operators and has no counts to offer until it is run. A facet is a value you tick; a condition is a sentence you write. And once the query is composed, the thing on screen most of the time is not this component at all but its chips variant — the applied set summarised over the register, with the builder itself behind a trigger.",
+  "rules": [
+    "The strip this replaces was three selects, and the first version of this component was shipped as a straight upgrade of it: same screen, same place, builder always open above the register. Every buyer hated it and the reason took a week to find. A select says what it filters on at rest — \"All vendors\" is a sentence about the register even when nothing is chosen — and an empty condition row says nothing at all, so a register that had been legible from the toolbar down became a register with an empty form on top of it. The builder belongs behind a trigger with the applied set drawn as chips, which is why chips is the variant most screens should take and default is the one they open into.",
+    "Changing the field discards the value, and it has to. The row Order value is over 200000 asked for Delivery date leaves a 200000 in the value cell, and the register that came back was every order due after the year 200000 — which is to say all of them, silently. Discarding looks destructive in review and is the only safe answer: the value belonged to a field that is no longer in the row, and there is no reading of it that survives the change. The operator survives only where the new field has an operator by that name, and it is reset to the first one on the list where it does not.",
+    "Changing the operator discards the value only when the shape of the value changes. is over to is under keeps ₹2,00,000, because one number is still one number; is over to is between keeps the first box and empties the second, because a floor with no ceiling is a half-written condition and not a wrong one; anything to is blank drops both, because the operator now takes no value at all. Discarding on every operator change was the first implementation and it made the commonest edit in the component — flipping a comparison the wrong way round — cost the user the figure they had just typed.",
+    "An operator that takes no value must not leave a disabled input in the row. A greyed box beside \"is blank\" reads as a value the user is not allowed to set rather than a value the condition does not have, and three people asked in a fortnight what to type in it. The cell becomes grey text saying the operator needs nothing, which is the same width, holds the column, and is not a tab stop.",
+    "Nesting stops at one level and the limit is in the markup, not in a warning. Two levels — conditions inside groups, groups joined to each other — covers every real procurement query anybody has brought to this: open orders from these three vendors OR any order over ₹10,00,000, at Silvassa, due this month. A third level is where a filter stops being a form and becomes a query language, and a query language needs precedence rules, brackets you can see, and a way to read the whole thing back — none of which a row of selects has. Where somebody genuinely needs the third level, the honest answer is a saved report written by a person who can read SQL, and the builder should say so rather than growing another Add group button.",
+    "The applied query and the query being edited are two different objects, and the one thing that must never happen is the register reflecting a half-typed condition. A user who has chosen Order value and is over and has typed the 2 of 2,00,000 has, for one keystroke, asked for every order over two rupees. Live application handles that with a debounce and by refusing to run a row whose value is empty; explicit application handles it with a draft that is copied over on Apply and reseeded from the applied set every time the builder opens. Both are here because both are right, on different registers — but a builder that writes straight into the applied set on every input event is wrong on all of them.",
+    "The result count is the only feedback the component gives, and it is worthless unless it says what it is counting out of. \"12 orders\" after an Apply does not tell a buyer whether the query was sharp or whether the register is empty this month; \"12 of 1,438 orders\" does. When every condition is dropped the line has to stop saying \"1,438 of 1,438\" and say \"1,438 orders\", because a fraction of itself reads as a filter that is still on.",
+    "A count that is above what the screen will draw is a different answer and must not be rounded into the same sentence. 18,204 rows behind a register that pages 50 at a time is a query that has not narrowed anything, and \"18,204 orders\" over a page of fifty is read as a working filter. The line names both figures and says which conditions would cut it, because the user who wrote four conditions and got the whole register back has usually written one of them against the wrong field.",
+    "A condition whose value does not fit its operator blocks the Apply, and the Apply stays focusable while it does. Disabling it is what every first implementation does and it strands the keyboard: the browser blurs a disabled element to the body, so a user who tabbed to Apply and then broke a value is thrown to the top of the document with nothing on screen saying why. aria-disabled leaves the button in the tab order, and pressing it moves focus to the first condition that is wrong — which is also the only way a screen reader user finds out which of six rows is the problem.",
+    "The query lives in the URL or it does not exist. A buyer who has spent four conditions working out which orders are actually late sends that screen to the plant head, and a builder holding its state in Alpine sends a link to the unfiltered register. Serialising is also what makes the export and the screen agree, what makes Back work between two versions of the same question, and what lets the saved view be nothing more cunning than a stored query string. The encoding has to survive a value with a comma in it — every vendor name has one — so it is one parameter per condition rather than one comma-joined list.",
+    "A saved view that has been edited must say so on the view, not only in a strip below it. The strip is where the three answers live — write the change into the view, keep the view and make a new one, throw the change away — but it scrolls away and the pill does not, and a register whose pill says \"Overdue receipts\" while the conditions say something else is how a saved view quietly becomes a lie. The pill carries \"edited\" beside its name for as long as the draft differs.",
+    "Three controls in a row do not fit on a phone and no amount of stacking makes them, because a stacked row loses the one thing a row is for: reading the condition as a sentence left to right. Below sm the builder goes into a bottom sheet where each condition is a bordered block with its three controls stacked and the sentence repeated above them in words, so the block still reads as one thought. The sheet is also where Apply has room to be a full-width button that says what it will do — \"Show 24 orders\" — which is the only place in the component where the count and the commit are the same control.",
+    "min-w-0 does nothing to a percent-encoded query string, and this component is where that was learnt. A flex item is allowed to shrink below its content only if the content has somewhere to break, and a parameter reading f=vendor:any: followed by two percent-encoded vendor names is one token with no space, no hyphen and no soft break anywhere in it — the encoding turned every space into %20 and the separating comma into %2C. So the item held its intrinsic width, the row held the item, and the document went to 471px inside a 390px viewport. Nothing in the class list predicts that and no static lint can catch it; it took a browser building the DOM and measuring it. Any run of characters the reader cannot break has to be given a break with break-all, or a scroller of its own carrying rule 14's whole apparatus — and for a URL somebody is meant to copy, wrapping is the right one of the two, because a link readable in three lines beats a link dragged sideways inside a box.",
+    "A chip is whitespace-nowrap, so whatever is written into it has to be the summarised form of the condition and never the raw value. \"Vendor is any of 3\" holds its line; \"Vendor is any of Gujarat Polymers Ltd, Sharma Extrusions, Nashik Steel Traders\" is a 400px pill that cannot wrap and takes the page with it at 390px. That is a rule about the string the server hands over, which is why the Django variant renders a display attribute off the condition object rather than joining the values in the template.",
+    "The row is assembled from controls that already exist and none of them may be redrawn here. The field and operator cells are select/filter's dense 34px select, the value cell is input-group when it takes a unit or a range, select when the field is a short fixed list, combobox/filter when it is a register of records, and calendar/presets behind the trigger when it is a date. A builder that draws its own miniature versions of those is four more places for the focus outline to be wrong, and it is the reason this entry's markup is mostly wiring.",
+    "Removing a row has to move focus somewhere deliberate and say what went. Focus lands on the field select of the row that took its place, or on Add condition when the last row goes, and a status region says which condition was removed by its sentence rather than by its number — \"Removed: Vendor is any of 3\". Leaving focus on a button that no longer exists drops the keyboard at the top of the document, and it is the single most common defect in a component made of rows you can delete."
+  ],
+  "anatomy": [
+    {
+      "part": "Panel",
+      "description": "The bordered white box holding the whole builder. It is never overflow-hidden, because the value cell opens a vendor panel and a date panel that have to cross its edge."
+    },
+    {
+      "part": "Condition row",
+      "description": "One predicate: the joiner, the field, the operator, the value and the remove button, on one line above sm and in a bordered block below it. It is a plain band inside the panel, not a shape, so it takes no rounding and no hover of its own."
+    },
+    {
+      "part": "Joiner",
+      "description": "The first cell. Fixed text \"Where\" on the first row and the conjunction on every row after it. It is one setting for the whole group and is drawn as a control on the second row only — a select on every row invites a query that alternates and cannot be read."
+    },
+    {
+      "part": "Field select",
+      "description": "The register's filterable columns, grouped where there are more than about ten. Changing it rebuilds the operator list and discards the value."
+    },
+    {
+      "part": "Operator select",
+      "description": "The operators the chosen field's type has, and nothing else. A date has no \"contains\" and a status has no \"is between\"."
+    },
+    {
+      "part": "Value cell",
+      "description": "The one cell that changes shape: a text box, a number, an amount with its ₹, a date behind presets, a select, a vendor combobox, two boxes in one enclosure for a range, or grey text where the operator takes no value."
+    },
+    {
+      "part": "Remove button",
+      "description": "An icon button at the end of the row, named for the condition it drops. It moves focus to the row that takes the place of the one it removed."
+    },
+    {
+      "part": "Add condition",
+      "description": "The one control in the footer of the group. It appends a row seeded with the first field and that field's first operator, and puts focus on the new row's field select."
+    },
+    {
+      "part": "Group",
+      "description": "A recessed band holding its own conditions and its own joiner, joined to the other groups by the outer joiner. There is no Add group inside a group — one level and no more."
+    },
+    {
+      "part": "Footer",
+      "description": "Where the commit lives: Apply, Reset and the count of what has changed since the applied set. The live builder has no footer at all, which is what makes it a different variant rather than a flag."
+    },
+    {
+      "part": "Result count",
+      "description": "A role=\"status\" in the document from first paint, saying how many records match out of how many are in the register. It is never rendered inside the block it describes."
+    },
+    {
+      "part": "Chips",
+      "description": "The applied set as one removable chip per condition over the register, each chip the whole sentence and each remove button named for it. This is what the screen shows when the builder is shut."
+    },
+    {
+      "part": "Saved views",
+      "description": "A nav of named queries with aria-current on the one in force, the count beside each, and \"edited\" on the current one while the draft differs from what was saved."
+    },
+    {
+      "part": "Problem summary",
+      "description": "The strip above the footer listing every condition whose value does not fit its operator, each entry a button that focuses the cell it names."
+    }
+  ],
+  "behaviour": [
+    "A row is a field, an operator and a value, and the operator list is a property of the field's type: text takes contains, is, starts with and the two blank tests; a number takes is, is more than, is less than and is between; a date takes before, after, between and has no date; a status takes is, is not and is any of; a vendor takes is any of and is none of.",
+    "Choosing a different field rebuilds the operator list, keeps the operator only if the new field has one by that name, and always discards the value — a figure typed for one field is never a value for another.",
+    "Choosing a different operator keeps the value where the shape of the value is unchanged, keeps the first half of a range when a single comparison becomes a between, and discards everything when the operator takes no value at all.",
+    "The value cell swaps with the field's type and the operator's arity: no control for is blank, one for a comparison, two inside a single enclosure for a between. Dates are chosen from presets first and a picker second, because nobody clicks their way to the end of the month.",
+    "The explicit builder holds a draft. Opening it reseeds the draft from the applied set, so a panel abandoned mid-edit cannot commit something the user walked away from; Apply copies the draft over the applied set, and Reset copies it back the other way.",
+    "The live builder has no Apply. It debounces at 300ms, skips any row whose value is still empty, and writes the result count into a live region — which is why it is only correct on a register that filters in the browser or behind a request that costs nothing.",
+    "The URL is the source of truth for the applied set. Every applied condition is one parameter, the joiner is one more, and the builder reads its opening state out of the query string rather than out of storage — so Back moves between two answers, a link carries the query, and the export and the screen cannot disagree.",
+    "Applying pushes a new URL and re-fetches the register; it does not filter what is already drawn. The rows on screen stay until the new ones arrive and the panel carries aria-busy while they are in flight.",
+    "A saved view is a stored query string with a name. Picking one replaces the whole condition set and resets the register to its first page; editing any condition marks the view edited, and the three answers to that are save into it, save as a new one, or reset.",
+    "Apply is blocked while any condition's value does not fit its operator — a date in a number field, a between whose floor is above its ceiling, an operator that needs a value against an empty cell. The button stays focusable and pressing it moves focus to the first condition that is wrong.",
+    "Removing the last condition returns the register to its unfiltered state and the count line stops quoting a fraction of itself.",
+    "Below sm the whole builder moves into a bottom sheet: one bordered block per condition with its three controls stacked, the sentence repeated in words above them, and an Apply that carries the count it will produce."
+  ],
+  "accessibility": [
+    "Every control in a row is named for its row and for its field, because \"Field\", \"Operator\" and \"Value\" repeated six times is what a screen reader user otherwise hears. The names are aria-labels rather than visible labels — there is no room for three labels on a 34px row — and they read \"Condition 2, field\", \"Condition 2, operator for Order value\", \"Condition 2, value for Order value\".",
+    "The remove button is named for the condition it drops and not for its position alone: \"Remove condition 2, Order value is over ₹2,00,000\". Six buttons called Remove is the version of this that ships first and cannot be used without sight.",
+    "Removing a row moves focus deliberately — to the field select of the row that has taken its place, or to Add condition when the last row goes — and a role=\"status\" says what was removed by its sentence. Focus left on a destroyed button lands on the body and the keyboard user is at the top of the document with no explanation.",
+    "Adding a row moves focus to the new row's field select, so the keyboard is already in the thing that was just created rather than still on the button that created it.",
+    "The result count is a role=\"status\" rendered with the page and never inside the block it describes. A live region that arrives with its message already in it has not changed and is announced to nobody, which is exactly what happens when the count is written into the empty state.",
+    "The value cell changes control when the field or the operator changes, so the new control is given focus only if the old one had it. Moving focus into a cell nobody was in steals the keyboard out of the operator select the user is still walking with the arrow keys.",
+    "A group is a real fieldset with a legend naming it and its joiner — \"Group 1, any of these\" — so the nesting is audible. Without it a screen reader hears twelve selects in a row and no indication that four of them are bracketed together.",
+    "The joiner is one control for the whole group and it carries a name that says so: \"Join every condition in this group with\". A select per row that all write the same value is three tab stops promising three independent settings.",
+    "A condition whose value does not fit its operator carries aria-invalid on the control and aria-describedby pointing at the message, and the summary above the footer is a role=\"alert\" listing every one of them as a button that focuses the cell it names.",
+    "Apply carries aria-disabled rather than disabled while the set is invalid, so it stays in the tab order and can explain itself when pressed. disabled removes it from the tab order and blurs it to the body if it was focused when the set went bad.",
+    "Each chip's remove button names the whole condition — \"Remove the condition Vendor is any of 3\" — and the chip row itself is a labelled group, so it is reachable as one thing rather than as loose pills above a table.",
+    "The saved views are a nav of buttons carrying aria-current, not a tablist and not a radiogroup: there are no panels that switch and there is no single tab stop to walk with arrows. The word \"edited\" is real text inside the current pill rather than a colour or a dot.",
+    "The bottom sheet is a role=\"dialog\" with aria-modal and a focus trap, Escape closes it, and focus returns to the trigger — and the trigger carries the number of conditions in force in its own text rather than in a title."
+  ],
+  "related": [
+    "data-table",
+    "select",
+    "combobox",
+    "input-group",
+    "badge"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Conditions over a register",
+      "markup": "r/filter-builder/default.html"
+    },
+    {
+      "id": "types",
+      "name": "The value cell swapping per field type",
+      "markup": "r/filter-builder/types.html"
+    },
+    {
+      "id": "chips",
+      "name": "The applied set as chips over the register",
+      "markup": "r/filter-builder/chips.html"
+    },
+    {
+      "id": "groups",
+      "name": "One level of AND / OR nesting",
+      "markup": "r/filter-builder/groups.html"
+    },
+    {
+      "id": "saved",
+      "name": "Saved views, and one that has been edited",
+      "markup": "r/filter-builder/saved.html"
+    },
+    {
+      "id": "apply",
+      "name": "A draft, and an explicit Apply",
+      "markup": "r/filter-builder/apply.html"
+    },
+    {
+      "id": "live",
+      "name": "Debounced, with no Apply at all",
+      "markup": "r/filter-builder/live.html"
+    },
+    {
+      "id": "empty",
+      "name": "No conditions yet",
+      "markup": "r/filter-builder/empty.html"
+    },
+    {
+      "id": "invalid",
+      "name": "A value that does not fit its operator",
+      "markup": "r/filter-builder/invalid.html"
+    },
+    {
+      "id": "sheet",
+      "name": "The builder in a bottom sheet at 390px",
+      "markup": "r/filter-builder/sheet.html"
+    },
+    {
+      "id": "count",
+      "name": "The count, and a query that narrowed nothing",
+      "markup": "r/filter-builder/count.html"
+    },
+    {
+      "id": "url",
+      "name": "The query serialised to the query string",
+      "markup": "r/filter-builder/url.html"
+    },
+    {
+      "id": "htmx",
+      "name": "The register re-fetching on apply",
+      "markup": "r/filter-builder/htmx.html"
+    },
+    {
+      "id": "django",
+      "name": "Rendered server-side from GET params",
+      "markup": "r/filter-builder/django.html"
+    }
+  ]
+}

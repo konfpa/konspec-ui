@@ -1,0 +1,124 @@
+<!-- A grid cannot be a grid at 390px. Frozen or not, three role columns are
+     down to sixty pixels each, the permission names wrap to four lines, and
+     panning a matrix with one thumb while the other hand holds the phone is not
+     a way anybody sets up a role.
+
+     One role at a time, picked by a select, and its permissions as a list
+     grouped by module. The alternative was one permission at a time across the
+     roles, and it answers the wrong question: permission-first is the audit
+     question — who may approve over ₹5,00,000 — which is read rather than
+     edited, and the audit view serves it better than a form would. Editing is
+     role-first, because what somebody has to see before pressing Save is
+     everything one role may do, in one list, rather than assembling it from
+     twelve screens.
+
+     A separate variant and never a media query on the grid. Both arrangements
+     in one DOM with one of them display:none posts every permission twice — a
+     display:none checkbox still submits — and here the two copies can disagree,
+     so the save is a coin toss. The server renders one or the other.
+
+     Two forms side by side, because a form cannot nest: the picker is a GET
+     that reloads with the chosen role, the permissions are a POST. Which leaves
+     a real hole — switching the select throws away ticks that were never saved
+     — so the picker's button is bound to the change count and the reason is
+     text under it, never a tooltip on it. A disabled control fires no pointer
+     events and takes no focus, so a tooltip on one opens for nobody.
+
+     No box here carries an aria-label and none needs one. Each has visible
+     words of its own and the role is the legend on the fieldset, announced on
+     the way in. The aria-labels in the grid exist only because a table cell
+     gives its box neither axis. -->
+<div data-kui="permission-matrix/phone" class="max-w-[390px] rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       base: ['grn.post', 'grn.reverse', 'st.issue', 'st.return'],
+       now: [],
+       init() { this.now = [...this.base] },
+       get changed() { return [...new Set([...this.base, ...this.now])].filter(k => this.base.includes(k) !== this.now.includes(k)) }
+     }">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 class="text-[14px]/5 font-semibold">Role permissions</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">6 roles · 9 permissions · one role on screen at a time</p>
+  </div>
+
+  <form method="get" class="flex items-end gap-2 border-b border-zinc-200 px-4 py-3">
+    <div class="min-w-0 flex-1">
+      <label for="pm-p-role" class="block text-[12px]/4 font-medium text-zinc-600">Role</label>
+      <select id="pm-p-role" name="role"
+              class="mt-1 h-9 w-full rounded-lg border border-zinc-300 bg-white px-2.5 text-[14px]/5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <option value="purchase">Purchase officer</option>
+        <option value="stores" selected>Store keeper</option>
+        <option value="qc">QC inspector</option>
+        <option value="accounts">Accounts</option>
+        <option value="maint">Maintenance</option>
+        <option value="plant">Plant head — you cannot edit this one</option>
+      </select>
+    </div>
+    <button type="submit" :disabled="changed.length"
+            class="h-9 shrink-0 rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400">Show</button>
+  </form>
+
+  <p x-show="changed.length" x-cloak class="border-b border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 tabular-nums text-zinc-600">
+    <span x-text="'Store keeper has ' + changed.length + ' changes that are not saved.'">Store keeper has 1 change that is not saved.</span>
+    Save them before switching roles — the switch reloads this pane and they go with it.
+  </p>
+
+  <form method="post" class="px-4 py-3">
+    <input type="hidden" name="role" value="stores">
+
+    <fieldset>
+      <legend class="mb-2 text-[13px]/5 font-medium">Store keeper — what this role may do</legend>
+
+      <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Goods receipt</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 text-zinc-500">
+          <input type="checkbox" checked disabled class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">View the purchase register</span>
+          <span class="shrink-0 text-[12px]/4 text-zinc-500">With the role</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn.post" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Post a GRN</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="grn.reverse" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Reverse a posted GRN</span>
+        </label>
+      </div>
+
+      <p class="mt-4 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Stores</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.issue" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Issue material from stores</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.return" checked x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Return material to stores</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.adjust" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Adjust stock on a physical count</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="st.transfer" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise a stock transfer to Vapi</span>
+        </label>
+      </div>
+
+      <p class="mt-4 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Purchase orders</p>
+      <div class="-mx-4 mt-1 divide-y divide-zinc-100 border-y border-zinc-100">
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="po.raise" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1">Raise a purchase order</span>
+        </label>
+        <label class="flex items-center gap-2.5 px-4 py-2.5 text-[14px]/5 hover:bg-zinc-100">
+          <input type="checkbox" name="perm" value="po.approve5" x-model="now" class="size-4 shrink-0 accent-zinc-700">
+          <span class="min-w-0 flex-1 tabular-nums">Approve up to ₹5,00,000</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="mt-4 inline-flex h-9 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save Store keeper</button>
+    <p class="mt-2 text-[12px]/4 tabular-nums text-zinc-500" x-text="now.length + ' of 9 granted. Saves this role only — the other 5 are unchanged by this form.'">4 of 9 granted. Saves this role only — the other 5 are unchanged by this form.</p>
+  </form>
+</div>

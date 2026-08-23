@@ -1,0 +1,179 @@
+{
+  "id": "tree-view",
+  "name": "Tree view",
+  "category": "data",
+  "markup": "No html in this file. Each variant below carries the path to its own markup at r/tree-view/<variant>.html — fetch the one you need.",
+  "description": "Records that nest, drawn as rows that expand to reveal the rows underneath them. A bill of material exploded into its sub-assemblies, a chart of accounts, a plant broken down to the bin — every row still a record with its own code and its own figures.",
+  "when_to_use": "Reach for this when the records are the same kind of thing at every level and the nesting is part of the data rather than part of the page: a BOM and its sub-assemblies, an account and its ledgers, a plant that contains buildings that contain racks that contain bins. The test is whether a child row would still make sense on its own in a register — if it would, this is a tree; if the second level is a paragraph, a form or a panel of detail, it is not. A flat set of sections whose headings read as a list is accordion, and one trigger over one panel is collapsible. Two levels where the upper one is a heading with a subtotal rather than a record — orders under a vendor name — is table/grouped, which does not collapse at all because a register is scanned rather than navigated. The application's own navigation is sidebar, whose nested variant is this shape with links in it and none of the figures. A queue worked one record at a time, with the record beside the list, is list-detail. And a tree that has grown past a few hundred visible rows is usually a filter problem wearing a hierarchy: the user is looking for one part, and search-page or a combobox finds it in one step instead of four.",
+  "rules": [
+    "The row is a full-bleed band and the indent is a run of empty w-6 spans inside it, not padding on the nested list. Indenting the <ul> was the first thing anyone tried and it moves the row's left edge inwards with it: at the third level the hover band starts 72px from the card edge, so four levels of tree hover as four stacked lists that happen to be lined up, and the eye reads the ragged left edges of the fills rather than the rows. Padding the row instead keeps every band the full width of the card and puts the whole difference into where the text starts, which is the only place the depth is meant to show.",
+    "role=\"tree\" is a widget with one tab stop, and taking the role means taking all of it. A nested list of chevron buttons wearing role=\"tree\" was shipped once: the screen reader announced a tree and then the Tab key walked through forty chevrons anyway, because nothing had made them tabindex=\"-1\", and the level it announced came from a DOM the search filter had already flattened. Either build the widget — roving tabindex, the arrow-key contract, aria-level, aria-setsize, aria-posinset, all of it, which is the keyboard variant — or build a nested list of disclosures, which is every other variant here and is the right answer for a tree that is read rather than navigated.",
+    "The chevron is its own button with its own name; it is never the row. A BOM row carries a part code somebody clicks through to, a checkbox that puts the part on an issue slip, and a menu that opens where it is stocked, and one control cannot both open the branch and open the part. That is also why the row may not be a <label> in the selection variant — the chevron is inside it, so labelling the row means a click on the chevron ticks the box, and expanding a sub-assembly silently adds every part under it to the slip.",
+    "A leaf gets an empty size-6 box where a chevron would be. Rendering nothing there is the same defect as forgetting the box on a marker: every leaf's description starts 24px left of its siblings', so the column of names has two left edges and the nesting reads one level shallower than it is. The box is aria-hidden and takes no hover, because it is a spacer and not a control that has run out of things to do.",
+    "A leaf must not carry aria-expanded, and Alpine will not let a binding take it off. Falsy values are removed from most attributes and deliberately preserved on anything starting aria- or data-, so :aria-expanded=\"false\" on a row with no children renders the attribute set to false — which announces a row that has children and is currently hiding them, a different and wrong fact about a bought-out part. The only way to remove it from a binding is x-effect on the element itself, setting the attribute when the node has children and removing it when it does not, which is the same shape indeterminate takes on a checkbox and for the same reason.",
+    "A nested panel must never carry padding on the element x-collapse animates, and in a tree that rule bites twice, because the panels are inside each other. Collapse a parent while a child of it is still animating and the plugin measures the child mid-transition: the parent records a height that was true for one frame, and the branch reopens to a box that clips its own last two rows until something forces a reflow. Keep the animated <ul> free of padding, borders and margins, put the spacing on the rows, and expect a deep tree to be one of the places a 200ms duration is worth shortening.",
+    "A sub-assembly quantity is per assembly and multiplies everything under it. The 2 on a shell assembly means the tank has two of them, so the 62.500 kg on the granule row under it is 125.000 kg of granule in the finished good — and a tree that prints the stored per-assembly quantity in one column beside a rolled-up amount in the next is reporting two different bases in one row. Decide which the tree is: per-assembly quantities with per-assembly amounts, or the exploded figures throughout. Then say which in the column header, because a buyer reading a BOM cannot tell the two apart by looking.",
+    "A rolled-up figure is a sum of the records, never a sum of what is on screen. Compute a branch's amount from the same array its children paint from and it cannot disagree with them; add up the visible rows instead and collapsing a branch quietly changes the total, which is how a works order came to show a different value on a manager's screen than on the storekeeper's. The corollary is that a collapsed branch still has to carry its own figure, because the figure is the reason anybody would open it.",
+    "A shut branch has to say what is wrong underneath it. Colour lives in the dot and there is one dot per row, so a parent takes the worst state under it — red beats amber beats everything else — with a count beside it saying how many rows that is. Without it a blocked operation four levels down is invisible on a screen that fits, the user closes the last branch at the end of the day and the tree reads as clear. The count is what makes the dot honest: one red dot on a parent that means eleven blocked lines and one that means one are different mornings.",
+    "A parent checkbox reads its leaf descendants, not its direct children. Written against the children it works perfectly at two levels and breaks silently at three: the grandparent goes fully checked as soon as its two child branches report checked, and stays checked when a grandchild is unticked because the child branch it asks is the one now reporting indeterminate. Keep a map from every branch to the leaves under it — the leaves are what the form posts — and read every state off that. indeterminate has no attribute, so it is written by script on each render with x-effect on the box itself, exactly as checkbox/nested does it.",
+    "Search keeps a hit's ancestors on screen, and those ancestors are scaffolding rather than results. They are drawn dimmed and unmarked, they are not counted in \"4 matches\", and the count that is quoted is the count of rows carrying a mark — a tree that counted the rows it drew reported eleven matches for a query that hit four parts, and the buyer went looking for the other seven. The children of a hit are not results either and are not drawn; the branch keeps its chevron so they can be asked for.",
+    "The filter must not expand branches by writing into the same open set the user's clicks write into. That was the defect: typing a query opened nine branches, clearing the query left all nine open, and the tree the user had carefully collapsed was gone. While a query is in force the open set is ignored entirely and visibility is derived from the matches; the moment the query is cleared the user's own set is still there, untouched, and the tree snaps back to the shape they left it in.",
+    "A branch is only a branch if the server said it has children. A chevron rendered on every row because the client does not know yet gives the user a control that opens onto nothing, and an empty 200 from the lazy endpoint leaves it spinning and then blank, which reads as a failure rather than as an answer. Send a child count with the parent row, draw the chevron from it, and have the endpoint answer an empty branch with the one line that says so — a store bin that is genuinely empty is a fact worth a row.",
+    "A cycle in the data is an infinite tree. A part that appears in its own bill — an assembly reused as a component of itself, which is a data entry mistake and not an impossible one — recurses until the template engine or the browser gives up, and Django's include does not notice, it just resolves the same template again. The depth guard in the recursive partial is the last line of defence rather than the fix: it stops the page rendering for ever and prints a row saying the tree was cut off, so somebody sees the defect. The fix is a cycle check where the BOM is saved."
+  ],
+  "anatomy": [
+    {
+      "part": "Root",
+      "description": "The card, and where the open set lives. One x-data for the whole tree, keyed by record id — never by index, because a filtered or reordered tree moves every index but no key."
+    },
+    {
+      "part": "Row",
+      "description": "A full-bleed band, min-h-9, holding the indent, the chevron, the label and the figures. It is a SURFACE: it hovers one step off the band it crosses, zinc-100 inside a white card, and it takes the negative focus offset because the card clips it."
+    },
+    {
+      "part": "Indent",
+      "description": "One empty w-6 span per ancestor level, inside the row. Depth is a count of spans, so nothing about the indent has to be recomputed when a node moves level."
+    },
+    {
+      "part": "Chevron",
+      "description": "A size-6 button carrying aria-expanded and aria-controls, with its own accessible name saying what it opens. The rotation class goes on a flex span around the icon, never on the <i data-lucide>."
+    },
+    {
+      "part": "Leaf box",
+      "description": "The same size-6 box, empty and aria-hidden, on every row that has no children. It exists so the descriptions line up."
+    },
+    {
+      "part": "Label",
+      "description": "min-w-0 flex-1 truncate, holding the code and the description. The code is what people quote, so it is font-medium and tabular-nums and never truncated out first."
+    },
+    {
+      "part": "Figures",
+      "description": "The shrink-0 columns on the right — quantity, rate, amount. tabular-nums throughout, and a branch shows the roll-up of the records under it rather than of the rows on screen."
+    },
+    {
+      "part": "Group",
+      "description": "The nested <ul> the chevron names through aria-controls. It carries the id, x-show, x-collapse and nothing else — no padding, no border, no background — or the collapse bottoms out at its own padding and snaps."
+    },
+    {
+      "part": "Guides",
+      "description": "The elbow and the continuation rails, drawn with borders on empty spans inside the indent columns. The rail above a last child stops at the elbow, because a rail running past the last row points at nothing."
+    },
+    {
+      "part": "Status",
+      "description": "The 6px dot on a row, and on a shut branch the worst state under it with a count beside it. One dot per row and no other colour on it."
+    },
+    {
+      "part": "Row menu",
+      "description": "The trigger revealed on hover and brought back by focus-visible, hidden with opacity rather than display so it stays in the tab order at all times."
+    },
+    {
+      "part": "Branch note",
+      "description": "The single row a branch shows when it opens onto nothing — an empty bin, a bought-out part with no explosion, a query that matched the parent and none of its children."
+    }
+  ],
+  "behaviour": [
+    "Clicking a chevron opens or closes that branch and nothing else. Several branches are open at once, because two sub-assemblies are compared against each other far more often than one is read alone, and a tree that shuts the first when the second opens makes that comparison impossible.",
+    "The open set is keyed by record id and survives a sort, a filter and a re-render. Keyed by position it survives none of them: the tree comes back with the wrong three branches open and nothing on screen says why.",
+    "A branch that starts closed carries x-cloak. A branch that starts open must not, or it stays hidden until Alpine boots and the tree assembles itself in front of the reader.",
+    "A branch figure is the roll-up of the records under it, computed from the data rather than from the rows drawn. Collapsing a branch changes what is on screen and never changes a number.",
+    "A group control expands or collapses the whole tree and its label is derived from how many branches are open. It states the row count it is about to produce, because a fully exploded BOM is not the same size as the tree in front of the user.",
+    "While a search is in force the open set is ignored: every node with a match in its subtree is drawn, hits are marked, and ancestors are dimmed. Clearing the query restores the shape the user had, because the filter never wrote into it.",
+    "A lazily loaded branch is fetched on the first expand and never again. The spinner takes the chevron's place rather than sitting beside it, so the label does not move 20px right and back, and a failure leaves a retry in the branch rather than an empty one.",
+    "Selection cascades down to every leaf under a branch and reads back up as checked, indeterminate or clear. The leaves are what posts; a branch box has no name and no value of its own.",
+    "A row menu is revealed on hover and present at all times for the keyboard. The tree's own card is not overflow-hidden while a menu is in it, or the menu is clipped at the card edge; the rows are kept off the rounded corners by a strip above and below them instead.",
+    "On a phone the indent step drops to 16px and the figures move under the label. Nothing scrolls sideways: the description truncates and the code, which is the part nobody can reconstruct, keeps its width.",
+    "The keyboard tree is one tab stop. Arrows move within it, Enter activates the row, and the tab stop follows the active row so returning to the tree lands where the user left it."
+  ],
+  "accessibility": [
+    "Two shapes, and the choice is a real one. A nested list of disclosures is a plain <ul> of <li>, each expandable row carrying a real button with aria-expanded bound to the open state and aria-controls naming the nested <ul>; every control is reachable with Tab, which is what a tree holding links, checkboxes and row menus needs.",
+    "The widget shape is role=\"tree\" on the container, role=\"treeitem\" on each row and role=\"group\" on each nested list, and it is a single tab stop with a roving tabindex: the active row is tabindex=\"0\" and every other row is tabindex=\"-1\". Do not put that role on a list of buttons and stop there — a tree that still has forty tab stops in it is announced as a widget and behaves as a list.",
+    "Where the rows are rendered flat rather than nested — a tree table, or any tree drawn from a flattened array — the DOM no longer carries the depth, so aria-level, aria-setsize and aria-posinset become load-bearing. aria-setsize counts siblings at that level, not rows on screen, and aria-posinset is the row's position among those siblings; both are wrong the moment they are taken from the rendered index.",
+    "The arrow-key contract is fixed. Down and Up move to the next and previous visible row regardless of level; Right expands a closed branch and moves into the first child of an open one; Left collapses an open branch and moves to the parent of a closed one or of a leaf; Home and End go to the first and last visible row. Enter activates the row, Space selects it where the tree has selection.",
+    "Type-ahead moves focus to the next visible row whose label starts with what has been typed, wrapping past the end, with the buffer cleared after about half a second. It matches the label the row displays — a user types the part code they can see, so a buffer matched against an internal key finds nothing and looks broken.",
+    "aria-expanded goes on whatever the user operates: the button in the disclosure shape, the row itself in the widget shape. It is bound rather than hardcoded, and a leaf carries no aria-expanded at all — false there says the row has children that are hidden, which is a different fact.",
+    "Moving focus into rows the same key press just revealed needs the render to have happened. Set the open state, then move focus in the next tick; focusing an element that x-show is about to unhide is a silent no-op and the keyboard stays where it was.",
+    "The tab stop cannot disappear. Collapse a branch while the active row is inside it and the roving tabindex is on an element that is now display:none, so the tree drops out of the tab order entirely; move the active row up to the branch that was collapsed, which is where the user's attention already is.",
+    "A chevron's accessible name says what it opens, not what it is. Twelve buttons all named Expand is twelve identical rows in a screen reader's element list, so the name carries the record — Parts under SA-1140 Tank shell assembly — and the chevron itself is decorative inside it.",
+    "The row's figures are read as part of the row and belong in it, but a status has to be a word as well as a dot. The dot is aria-hidden and the state is written beside it, in text or sr-only text, for the same reason a badge does it: colour and shape are for the eye and the word is the data.",
+    "A count on a shut branch is announced with the branch, which is the only place it can be heard, so it says what it counts: \"3 blocked\" and not \"3\". The tree is where a screen reader user finds out that something is wrong under a row they have not opened.",
+    "A tree table is role=\"treegrid\" with aria-level, aria-posinset, aria-setsize and aria-expanded on each row. It is a grid first, so the moment a cell holds a control the arrow keys owe the user cell navigation as well; a treegrid whose cells are read-only figures is the one case where row-level movement is the whole contract."
+  ],
+  "related": [
+    "accordion",
+    "table",
+    "sidebar",
+    "checkbox"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Default",
+      "markup": "r/tree-view/default.html"
+    },
+    {
+      "id": "guides",
+      "name": "Indent guides",
+      "markup": "r/tree-view/guides.html"
+    },
+    {
+      "id": "expand-all",
+      "name": "Opening the whole tree at once",
+      "markup": "r/tree-view/expand-all.html"
+    },
+    {
+      "id": "keyboard",
+      "name": "The tree widget, walked with the keyboard",
+      "markup": "r/tree-view/keyboard.html"
+    },
+    {
+      "id": "selection",
+      "name": "Boxes that cascade down and read back up",
+      "markup": "r/tree-view/selection.html"
+    },
+    {
+      "id": "columns",
+      "name": "A tree table with figures that roll up",
+      "markup": "r/tree-view/columns.html"
+    },
+    {
+      "id": "lazy",
+      "name": "Children fetched the first time a branch opens",
+      "markup": "r/tree-view/lazy.html"
+    },
+    {
+      "id": "search",
+      "name": "Filtering without losing the hierarchy",
+      "markup": "r/tree-view/search.html"
+    },
+    {
+      "id": "actions",
+      "name": "A menu on the row",
+      "markup": "r/tree-view/actions.html"
+    },
+    {
+      "id": "status",
+      "name": "A state on the row, and on the branch above it",
+      "markup": "r/tree-view/status.html"
+    },
+    {
+      "id": "empty",
+      "name": "Nothing to draw, and branches with nothing under them",
+      "markup": "r/tree-view/empty.html"
+    },
+    {
+      "id": "phone",
+      "name": "At 390px",
+      "markup": "r/tree-view/phone.html"
+    },
+    {
+      "id": "htmx",
+      "name": "The open set on the server, in the URL",
+      "markup": "r/tree-view/htmx.html"
+    },
+    {
+      "id": "django",
+      "name": "Server-rendered, one partial that includes itself",
+      "markup": "r/tree-view/django.html"
+    }
+  ]
+}

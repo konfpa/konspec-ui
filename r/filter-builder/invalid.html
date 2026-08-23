@@ -1,0 +1,169 @@
+<!-- Three ways a row goes wrong and one way out of all of them. A date typed
+     into a number field, an operator that needs a value against an empty cell,
+     and a between whose floor is above its ceiling — the last is the one nobody
+     catches by eye, because both boxes are full and both figures are numbers.
+
+     Apply carries aria-disabled and not disabled. A real disabled attribute
+     takes the button out of the tab order, and the browser blurs a focused
+     element the moment it is disabled — so a user who tabbed to Apply and then
+     broke a value in the row above is thrown to the body with nothing on screen
+     saying why. aria-disabled leaves it reachable, and pressing it moves focus
+     to the first row that is wrong, which is also the only way a screen reader
+     user finds out which of five rows is the problem.
+
+     The summary is a role="alert" and its entries are buttons rather than
+     links. There is nothing to navigate to — the cell is on this screen — and a
+     link that only moves focus is a link the browser will offer to open in a
+     new tab.
+
+     The message is under the row and the red is the wrapper's border plus the
+     sentence. Nothing inside the enclosure turns red: a red ₹ reads as a
+     negative amount, and a red unit reads as the wrong unit.
+
+     aria-invalid goes on the control that holds the bad value, and for the
+     between it goes on both boxes, because the fault is a property of the pair
+     and reporting it under whichever one was touched last puts the same mistake
+     in two places on two visits. -->
+<div data-kui="filter-builder/invalid" class="max-w-3xl"
+     x-data="{
+       announce: '',
+       conds: [
+         { id: 1, field: 'Status', type: 'text', op: 'is', v: 'Open', v2: '' },
+         { id: 2, field: 'Line count', type: 'number', op: 'is more than', v: '31/08/2026', v2: '' },
+         { id: 3, field: 'Vendor', type: 'text', op: 'is', v: '', v2: '' },
+         { id: 4, field: 'Order value', type: 'number', op: 'is between', v: '5,00,000', v2: '1,00,000' }
+       ],
+       num(s) { const n = Number(String(s).replace(/,/g, '')); return Number.isFinite(n) ? n : null },
+       fault(c) {
+         if (c.op === 'is between') {
+           if (this.num(c.v) === null || this.num(c.v2) === null) return 'Both ends of a between have to be numbers.';
+           if (this.num(c.v) > this.num(c.v2)) return 'The floor is above the ceiling, so nothing can match. ₹' + c.v + ' is more than ₹' + c.v2 + '.';
+           return '';
+         }
+         if (!String(c.v).trim()) return 'This operator needs a value and the cell is empty.';
+         if (c.type === 'number' && this.num(c.v) === null) return 'Line count is a whole number, and 31/08/2026 is a date.';
+         return '';
+       },
+       get problems() { return this.conds.map((c, i) => ({ c: c, i: i, msg: this.fault(c) })).filter(p => p.msg) },
+       apply() {
+         if (!this.problems.length) { this.announce = 'Applied. 24 of 1,438 orders match.'; return }
+         const first = this.problems[0];
+         this.announce = this.problems.length + ' conditions cannot be applied.';
+         document.getElementById('fb-i-v-' + first.c.id).focus();
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+            <div class="min-w-0 flex-1 basis-36">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option>Status</option>
+                  <option>Vendor</option>
+                  <option>Line count</option>
+                  <option>Order value</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1 basis-32">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                  <option>is</option>
+                  <option>is more than</option>
+                  <option>is between</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3.5"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1 basis-48">
+              <template x-if="c.op === 'is between'">
+                <div class="flex items-stretch rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                     :class="fault(c) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+                  <span aria-hidden="true" class="flex items-center pl-2.5 text-[13px]/5 text-zinc-600">₹</span>
+                  <input :id="'fb-i-v-' + c.id" inputmode="numeric" x-model="c.v"
+                         :aria-label="'Condition ' + (i + 1) + ', lowest order value'"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                  <span aria-hidden="true" class="flex items-center px-1 text-[13px]/5 text-zinc-500">–</span>
+                  <input inputmode="numeric" x-model="c.v2"
+                         :aria-label="'Condition ' + (i + 1) + ', highest order value'"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-right text-[13px]/5 tabular-nums outline-none">
+                </div>
+              </template>
+              <template x-if="c.op !== 'is between'">
+                <div class="rounded-lg border bg-white focus-within:outline-3 focus-within:outline-offset-2"
+                     :class="fault(c) ? 'border-red-600 focus-within:outline-red-600/15' : 'border-zinc-200 focus-within:border-zinc-700 focus-within:outline-zinc-700/15'">
+                  <input :id="'fb-i-v-' + c.id" type="text" x-model="c.v" placeholder="Type a value"
+                         :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                         :aria-invalid="fault(c) ? 'true' : 'false'" :aria-describedby="'fb-i-m-' + c.id"
+                         class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+                </div>
+              </template>
+            </div>
+
+            <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                    class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="x" class="size-4"></i>
+            </button>
+          </div>
+
+          <p :id="'fb-i-m-' + c.id" x-show="fault(c)" x-cloak class="mt-1.5 pl-16 text-[12px]/4">
+            <span class="flex items-start gap-1.5 font-medium text-red-600">
+              <i data-lucide="alert-circle" class="mt-px size-3.5 shrink-0"></i>
+              <span class="tabular-nums" x-text="fault(c)"></span>
+            </span>
+          </p>
+        </div>
+      </template>
+    </div>
+
+    <div x-show="problems.length" x-cloak role="alert"
+         class="border-t border-zinc-200 px-3 py-2.5">
+      <p class="flex items-start gap-2 text-[13px]/5 font-medium">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+        <span class="tabular-nums"><span x-text="problems.length"></span> conditions cannot be applied</span>
+      </p>
+      <ul role="list" class="mt-1.5 space-y-0.5 pl-6">
+        <template x-for="p in problems" :key="p.c.id">
+          <li>
+            <button type="button" @click="document.getElementById('fb-i-v-' + p.c.id).focus()"
+                    class="rounded-sm text-left text-[12px]/4 tabular-nums text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Condition <span x-text="p.i + 1"></span>, <span x-text="p.c.field"></span> — <span x-text="p.msg"></span>
+            </button>
+          </li>
+        </template>
+      </ul>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600"
+         x-text="problems.length ? 'Fix ' + problems.length + ' conditions before this can run' : 'Every condition is complete'"></p>
+      <button type="button" @click="apply()" :aria-disabled="problems.length ? 'true' : 'false'"
+              class="inline-flex h-9 items-center rounded-lg px-4 text-[13px]/5 font-medium focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+              :class="problems.length ? 'bg-zinc-300 text-zinc-600' : 'bg-zinc-700 text-white hover:bg-zinc-800'">
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="announce"></p>
+</div>

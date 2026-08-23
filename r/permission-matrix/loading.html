@@ -1,0 +1,91 @@
+<!-- What is loading is the grants, not the axes. The permissions come out of
+     the modules that are switched on and the roles came with the page, so both
+     headers are drawn for real — and drawing them does two jobs at once:
+     somebody can decide which column they are going to read before the boxes
+     land, and the browser's own table layout sets the column widths from the
+     same markup it will use for the loaded grid, so no column moves on arrival.
+
+     The first version greyed the role headings as well, because they are data
+     in the sense that they came from the server. Then the grid arrived, three
+     column headings turned out to be wider than their grey bars, and the whole
+     table reflowed under a pointer that was already on its way to a cell.
+
+     Three role columns because that is what the loaded grid has. The count of
+     columns is as much a promise as the count of rows — a skeleton drawn with
+     four and answered with three reflows the whole table on arrival, which is
+     the one thing a skeleton exists to prevent.
+
+     Six rows because there are six permissions, not because six looks right.
+     The count is what the screen is about to show; where it genuinely cannot be
+     known, guess low, since growth pushes down only what is below the panel
+     while shrinkage pulls the whole page up.
+
+     Each placeholder is a size-4 rounded block in a flex h-5 box, which is the
+     16px box a checkbox occupies inside the 20px line a cell gives it. Put the
+     block straight into the cell and the row comes back four pixels short,
+     which across six rows is most of a row missing.
+
+     aria-busy on the panel, one sr-only status naming what is loading, and the
+     grey body aria-hidden — without that a screen reader walks a table of
+     eighteen empty cells and is never told why. -->
+<div data-kui="permission-matrix/loading" class="overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <p role="status" class="sr-only">Loading who may do what</p>
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-l-h" class="text-[14px]/5 font-semibold">Role permissions — Konspec Industries</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 6 permissions · Silvassa and Vapi</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-l-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody class="animate-pulse motion-reduce:animate-none" aria-hidden="true">
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr class="border-b border-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+      <tr>
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Match the invoice against the GRN</th>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+        <td class="px-2 py-2.5"><div class="flex h-5 items-center justify-center"><div class="size-4 rounded bg-zinc-200"></div></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="border-t border-zinc-200 px-4 py-3" aria-hidden="true">
+    <div class="h-9 w-36 animate-pulse rounded-lg bg-zinc-200 motion-reduce:animate-none"></div>
+  </div>
+</div>

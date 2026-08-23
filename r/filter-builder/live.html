@@ -1,0 +1,146 @@
+<!-- No footer, no commit, and the count is the only thing that answers. This
+     is correct where the filtering happens in the browser or behind a request
+     that costs nothing — a register of a few hundred rows already on the page.
+     On a server-paged register it is wrong and apply is the variant to take.
+
+     300ms of debounce, and a row whose value is still empty is skipped rather
+     than run. Without the second rule the register empties itself the instant
+     Add condition is pressed, because a brand new row is Status is nothing and
+     nothing matches it — which reads as a filter that broke on being created.
+
+     The debounce is visible while it is pending. "Working…" beside the count is
+     not decoration: without it the 300ms between the last keystroke and the new
+     figure is 300ms in which the count on screen is about the previous query,
+     and a user comparing two numbers cannot tell which one they are reading.
+
+     The count is a role="status" in the document from first paint, outside
+     every block that can disappear. Put the live region inside the empty state
+     and it arrives with its message already in it, which is not a change and is
+     announced to nobody. The pending marker is aria-hidden and is for the eye —
+     announcing "Working" and then the count talks over the answer.
+
+     Nothing here disables a control while the debounce is pending. The user is
+     typing in it. -->
+<div data-kui="filter-builder/live" class="max-w-3xl"
+     x-data="{
+       pending: false, timer: null,
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'vname', op: 'contains', v: 'Guj' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', vname: 'Gujarat Polymers Ltd', status: 'open', amount: 1842000 },
+         { po: 'PO-24-1191', vname: 'Sharma Extrusions', status: 'open', amount: 468500 },
+         { po: 'PO-24-1194', vname: 'Gujarat Polymers Ltd', status: 'overdue', amount: 2710400 },
+         { po: 'PO-24-1199', vname: 'Nashik Steel Traders', status: 'open', amount: 132900 },
+         { po: 'PO-24-1203', vname: 'Gujarat Polymers Ltd', status: 'open', amount: 967500 },
+         { po: 'PO-24-1207', vname: 'Konkan Chemicals Pvt Ltd', status: 'closed', amount: 5460000 },
+         { po: 'PO-24-1211', vname: 'Gujarat Polymers Ltd', status: 'approved', amount: 2143000 },
+         { po: 'PO-24-1218', vname: 'Sharma Extrusions', status: 'open', amount: 1290500 }
+       ],
+       applied: [],
+       dot: { open: 'bg-zinc-500', approved: 'bg-amber-500', overdue: 'bg-red-600', closed: 'bg-emerald-600' },
+       name: { open: 'Open', approved: 'Approved', overdue: 'Overdue', closed: 'Closed' },
+       money(n) { return '₹' + n.toLocaleString('en-IN') },
+       init() { this.settle() },
+       nudge() {
+         this.pending = true;
+         clearTimeout(this.timer);
+         this.timer = setTimeout(() => this.settle(), 300);
+       },
+       settle() { this.pending = false; this.applied = this.conds.filter(c => c.v.trim()).map(c => ({ field: c.field, op: c.op, v: c.v.trim() })) },
+       hit(o, c) {
+         const val = String(o[c.field]).toLowerCase(), q = c.v.toLowerCase();
+         return c.op === 'is' ? val === q : val.includes(q);
+       },
+       get rows() { return this.orders.filter(o => this.applied.every(c => this.hit(o, c))) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions apply as they are typed</h3>
+      <p class="flex items-center gap-2">
+        <span x-show="pending" x-cloak aria-hidden="true" class="text-[12px]/4 text-zinc-500">Working…</span>
+        <span role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+              x-text="applied.length ? rows.length + ' of ' + orders.length + ' orders match' : orders.length + ' orders'"></span>
+      </p>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" @change="c.v = ''; nudge()" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="status">Status</option>
+                <option value="vname">Vendor</option>
+                <option value="po">PO number</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" @change="nudge()" :aria-label="'Condition ' + (i + 1) + ', operator'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="contains">contains</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" @input="nudge()" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value'"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1); nudge()"
+                  :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="conds.push({ id: Date.now(), field: 'status', op: 'is', v: '' })"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">
+        A row with no value yet is not run. <span x-text="conds.length - applied.length"></span> of <span x-text="conds.length"></span> are waiting on one.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-3 divide-y divide-zinc-100 rounded-xl border border-zinc-200 bg-white">
+    <template x-for="o in rows" :key="o.po">
+      <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2.5">
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums" x-text="o.po"></p>
+          <p class="mt-0.5 truncate text-[12px]/4 text-zinc-500" x-text="o.vname"></p>
+        </div>
+        <div class="flex shrink-0 items-center gap-2.5">
+          <span class="text-[13px]/5 tabular-nums" x-text="money(o.amount)"></span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 text-zinc-700 ring-1 ring-inset ring-zinc-300">
+            <span class="size-1.5 rounded-full" :class="dot[o.status]" aria-hidden="true"></span><span x-text="name[o.status]"></span>
+          </span>
+        </div>
+      </div>
+    </template>
+    <p x-show="!rows.length" x-cloak class="px-4 py-6 text-center text-[13px]/5 tabular-nums text-zinc-500">No order matches. Widen one condition and the eight come back.</p>
+  </div>
+</div>

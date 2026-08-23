@@ -1,0 +1,175 @@
+<!-- One request per cell, and the answer is the cell. There is no Save on this
+     grid, which makes it the wrong shape for setting a role up from scratch and
+     the right one for the screen somebody lives in — an administrator moving
+     one permission at a time while a plant runs, where a change that is only in
+     the browser is a change that is not made.
+
+     The cell is the target and the swap is its outerHTML, which means the
+     element the user is standing on is destroyed and replaced. That drops focus
+     to the body, and a keyboard user working down a column loses their place on
+     every tick. The returned cell keeps the same id on the box as the one it
+     replaced, and that is the whole fix — htmx restores focus to the element
+     whose id matches. Take the id off and it looks identical and works only
+     with a mouse.
+
+     hx-sync on the cell rather than on the grid. Two boxes ticked a second
+     apart are two independent writes to two independent records, so syncing at
+     the form level makes the second wait for the first for no reason; syncing
+     at the cell keeps a double-tick on ONE cell in order, which is the only
+     race that exists here.
+
+     No hx-disabled-elt. Disabling the box while its own request is in flight
+     costs the same focus the swap was already threatening, and the request is
+     one round trip on a LAN.
+
+     The caption under each box is where the outcome lives, because it is a fact
+     about that permission and the cell is where anybody will look for it. Only
+     the failed caption carries role="status": it is inserted with the answer,
+     so it announces on arrival, and the revert underneath it is script writing
+     checked, which announces nothing at all. Twenty-seven permanent live
+     regions in a grid this size would announce every tick twice.
+
+     The token every one of these posts is in the django variant. -->
+<div data-kui="permission-matrix/htmx" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-h-h" class="text-[14px]/5 font-semibold">Role permissions — written as you tick them</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 4 permissions · every box is one request and there is no Save on this screen</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-h-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-purchase" name="granted" value="1" checked
+                 aria-label="Raise a purchase order — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 11:04</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-stores" name="granted" value="1"
+                 aria-label="Raise a purchase order — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-raise-qc" name="granted" value="1"
+                 aria-label="Raise a purchase order — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/po.raise/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-purchase" name="granted" value="1" checked
+                 aria-label="Approve up to ₹5,00,000 — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 09:12</span>
+        </td>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-stores" name="granted" value="1" checked
+                 aria-label="Approve up to ₹5,00,000 — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500">
+            <i data-lucide="loader-circle" class="size-3 shrink-0 animate-spin motion-reduce:animate-none"></i>Saving
+          </span>
+        </td>
+
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-po-approve5-qc" name="granted" value="1"
+                 aria-label="Approve up to ₹5,00,000 — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/po.approve5/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span role="status" class="mt-1 block min-h-4 text-[11px]/4 font-medium text-red-600">Not saved — the approval policy sets this one</span>
+          <button type="button"
+                  hx-post="/settings/roles/qc/permissions/po.approve5/"
+                  hx-trigger="click" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                  class="mt-0.5 text-[11px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Try again</button>
+        </td>
+      </tr>
+
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-purchase" name="granted" value="1"
+                 aria-label="Post a GRN — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-stores" name="granted" value="1" checked
+                 aria-label="Post a GRN — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 04 Apr</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-grn-post-qc" name="granted" value="1"
+                 aria-label="Post a GRN — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/grn.post/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+      </tr>
+
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-purchase" name="granted" value="1"
+                 aria-label="Record a QC result — Purchase officer"
+                 hx-post="/settings/roles/purchase/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-stores" name="granted" value="1"
+                 aria-label="Record a QC result — Store keeper"
+                 hx-post="/settings/roles/stores/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Not granted</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" id="pm-h-qc-record-qc" name="granted" value="1" checked
+                 aria-label="Record a QC result — QC inspector"
+                 hx-post="/settings/roles/qc/permissions/qc.record/"
+                 hx-trigger="change" hx-target="closest td" hx-swap="outerHTML" hx-sync="this:replace"
+                 class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 tabular-nums text-zinc-500">Saved 04 Apr</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="border-t border-zinc-200 px-4 py-2.5 text-[12px]/4 tabular-nums text-zinc-500">
+    Every tick is written when it is made and appears in the audit trail with your name against it. 1 of the 12 cells was refused and shows what is stored.
+  </p>
+</div>

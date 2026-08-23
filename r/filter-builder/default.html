@@ -1,0 +1,185 @@
+<!-- One row per condition — the joiner, the field, the operator, the value —
+     and Add condition under them. Every field in this variant is a short fixed
+     list, so the value cell is one select throughout; the moment a field is a
+     number, an amount or a date the cell has to swap and that is the types
+     variant, not a flag on this one.
+
+     The joiner is fixed text on the first row and a control on the second only.
+     It is one setting for the whole set, and a select on every row invites a
+     query that alternates between and and or, which nothing in a row of selects
+     can render legibly and nobody can read back.
+
+     The field select does not use x-model. Choosing a field has to rebuild the
+     operator list and throw the value away, and x-model writes the value before
+     anything else runs — which is how a row left the builder reading Plant is
+     open. :value with a change handler is the whole fix.
+
+     Removing a row moves focus to the field select of the row that took its
+     place, or to Add condition when the last one goes, and the status line says
+     what went by its sentence. A row you can delete that leaves focus on the
+     button it destroyed drops the keyboard at the top of the document.
+
+     The count is a role="status" in the document from first paint, and it stops
+     quoting a fraction of itself the moment the last condition goes. -->
+<div data-kui="filter-builder/default" class="max-w-3xl"
+     x-data="{
+       next: 4,
+       announce: '',
+       joiner: 'and',
+       fields: [
+         { id: 'status', label: 'Status' },
+         { id: 'vendor', label: 'Vendor' },
+         { id: 'plant', label: 'Plant' },
+         { id: 'buyer', label: 'Raised by' }
+       ],
+       values: {
+         status: [['open', 'Open'], ['approved', 'Approved'], ['overdue', 'Overdue'], ['closed', 'Closed']],
+         vendor: [['gujarat', 'Gujarat Polymers Ltd'], ['sharma', 'Sharma Extrusions'], ['nashik-steel', 'Nashik Steel Traders'], ['konkan', 'Konkan Chemicals Pvt Ltd']],
+         plant: [['silvassa', 'Silvassa'], ['nashik', 'Nashik'], ['vadodara', 'Vadodara']],
+         buyer: [['ap', 'A Prabhu'], ['rk', 'R Kulkarni'], ['sd', 'S Desai']]
+       },
+       rows: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'plant', op: 'is', v: 'silvassa' },
+         { id: 3, field: 'vendor', op: 'is not', v: 'konkan' }
+       ],
+       orders: [
+         { po: 'PO-24-1187', status: 'overdue', vendor: 'gujarat', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1191', status: 'open', vendor: 'sharma', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1194', status: 'open', vendor: 'nashik-steel', plant: 'silvassa', buyer: 'rk' },
+         { po: 'PO-24-1199', status: 'approved', vendor: 'gujarat', plant: 'nashik', buyer: 'sd' },
+         { po: 'PO-24-1203', status: 'open', vendor: 'konkan', plant: 'silvassa', buyer: 'ap' },
+         { po: 'PO-24-1207', status: 'closed', vendor: 'sharma', plant: 'vadodara', buyer: 'rk' },
+         { po: 'PO-24-1211', status: 'open', vendor: 'gujarat', plant: 'silvassa', buyer: 'sd' },
+         { po: 'PO-24-1218', status: 'open', vendor: 'nashik-steel', plant: 'nashik', buyer: 'ap' }
+       ],
+       label(fid) { return this.fields.find(f => f.id === fid).label },
+       valueLabel(r) { const v = this.values[r.field].find(x => x[0] === r.v); return v ? v[1] : 'nothing yet' },
+       sentence(r) { return this.label(r.field) + ' ' + r.op + ' ' + this.valueLabel(r) },
+       hit(o, r) { return r.op === 'is' ? o[r.field] === r.v : o[r.field] !== r.v },
+       get matched() {
+         const live = this.rows.filter(r => r.v);
+         if (!live.length) return this.orders;
+         return this.orders.filter(o => this.joiner === 'and'
+           ? live.every(r => this.hit(o, r))
+           : live.some(r => this.hit(o, r)));
+       },
+       setField(r, id) { r.field = id; r.v = ''; },
+       add() {
+         const r = { id: this.next++, field: 'status', op: 'is', v: '' };
+         this.rows.push(r);
+         this.announce = 'Condition ' + this.rows.length + ' added.';
+         this.$nextTick(() => document.getElementById('fb-d-f-' + r.id).focus());
+       },
+       remove(i) {
+         const gone = this.sentence(this.rows[i]);
+         this.rows.splice(i, 1);
+         this.announce = 'Removed: ' + gone + '.';
+         this.$nextTick(() => {
+           const next = this.rows[i] || this.rows[i - 1];
+           const el = next ? document.getElementById('fb-d-f-' + next.id) : this.$refs.add;
+           if (el) el.focus();
+         });
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions on the purchase order register</h3>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="rows.filter(r => r.v).length
+                   ? matched.length + ' of ' + orders.length + ' orders match'
+                   : orders.length + ' orders'"></p>
+    </div>
+
+    <div>
+      <template x-for="(r, i) in rows" :key="r.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+
+          <div class="w-14 shrink-0">
+            <template x-if="i === 0">
+              <span class="block text-[12px]/4 text-zinc-500">Where</span>
+            </template>
+            <template x-if="i === 1">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="joiner" aria-label="Join every condition with"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1 pr-5 pl-1.5 text-[12px]/4 outline-none">
+                  <option value="and">and</option>
+                  <option value="or">or</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-1 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3"></i>
+                </span>
+              </div>
+            </template>
+            <template x-if="i > 1">
+              <span class="block text-[12px]/4 text-zinc-500" x-text="joiner"></span>
+            </template>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-d-f-' + r.id" :value="r.field" @change="setField(r, $event.target.value)"
+                      :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <template x-for="f in fields" :key="f.id">
+                  <option :value="f.id" x-text="f.label"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="r.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + label(r.field)"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="is not">is not</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="r.v" :aria-label="'Condition ' + (i + 1) + ', value for ' + label(r.field)"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="">Choose a value</option>
+                <template x-for="v in values[r.field]" :key="v[0]">
+                  <option :value="v[0]" x-text="v[1]"></option>
+                </template>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <button type="button" @click="remove(i)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + sentence(r)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" x-ref="add" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <p class="min-w-0 text-[12px]/4 text-zinc-500">
+        <span x-text="rows.length"></span> conditions, joined with <span class="font-medium text-zinc-700" x-text="joiner"></span>
+      </p>
+    </div>
+  </div>
+
+  <p role="status" class="sr-only" x-text="announce"></p>
+</div>

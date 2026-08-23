@@ -1,0 +1,137 @@
+<!-- A works order and the material against it. Every row is doing something, so
+     every row carries a state, and the whole reason to look at this screen is
+     to find the two that are not moving.
+
+     A shut branch carries the worst state under it, with a count. Without it a
+     line short-received four levels down is invisible on a screen that fits:
+     the storekeeper collapses the last branch at the end of the shift and the
+     order reads as clear. Red beats amber beats everything else, and the count
+     is what makes the dot honest — one red dot meaning eleven blocked lines and
+     one meaning a single line are different mornings.
+
+     One dot per row and the word beside it stays graphite. A column of tinted
+     pills in a tree is a traffic light with an indent, and by the eighth row it
+     has stopped meaning anything; the dot is the only colour on the row and the
+     eye finds it down the column without reading a word. That is the pill rule
+     applied to a row that has no room for a pill.
+
+     The dot is aria-hidden and the state is the word. A screen reader gets
+     "Short received" and a count; a 6px background circle announces nothing at
+     all, so a tree that put the state only in the colour has no state in it for
+     half its users.
+
+     Short received and Blocked both take red — the alarm meanings — and
+     Awaiting QC takes amber, because somebody has to act before it can move.
+     The dots come from the fixed table and never from a per-screen reading of
+     what feels urgent.
+
+     The figure that explains a red row goes on the row. "1.250 kg of 3.000 kg"
+     is the whole story of a short receipt, and putting it behind a link is
+     asking somebody to open eleven rows to find the one that is wrong. -->
+<div data-kui="tree-view/status" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { wo: true, shell: true, lid: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">WO-2026-0412 — Water tank 1000 L × 40</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Due 28 Aug 2026</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.wo = !open.wo" :aria-expanded="open.wo" aria-controls="tv-t-wo"
+                aria-label="Material against WO-2026-0412"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.wo && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2200</span> <span class="text-zinc-600">Water tank 1000 L</span></span>
+        <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>In progress</span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+      </div>
+
+      <ul role="list" id="tv-t-wo" x-show="open.wo" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-t-shell"
+                    aria-label="Material under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-zinc-500"></span>Issuing</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+          </div>
+
+          <ul role="list" id="tv-t-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received in full</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2,500.000 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Short received</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">28.000 of 50.000 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-amber-500"></span>Awaiting QC</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <!-- shut, and carrying the worst state of the two rows underneath it -->
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-t-lid"
+                    aria-label="Material under SA-1155 Lid and gasket assembly, 2 lines blocked"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 font-medium tabular-nums text-zinc-900"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>2 blocked</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">80 nos</span>
+          </div>
+          <ul role="list" id="tv-t-lid" x-show="open.lid" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Blocked — mould under repair</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></span>
+                <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-red-600"></span>Blocked — failed inspection</span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></span>
+            <span class="ml-3 flex shrink-0 items-center gap-1.5 text-[12px]/4 text-zinc-600"><span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-emerald-600"></span>Received in full</span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">40 nos</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

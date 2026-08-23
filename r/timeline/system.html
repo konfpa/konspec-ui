@@ -1,0 +1,88 @@
+<!-- Half of a real history is written by jobs rather than by people — the
+     reminder that went out, the exchange rate that was pulled, the order that
+     was closed automatically when the last line was received. Telling those
+     apart from a person's action matters, because "the order was amended" and
+     "a nightly job amended the order" are different facts.
+
+     Three things separate them and none of them is a colour. The mark is a
+     size-4 icon instead of a 6px disc, the actor is an 11px uppercase System
+     chip instead of a name, and the source — the job, the mailbox, the
+     integration — is written in mono underneath. The first attempt tinted
+     system rows blue, which burned a colour that means nothing in this system
+     and taught readers the palette is decorative. The second greyed the whole
+     row, which said the event mattered less, on a screen where a failed
+     reminder job is often the reason the order is late.
+
+     Because dots and icons share the column, the column takes a fixed w-4 and
+     both are centred in it. Left to their own widths, the disc sits at six
+     pixels and the icon at sixteen, and the rail kinks at every handover
+     between a person and a job.
+
+     A system event that failed still takes red in the dot and says "Failed"
+     in words. Automated is not a severity. -->
+<div data-kui="timeline/system" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0411 · history</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">People and jobs in one column</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="alert-circle" class="mt-0.5 size-4 text-red-600"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span><span class="sr-only">Failed — </span>The delivery reminder to Sharma Steel &amp; Alloys bounced.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">reminders.overdue · 550 mailbox unavailable · purchase@sharmasteel.in</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T06:00+05:30">04 Sep 2026, 06:00</time> · 10 hours ago</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="cpu" class="mt-0.5 size-4 text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span>The order was marked overdue — promised 31 Aug 2026, nothing received.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">orders.age · 4 days past the promised date</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T00:05+05:30">04 Sep 2026, 00:05</time> · 16 hours ago</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px]/5 tabular-nums">
+          <span class="font-medium">Sanjay Rane</span> rang the mill and recorded that despatch is planned for 08 Sep.
+        </p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-03T16:40+05:30">03 Sep 2026, 16:40</time> · yesterday · buyer</p>
+      </div>
+    </li>
+
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex w-4 shrink-0 flex-col items-center" aria-hidden="true">
+        <i data-lucide="cpu" class="mt-0.5 size-4 text-zinc-500"></i>
+        <span class="mt-1 w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]/5 tabular-nums">
+          <span class="inline-flex shrink-0 items-center rounded-full bg-zinc-200 px-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase ring-1 ring-inset ring-zinc-300">System</span>
+          <span>The first delivery reminder was emailed to the vendor.</span>
+        </p>
+        <p class="mt-0.5 font-mono text-[11px]/4 tabular-nums text-zinc-500">reminders.overdue · delivered · purchase@sharmasteel.in</p>
+        <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-01T06:00+05:30">01 Sep 2026, 06:00</time> · 3 days ago</p>
+      </div>
+    </li>
+  </ol>
+</div>

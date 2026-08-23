@@ -210,6 +210,7 @@ keeping it to yourself in one screen.
 - **Attachment** `attachment` — The documents hanging off a record — a drop zone over the list of what is already there. Every file shows its type, size, who attached it and when. Variants: default, empty, uploading, failed, rejected, required, versions, readonly, single, compact, images, htmx, django.
 - **Calendar** `calendar` — A month grid for picking a date or a range. Monday-first, tabular figures, and the same graphite selection the rest of the system uses. Variants: month, picker, range, jump, constrained, presets, marked, slot, period, locked, phone, native, htmx, django.
 - **Questionnaire** `questionnaire` — A run of questions answered in order on one page — a QC checklist, a vendor assessment, a safety audit. One fieldset per question, the question text as its legend, and three equal tiles carrying the answer so a column of them can be read at a glance. Variants: question, run, observation, conditional, not-applicable, evidence, scale, multi, sheet, remaining, invalid, autosave, signed, django.
+- **Filter builder** `filter-builder` — Conditions composed into a query over a register — one row carrying a field, an operator and a value, added and removed until the list on screen is the list somebody asked for. The control a buyer uses to ask for open orders over ₹2,00,000, from three vendors, due before the end of the month. Variants: default, types, chips, groups, saved, apply, live, empty, invalid, sheet, count, url, htmx, django.
 
 ### Data display
 
@@ -223,6 +224,9 @@ keeping it to yourself in one screen.
 - **Skeleton** `skeleton` — Grey blocks standing in the exact box the content will occupy — same rows, same leading, same column widths — so the first paint of a screen whose layout is already known lands without moving. Variants: text, heading, table, dense, cell, card, stats, list, form, chart, record, append, delayed, states, django.
 - **Marker** `marker` — The mark that opens a list item — a dot, a number, an icon or a tinted well — drawn as a real element in a box the height of one line, so it holds its place when the item wraps. Variants: prose, dot, numbered, clauses, checklist, timeline, pending, register, rows, grouped, nested, steps, dense, django.
 - **Spinner** `spinner` — The indeterminate wait. A graphite ring that turns while work of unknown length is in flight, and a line of text that says what the work is. Variants: default, sizes, label, motion, panel, inline, slot, queue, overlay, delayed, phases, states, stalled, django.
+- **Timeline** `timeline` — What happened to one record, in order — the history strip on a purchase order, the audit trail on a vendor master, the QC events on a batch. Each entry is an actor, a verb, a time, and where it matters what the value was before. Variants: default, dense, grouped, changes, status, comment, system, pending, load-more, filter, inline, empty, loading, htmx, django.
+- **Permission matrix** `permission-matrix` — A grid of roles down one axis and permissions down the other, with the granted cell as a real checkbox. The screen an admin uses to say who may approve a purchase order over ₹5,00,000. Variants: default, scroll, groups, inherited, readonly, compare, dirty, phone, empty, loading, failed, htmx, django.
+- **Tree view** `tree-view` — Records that nest, drawn as rows that expand to reveal the rows underneath them. A bill of material exploded into its sub-assemblies, a chart of accounts, a plant broken down to the bin — every row still a record with its own code and its own figures. Variants: default, guides, expand-all, keyboard, selection, columns, lazy, search, actions, status, empty, phone, htmx, django.
 
 ### Feedback
 
@@ -288,18 +292,18 @@ thing that answers the question.
 
 | endpoint | size | cost | what it is |
 |---|---|--:|---|
-| [r/index.json](r/index.json) | 136 KB | ~39k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
-| `r/<id>.json` | median 16 KB, largest 27 KB (`sidebar`) | ~5k tokens / ~8k tokens | One component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No markup. |
+| [r/index.json](r/index.json) | 144 KB | ~41k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
+| `r/<id>.json` | median 17 KB, largest 27 KB (`sidebar`) | ~5k tokens / ~8k tokens | One component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No markup. |
 | `r/<id>/<variant>.html` | median 6 KB, largest 45 KB (`app-shell/default`) | ~2k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
-| `r/<id>.full.json` | median 91 KB, largest 189 KB (`search-page`) | ~26k tokens / ~54k tokens | The component and every variant's html in one file — what `r/<id>.json` used to be. Back-compat; you want the two rows above. |
-| [registry.json](registry.json) | 1 KB | ~406 tokens | A pointer at this table. It was 7.2 MB, about 11× a 200k context window, and every agent that fetched it got a silently truncated file. |
+| `r/<id>.full.json` | median 99 KB, largest 189 KB (`search-page`) | ~28k tokens / ~54k tokens | The component and every variant's html in one file — what `r/<id>.json` used to be. Back-compat; you want the two rows above. |
+| [registry.json](registry.json) | 1 KB | ~406 tokens | A pointer at this table. It was 7.8 MB, about 11× a 200k context window, and every agent that fetched it got a silently truncated file. |
 
 The component list above prints every variant id, so once you have read this
 file you can build a variant URL yourself and skip r/index.json entirely:
 `GET /r/button/variants.html` returns the markup for button/variants and nothing
 else. That is the common path — one read of llms.txt, then a few small ones.
 
-Read the ids; do not guess them. Only 40 of the 74 components have a variant
+Read the ids; do not guess them. Only 44 of the 78 components have a variant
 called `default`, and 34 do not, so a guessed URL is a 404 rather
 than a fallback. The ids are listed above precisely because they are not
 predictable from the component name.

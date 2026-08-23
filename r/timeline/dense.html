@@ -1,0 +1,86 @@
+<!-- The same strip in a 360px drawer beside a register, where twenty-six
+     entries have to be skimmable without the drawer becoming a page of its
+     own. What changes is the type step, not the padding.
+
+     Dropping the entry to text-[12px]/4 moves the marker box to h-4 with it,
+     because the box height is the leading of the text beside it and both are
+     written in the same class name so the two cannot drift. Squeezing the
+     padding while leaving the 20px box behind is how a drawer ends up with
+     every dot sitting a pixel above the line it belongs to.
+
+     The meta line loses everything that is not the time and the person. The
+     gate number, the vehicle and the mailbox are on the record itself, and a
+     drawer is where somebody is looking for the shape of the history rather
+     than reading one entry of it.
+
+     The time keeps its date. A drawer is exactly where "14:22" with no day on
+     it looks like today and turns out to be the eleventh. -->
+<div data-kui="timeline/dense" class="max-w-sm overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-zinc-200 px-4 py-2.5">
+    <h2 class="text-[13px]/5 font-semibold tabular-nums">GRN-4821 · history</h2>
+    <p class="text-[11px]/4 tabular-nums text-zinc-500">26 entries</p>
+  </div>
+
+  <ol role="list" class="px-4 py-3">
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Receipt posted in full — 12.480 MT.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:55+05:30">04 Sep, 08:55</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums"><span class="sr-only">Passed — </span>QC passed lot 26-119 against IS 2062 E250.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:41+05:30">04 Sep, 08:41</time> · Farida Qureshi</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-red-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums"><span class="sr-only">Short received — </span>Short receipt of 600 kg raised as DN-26-0117.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T08:12+05:30">04 Sep, 08:12</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Weighbridge slip 8841 attached at the gate.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:58+05:30">04 Sep, 07:58</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Vehicle GJ-15-AT-4482 booked in at gate 2.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:31+05:30">04 Sep, 07:31</time> · Suresh Kadam</p>
+      </div>
+    </li>
+    <li class="group flex gap-2.5 pb-2.5 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-4 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px]/4 tabular-nums">Receipt opened against PO-2026-0418.</p>
+        <p class="mt-0.5 text-[11px]/4 tabular-nums text-zinc-500"><time datetime="2026-09-04T07:29+05:30">04 Sep, 07:29</time> · Suresh Kadam</p>
+      </div>
+    </li>
+  </ol>
+</div>

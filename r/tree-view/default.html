@@ -1,0 +1,158 @@
+<!-- A bill of material exploded: the finished good, the sub-assemblies under it
+     and the material under those. Three levels of the same kind of record —
+     every row has a code, a description and a quantity — which is what
+     separates a tree from an accordion, where the heading and the contents are
+     two different things.
+
+     Real nesting, a <ul> inside the <li> it belongs to. The indent is a run of
+     empty w-6 spans inside the row, not padding on that nested list: the row is
+     a full-bleed band and has to reach both edges of the card to hover as one
+     thing, and a padded list moves the left edge inwards and takes the hover
+     with it.
+
+     The chevron is its own button with its own name. It is not the row — the
+     row carries a part code somebody clicks through to, and one control cannot
+     both open the branch and open the part. Which is also why a leaf gets an
+     empty size-6 box where a chevron would be: without it every leaf's
+     description starts 24px left of its siblings' and the column of names has
+     two left edges.
+
+     This is a nested list of disclosures and not role="tree". A tree is a
+     widget with one tab stop and an arrow-key contract, and taking the role
+     means taking all of it — that is the keyboard variant. Here every chevron
+     is a button the Tab key reaches, which is the right trade for eleven rows
+     that are read rather than navigated.
+
+     The animated <ul> carries the id, x-show and x-collapse and nothing else.
+     Padding on it means height:0 cannot go below the padding, so the branch
+     bottoms out and x-show then removes it in one frame, which reads as a snap
+     — and in a tree that goes wrong twice, because the panels are inside each
+     other.
+
+     Sub-assembly quantities are per assembly: the 2 on the lid assembly
+     multiplies every row indented under it. -->
+<div data-kui="tree-view/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { fg: true, shell: true, lid: true, weld: false } }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Bill of material — FG-2200 Water tank 1000 L</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">Rev 4 · 11 lines</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li>
+      <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+        <button type="button" @click="open.fg = !open.fg" :aria-expanded="open.fg" aria-controls="tv-d-fg"
+                aria-label="Sub-assemblies of FG-2200 Water tank 1000 L"
+                class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <span class="flex transition-transform motion-reduce:transition-none" :class="open.fg && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+        </button>
+        <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">FG-2200</span> <span class="text-zinc-600">Water tank 1000 L, roto-moulded</span></span>
+        <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+      </div>
+
+      <ul role="list" id="tv-d-fg" x-show="open.fg" x-collapse.duration.200ms>
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-d-shell"
+                    aria-label="Parts under SA-1140 Tank shell assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+          <ul role="list" id="tv-d-shell" x-show="open.shell" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade M60075</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3312</span> <span class="text-zinc-600">Masterbatch, blue 2%</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1.250 kg</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.lid = !open.lid" :aria-expanded="open.lid" aria-controls="tv-d-lid"
+                    aria-label="Parts under SA-1155 Lid and gasket assembly"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.lid && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1155</span> <span class="text-zinc-600">Lid and gasket assembly</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">2 nos</span>
+          </div>
+          <ul role="list" id="tv-d-lid" x-show="open.lid" x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4402</span> <span class="text-zinc-600">Lid, moulded, 400 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4418</span> <span class="text-zinc-600">Gasket, EPDM 3 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span>
+            <button type="button" @click="open.weld = !open.weld" :aria-expanded="open.weld" aria-controls="tv-d-weld"
+                    aria-label="Parts under SA-1163 Fitting and finish kit"
+                    class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <span class="flex transition-transform motion-reduce:transition-none" :class="open.weld && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+            </button>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1163</span> <span class="text-zinc-600">Fitting and finish kit</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          </div>
+          <ul role="list" id="tv-d-weld" x-show="open.weld" x-cloak x-collapse.duration.200ms>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">HW-5501</span> <span class="text-zinc-600">Outlet nipple, GI, 1 in</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+              </div>
+            </li>
+            <li>
+              <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+                <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+                <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">CN-7710</span> <span class="text-zinc-600">Teflon tape, 12 mm</span></span>
+                <span class="ml-3 shrink-0 tabular-nums text-zinc-600">0.030 kg</span>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          <div class="flex min-h-9 items-center pr-3 pl-3 hover:bg-zinc-100">
+            <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+            <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PK-6620</span> <span class="text-zinc-600">Stretch film, 23 micron</span></span>
+            <span class="ml-3 shrink-0 tabular-nums text-zinc-600">0.180 kg</span>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

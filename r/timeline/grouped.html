@@ -1,0 +1,99 @@
+<!-- A day is the unit people argue in — "what happened on the second" — so
+     past about a dozen entries the date stops belonging on every line and
+     becomes a heading with a list under it. The entry line is then free to
+     carry the time and the person, which is what is actually different
+     between two entries on the same day.
+
+     Today and Yesterday are said in words and the date is said beside them,
+     never instead. "Today" alone is wrong the moment the tab is left open
+     past midnight, printed, or pasted into a mail to the vendor, and a
+     history whose headings depend on when it was read cannot be quoted.
+
+     The heading is an h3 outside the list, not an li. Written as a list item
+     it is announced as item 1 of 3 and every count in the strip is off by
+     one; dropped between two lis without one, the parser lifts it out of the
+     list entirely. Each day's ol points back at its heading, so the count
+     belongs to the day rather than to the panel.
+
+     The bands are a recessed strip inside one panel rather than a card per
+     day. Three bordered boxes with two entries in each restarts the column of
+     marks three times, and the column not restarting is the whole reason it
+     is worth drawing. -->
+<div data-kui="timeline/grouped" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Sharma Steel &amp; Alloys · vendor master</h2>
+    <p class="text-[12px]/4 tabular-nums text-zinc-500">14 entries in the last 30 days</p>
+  </div>
+
+  <h3 id="tl-g-d1" class="border-b border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Today · Friday, 04 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d1" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T14:22+05:30">14:22</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Meena Iyer</span> revised the payment terms from 30 days to 45 days.
+        </p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-04T09:12+05:30">09:12</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Meena Iyer</span> uploaded the MSME registration certificate, valid to 31 Mar 2027.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 id="tl-g-d2" class="border-y border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Yesterday · Thursday, 03 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d2" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-emerald-600"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T17:05+05:30">17:05</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Nilesh Patil</span> approved the vendor for the structural steel category.
+        </p>
+      </div>
+    </li>
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-03T11:48+05:30">11:48</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Sanjay Rane</span> recorded the plant visit of 28 Aug 2026 and attached the assessment.
+        </p>
+      </div>
+    </li>
+  </ol>
+
+  <h3 id="tl-g-d3" class="border-y border-zinc-100 bg-zinc-50 px-5 py-1.5 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase tabular-nums">Wednesday, 02 Sep 2026</h3>
+  <ol role="list" aria-labelledby="tl-g-d3" class="px-5 py-4">
+    <li class="group flex gap-3 pb-4 last:pb-0">
+      <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-amber-500"></span></span>
+        <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+      </span>
+      <div class="min-w-0 flex-1 sm:flex sm:gap-4">
+        <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500 sm:w-14"><time datetime="2026-09-02T16:20+05:30">16:20</time></p>
+        <p class="mt-0.5 min-w-0 flex-1 text-[13px]/5 tabular-nums sm:mt-0">
+          <span class="font-medium">Ritu Deshpande</span> sent the category approval to the plant head and it moved to Pending.
+        </p>
+      </div>
+    </li>
+  </ol>
+</div>

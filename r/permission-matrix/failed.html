@@ -1,0 +1,111 @@
+<!-- Eleven changes went up and three came back refused, because those three
+     permissions are held by an approval policy rather than by the role. The
+     first version showed a confirmation anyway and left all eleven cells
+     looking granted, which is the worst outcome available: the grid is the
+     record of what is true, and a cell that did not apply cannot be allowed to
+     go on showing the value somebody asked for.
+
+     So the three are reverted to what is actually stored, and each one is
+     marked where it sits with a red dot and words behind it. The eight that did
+     apply stay applied and stop counting as changes — a failure that rolls back
+     work that succeeded is a second defect wearing the first one's clothes, and
+     on this screen it means somebody re-does eight cells to find out which
+     three they cannot do at all.
+
+     The notice is a plain band inside the panel: white, zinc border, and the
+     only colour is the icon. A full-width red field over a grid shouts louder
+     than the three cells it is describing, and the cells are where the eye has
+     to end up. It names the three in words as well as marking them, because a
+     dot in a grid of twenty-four is findable only if you already know to look.
+
+     The reason is in the notice and not in a tooltip on the cell. A tooltip on
+     something that cannot be pressed opens for nobody, and the reason here is a
+     sentence about policy rather than a label. Try again re-sends the three
+     that failed and nothing else. -->
+<form data-kui="permission-matrix/failed" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-f-h" class="text-[14px]/5 font-semibold">Role permissions — Stores and quality</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 5 permissions · saved 23 Aug 2026, 11:04</p>
+  </div>
+
+  <div role="status" class="flex items-start gap-2.5 border-b border-zinc-200 px-4 py-3">
+    <i data-lucide="alert-circle" class="mt-0.5 size-4 shrink-0 text-red-600"></i>
+    <div class="min-w-0">
+      <p class="text-[13px]/5 font-medium tabular-nums">8 of your 11 changes were saved. 3 were refused and are back as they were.</p>
+      <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-600">
+        Approve up to ₹5,00,000 for Store keeper and for QC inspector, and Approve over ₹5,00,000 for Store keeper, are set by the approval policy for Silvassa and cannot be granted on a role. Change the policy under Settings, Approval limits, or ask Nilesh Patil.
+      </p>
+      <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <button type="button" class="inline-flex h-8 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-[12px]/4 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="rotate-cw" class="size-3.5 shrink-0 text-zinc-600"></i>Try those 3 again
+        </button>
+        <a href="#" class="text-[12px]/4 text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the approval policy</a>
+      </div>
+    </div>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-f-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-32 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" checked aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" checked aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approve5:stores" aria-label="Approve up to ₹5,00,000 — Store keeper, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approve5:qc" aria-label="Approve up to ₹5,00,000 — QC inspector, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+            <input type="checkbox" name="perm" value="po.approveover:stores" aria-label="Approve over ₹5,00,000 — Store keeper, not saved, set by the approval policy" class="size-4 accent-zinc-700">
+          </span>
+        </td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" checked aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" checked aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" checked aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-100 px-4 py-3">
+    <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-600">8 changes saved 23 Aug 2026, 11:04 by you. The 3 marked cells show what is stored, not what was asked for.</p>
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+  </div>
+</form>

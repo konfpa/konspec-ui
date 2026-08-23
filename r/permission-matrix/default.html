@@ -1,0 +1,98 @@
+<!-- The shape the whole entry is about: permissions down, roles across, and
+     the granted cell is a real checkbox rather than a tick somebody draws. Three
+     roles is what stands at 390px, and the number was measured rather than
+     chosen. A fourth column sat here until a browser sweep put the document at
+     405px: a width utility on a table cell is a preference the table overrules,
+     and what a column cannot go under is the widest unbreakable word inside it
+     — "Purchase" in the heading, ₹5,00,000 in a row label — so four role
+     columns plus the permission column overflow however the classes are
+     written. At three the whole grid is on screen at every width, Tab walks it
+     left to right in the order the eye reads it, and no box is off screen when
+     focus lands on it. Past that the permission column pays for every role
+     added and the grid has to scroll, which is the scroll variant and costs a
+     two-axis sticky.
+
+     Every box names both axes. A cell gives its control neither, and headers
+     are announced when a screen reader walks a table and not when it tabs the
+     controls inside one, which is how anybody filling this in moves. The label
+     repeats the words that are on screen, because voice control matches on
+     those and not on the permission code underneath them.
+
+     There is no row tint and no has-[:checked] on the tr. A matrix row holds
+     four separate answers and painting it from one of them says the whole row
+     is on; the hover band is the only thing that crosses the row, and its job
+     is carrying the eye to the far column.
+
+     Viewing the register comes with every role and is not set here, so those
+     four boxes are ticked and disabled. Disabled posts nothing and nothing
+     needs to be posted — but the columns this form does save are named in a
+     hidden field, or a server diffing the POST against every role in the
+     deployment revokes the ones it was never shown. -->
+<form data-kui="permission-matrix/default" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-d-h" class="text-[14px]/5 font-semibold">What each role may do with purchase orders</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles · 7 permissions · Silvassa and Vapi · last saved 12 Jul 2026 by Nilesh Patil</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-d-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-3 py-2.5 text-left font-medium sm:px-4">Permission</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">Purchase officer</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">Store keeper</th>
+        <th scope="col" class="w-28 px-2 py-2.5 font-medium">QC inspector</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal text-zinc-600">View the purchase register</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Purchase officer, comes with the role" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — Store keeper, comes with the role" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" checked disabled aria-label="View the purchase register — QC inspector, comes with the role" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:purchase" checked aria-label="Raise a purchase order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:stores" aria-label="Raise a purchase order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.raise:qc" aria-label="Raise a purchase order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:purchase" checked aria-label="Approve up to ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:stores" aria-label="Approve up to ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approve5:qc" aria-label="Approve up to ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:purchase" aria-label="Approve over ₹5,00,000 — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:stores" aria-label="Approve over ₹5,00,000 — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.approveover:qc" aria-label="Approve over ₹5,00,000 — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Post a GRN</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:purchase" aria-label="Post a GRN — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:stores" checked aria-label="Post a GRN — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="grn.post:qc" aria-label="Post a GRN — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Record a QC result</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:purchase" aria-label="Record a QC result — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:stores" aria-label="Record a QC result — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="qc.record:qc" checked aria-label="Record a QC result — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-3 py-2.5 text-left sm:px-4 font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:purchase" checked aria-label="Cancel an approved order — Purchase officer" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:stores" aria-label="Cancel an approved order — Store keeper" class="size-4 accent-zinc-700"></td>
+        <td class="px-2 py-2.5 text-center"><input type="checkbox" name="perm" value="po.cancel:qc" aria-label="Cancel an approved order — QC inspector" class="size-4 accent-zinc-700"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="purchase,stores,qc">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">Viewing the register comes with the role and is set on the role, not here. Orders over ₹25,00,000 go to the plant head whatever this grid says.</p>
+  </div>
+</form>

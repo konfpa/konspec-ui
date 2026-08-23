@@ -1,0 +1,125 @@
+<!-- Every row is a record, so every row has things you can do to it: open the
+     part, see where else it is used, look at its stock by bin, take it off this
+     assembly. Eleven visible triggers would be eleven pieces of furniture in a
+     column whose job is to be scanned, so the trigger is revealed on hover —
+     and is there at all times for anybody not using a pointer.
+
+     Hidden with opacity, never with display or visibility. Both of those take
+     the button out of the tab order entirely, so the keyboard user has no route
+     to the row menu at all and nothing on screen says a menu exists. opacity-0
+     keeps it focusable, and the focus-visible variant brings it back into view
+     the moment it takes focus.
+
+     The visible state is driven by attribute variants and not by a class
+     binding: group-hover for the pointer, focus-visible for the keyboard, and
+     aria-expanded for the open menu, which is an attribute the button already
+     has to carry. A bound :class alongside a static opacity-0 is the shape rule
+     6 warns about — Alpine removes only what it added, so the static class
+     survives every state change and the two fight in the cascade.
+
+     The panel is NOT overflow-hidden. A menu opening from the last row is
+     clipped at the card edge by a panel that clips, and the fix people reach
+     for — moving the menu into a portal — takes it out of the row it belongs
+     to. What keeps the tinted hover off the rounded corners instead is the
+     header band above the rows and the footer band below them, so no row ever
+     touches a corner.
+
+     The menu is anchored to the row, so the row carries relative and the menu
+     carries z-10. Anchored to the card it would need the row's offset measured
+     by hand, and a tree re-renders its rows every time a branch opens.
+
+     Destructive last, under a divider, and it says what it removes. "Remove"
+     over a tree is ambiguous by construction: the row could be a part or a
+     whole sub-assembly with nine parts under it, and the menu is the last place
+     that difference can be stated before it happens. -->
+<div data-kui="tree-view/actions" class="rounded-xl border border-zinc-300 bg-white text-[13px]/5"
+     x-data="{ open: { shell: true } }">
+  <div class="flex items-baseline justify-between gap-3 rounded-t-xl border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">SA-1140 Tank shell assembly</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600">3 components</p>
+  </div>
+
+  <ul role="list" class="py-1">
+    <li x-data="{ menu: false }">
+      <div class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100">
+      <button type="button" @click="open.shell = !open.shell" :aria-expanded="open.shell" aria-controls="tv-a-shell"
+              aria-label="Parts under SA-1140 Tank shell assembly"
+              class="flex size-6 shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span class="flex transition-transform motion-reduce:transition-none" :class="open.shell && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+      </button>
+      <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">SA-1140</span> <span class="text-zinc-600">Tank shell assembly</span></span>
+      <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+      <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+              aria-label="Actions for SA-1140 Tank shell assembly"
+              class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+        <i data-lucide="ellipsis" class="size-4"></i>
+      </button>
+      <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+           class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-500"></i>Open the sub-assembly
+        </button>
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 4 bills
+        </button>
+        <div class="my-1 border-t border-zinc-100"></div>
+        <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove SA-1140 and its 3 parts
+        </button>
+      </div>
+      </div>
+
+      <ul role="list" id="tv-a-shell" x-show="open.shell" x-collapse.duration.200ms>
+        <li class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100" x-data="{ menu: false }">
+          <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">RM-3301</span> <span class="text-zinc-600">HDPE, blow moulding grade</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">62.500 kg</span>
+          <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+                  aria-label="Actions for RM-3301 HDPE, blow moulding grade"
+                  class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+            <i data-lucide="ellipsis" class="size-4"></i>
+          </button>
+          <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+               class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package" class="size-4 shrink-0 text-zinc-500"></i>Stock by bin — 4 bins
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 11 bills
+            </button>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove RM-3301 from this assembly
+            </button>
+          </div>
+        </li>
+
+        <li class="group relative flex min-h-9 items-center pr-2 pl-3 hover:bg-zinc-100" x-data="{ menu: false }">
+          <span aria-hidden="true" class="w-6 shrink-0"></span><span aria-hidden="true" class="size-6 shrink-0"></span>
+          <span class="ml-2 min-w-0 flex-1 truncate"><span class="font-medium tabular-nums">PT-4471</span> <span class="text-zinc-600">Outlet boss, brass, 1 in</span></span>
+          <span class="ml-3 shrink-0 tabular-nums text-zinc-600">1 no</span>
+          <button type="button" @click="menu = !menu" :aria-expanded="menu" aria-haspopup="true"
+                  aria-label="Actions for PT-4471 Outlet boss, brass"
+                  class="ml-2 flex size-7 shrink-0 items-center justify-center rounded-lg text-zinc-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 aria-expanded:opacity-100">
+            <i data-lucide="ellipsis" class="size-4"></i>
+          </button>
+          <div x-show="menu" x-cloak @click.outside="menu = false" @keydown.escape.window="menu = false" role="menu"
+               class="absolute top-9 right-2 z-10 w-60 rounded-xl border border-zinc-300 bg-white py-1 shadow-lg">
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="package" class="size-4 shrink-0 text-zinc-500"></i>Stock by bin — 1 bin
+            </button>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="git-branch" class="size-4 shrink-0 text-zinc-500"></i>Where used — 2 bills
+            </button>
+            <div class="my-1 border-t border-zinc-100"></div>
+            <button type="button" role="menuitem" tabindex="-1" @click="menu = false" class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 text-red-600 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="trash-2" class="size-4 shrink-0"></i>Remove PT-4471 from this assembly
+            </button>
+          </div>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <p class="rounded-b-xl border-t border-zinc-200 bg-zinc-50 px-4 py-2 text-[12px]/4 text-zinc-500">Tab reaches every row menu whether or not the pointer is anywhere near it.</p>
+</div>

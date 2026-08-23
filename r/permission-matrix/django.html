@@ -1,0 +1,118 @@
+<!-- views.py
+
+     The grid is one repeated field name and the cell key is the value, so it
+     comes back with request.POST.getlist('perm') — .get() returns the last one
+     and drops every other tick on the screen. An unticked box posts nothing at
+     all, which is why the diff can only ever be taken against the columns named
+     in the scope field: absence in the POST and a column that was never
+     rendered are the same bytes.
+
+         def role_permissions(request):
+             roles = Role.objects.filter(site=request.site).order_by('rank')
+             editable = [r for r in roles if request.user.may_grant(r)]
+             if request.method == 'POST':
+                 scope = request.POST['scope'].split(',')
+                 if set(scope) - {r.code for r in editable}:
+                     raise PermissionDenied
+                 wanted = set(request.POST.getlist('perm'))
+                 revoked = set(request.POST.getlist('revoke'))
+                 Grant.objects.reconcile(scope=scope, wanted=wanted, revoked=revoked)
+             return render(request, 'settings/role_permissions.html', {
+                 'roles': roles,
+                 'permissions': Permission.objects.for_modules(request.site.modules),
+                 'scope': ','.join(r.code for r in editable),
+             })
+
+     Two loops, permissions outside and roles inside, so the row and the cell
+     come out in the order the header row already promises. Do not build the
+     rows in Python and print them — a cell has three shapes here and each of
+     them is markup.
+
+     The accessible name is assembled from both axes in the template, in the
+     same words the two headers show, because a table cell gives its box neither
+     and voice control matches on what is on screen. Keep the em dash: it is the
+     separator every other grid in this system reads back.
+
+     The scope value is joined in the view rather than with a join filter in the
+     attribute, because the filter argument needs quotes and the attribute is
+     already quoted. The token tag is the first thing inside the form.
+
+     The empty clause of the outer for tag is a real state and not a nicety: a
+     deployment with the modules switched off has no permissions to draw, and
+     without it the table renders a header row over nothing, which is the empty
+     table that reads as a bug. Where there are no ROLES the whole grid goes
+     instead, and that is the empty variant. -->
+<form data-kui="permission-matrix/django" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  {% csrf_token %}
+  <input type="hidden" name="scope" value="{{ scope }}">
+
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-dj-h" class="text-[14px]/5 font-semibold">Role permissions — {{ site.name }}</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">{{ roles|length }} roles · {{ permissions|length }} permissions · last saved {{ last_saved_at }} by {{ last_saved_by }}</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-dj-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        {% for role in roles %}
+          <th scope="col" class="w-32 px-2 py-2.5 font-medium">
+            <span class="block">{{ role.name }}</span>
+            {% if role.editable %}
+              <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case tabular-nums text-zinc-500">{{ role.user_count }} users</span>
+            {% else %}
+              <span class="mt-0.5 flex items-center justify-center gap-1 text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">
+                <i data-lucide="lock" class="size-3 shrink-0"></i>You cannot grant this
+              </span>
+            {% endif %}
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for perm in permissions %}
+        <tr class="border-b border-zinc-100 last:border-b-0 hover:bg-zinc-100">
+          <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">{{ perm.label }}</th>
+          {% for role in roles %}
+            <td class="px-2 py-2.5 text-center">
+              {% if perm.code in role.inherited %}
+                <input type="checkbox" checked disabled
+                       aria-label="{{ perm.label }} — {{ role.name }}, comes with the role"
+                       class="size-4 accent-zinc-700">
+              {% elif not role.editable %}
+                <input type="checkbox" disabled
+                       {% if perm.code in role.granted %}checked{% endif %}
+                       aria-label="{{ perm.label }} — {{ role.name }}, locked because you do not hold that role"
+                       class="size-4 accent-zinc-700">
+              {% else %}
+                <input type="checkbox" name="perm" value="{{ perm.code }}:{{ role.code }}"
+                       {% if perm.code in role.granted %}checked{% endif %}
+                       aria-label="{{ perm.label }} — {{ role.name }}"
+                       class="size-4 accent-zinc-700">
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="{{ roles|length|add:1 }}" class="px-6 py-12 text-center">
+            <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+              <i data-lucide="shield-off" class="size-5 text-zinc-600"></i>
+            </span>
+            <h4 class="mt-3 text-[16px]/6 font-semibold">No permissions to grant</h4>
+            <p class="mx-auto mt-1 max-w-sm text-[13px]/5 text-zinc-600">
+              Every module is switched off for {{ site.name }}, so there is nothing a role could be given. Switch a module on under Settings, Modules and the permissions it brings appear here.
+            </p>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save permissions</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">
+      This form is authoritative for {{ editable_count }} of the {{ roles|length }} columns. The rest are on the grid so it does not read as those roles having no permissions.
+    </p>
+  </div>
+</form>

@@ -1,0 +1,146 @@
+<!-- Alpine holds the conditions and htmx fetches the register; neither does
+     the other's job. The builder is local state until Apply, and Apply is one
+     GET carrying the serialised set.
+
+     hx-include picks up the hidden inputs the builder writes rather than the
+     three selects — the selects are the editor and the hidden inputs are the
+     applied query, and including the editor is how a half-typed value reaches
+     the server.
+
+     hx-push-url puts the query in the address bar, which is the whole reason
+     this variant is not just an Apply with a fetch behind it: the register is
+     re-fetched and the link is sendable, in one gesture, with no second
+     serialiser.
+
+     The target is the register panel and never the builder. Swapping the
+     builder replaces the selects somebody is still working in, and the request
+     they triggered looks from the outside like it worked.
+
+     hx-sync="this:replace" abandons a request already in flight, so pressing
+     Apply twice does not race two answers into the same target — and the button
+     is not disabled while it runs, because a browser blurs a disabled element
+     to the body and the keyboard user who pressed it is thrown to the top of
+     the document.
+
+     The rows that are already up stay up and are marked inert. Blanking the
+     register back to skeletons on every Apply is the cheapest way to make a
+     fast screen feel slow. The count line is the wait: it is already a
+     role="status", it already says the answer, and a second region saying
+     "Loading" talks over it. -->
+<div data-kui="filter-builder/htmx" class="max-w-3xl"
+     x-data="{
+       busy: false,
+       conds: [
+         { id: 1, field: 'status', op: 'is', v: 'open' },
+         { id: 2, field: 'amount', op: 'gt', v: '200000' }
+       ],
+       labels: { status: 'Status', amount: 'Order value', vendor: 'Vendor', due: 'Delivery date' },
+       add() { this.conds.push({ id: Date.now(), field: 'vendor', op: 'is', v: '' }) }
+     }"
+     @htmx:before-request.camel="busy = true"
+     @htmx:after-request.camel="busy = false">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" @change="c.v = ''" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="status">Status</option>
+                <option value="vendor">Vendor</option>
+                <option value="amount">Order value</option>
+                <option value="due">Delivery date</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + labels[c.field]"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option value="is">is</option>
+                <option value="not">is not</option>
+                <option value="gt">is over</option>
+                <option value="before">is before</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value for ' + labels[c.field]"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+    </div>
+
+    <div id="fb-h-applied" class="hidden">
+      <template x-for="c in conds" :key="c.id">
+        <input type="hidden" name="f" :value="c.field + ':' + c.op + ':' + c.v">
+      </template>
+      <input type="hidden" name="join" value="and">
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 bg-zinc-100 px-3 py-2.5">
+      <button type="button" @click="add()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+      <button type="button"
+              hx-get="/orders/register/" hx-include="#fb-h-applied input" hx-target="#fb-h-register"
+              hx-swap="outerHTML" hx-sync="this:replace" hx-push-url="true"
+              class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <span x-show="busy" x-cloak aria-hidden="true" class="flex"><i data-lucide="loader-circle" class="size-4 animate-spin"></i></span>
+        Apply
+      </button>
+    </div>
+  </div>
+
+  <div id="fb-h-register" :aria-busy="busy ? 'true' : 'false'"
+       class="mt-3 rounded-xl border border-zinc-200 bg-white transition-opacity motion-reduce:transition-none"
+       :class="busy && 'opacity-60'">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h4 class="text-[13px]/5 font-medium">Matching orders</h4>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500">24 of 1,438 orders match</p>
+    </div>
+    <div class="divide-y divide-zinc-100">
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1187</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Gujarat Polymers Ltd · Silvassa</span>
+        <span class="text-[13px]/5 tabular-nums">₹18,42,000</span>
+      </div>
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1211</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Sharma Extrusions · Silvassa</span>
+        <span class="text-[13px]/5 tabular-nums">₹21,43,000</span>
+      </div>
+      <div class="flex items-center justify-between gap-3 px-3 py-2.5">
+        <span class="text-[13px]/5 font-medium tabular-nums">PO-24-1218</span>
+        <span class="min-w-0 flex-1 truncate text-[12px]/4 text-zinc-500">Nashik Steel Traders · Nashik</span>
+        <span class="text-[13px]/5 tabular-nums">₹12,90,500</span>
+      </div>
+    </div>
+  </div>
+</div>

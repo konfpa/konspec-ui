@@ -1,0 +1,152 @@
+<!-- Roles inherit here: Senior buyer is Buyer plus whatever is added on top,
+     and Purchase head is Senior buyer plus the same. So a cell has three things
+     it can say and not two, and the grid is worth nothing if it cannot tell
+     them apart at a glance.
+
+     Comes with the parent — a locked tick and the words "From Buyer". It is not
+     editable in this column because it is not stored in this column; changing
+     it means opening Buyer, which is what the caption is for. Two kinds of
+     disabled box exist on these screens for two different reasons, and grey
+     says neither, so the reason is in the caption and in the box's accessible
+     name both.
+
+     Added here — a live tick and the words "Set here". This is the only kind of
+     cell in an inheriting column that posts a grant.
+
+     Revoked here — a live empty box, the words to say so, and a hidden field
+     with a name of its own. That field is the whole point of the variant. The
+     first version posted an unticked inheriting cell as simply not-granted,
+     somebody edited Buyer a fortnight later, and the permission came back —
+     because nothing had ever recorded that a person took it away on purpose.
+     An absence cannot carry an intention; a value can.
+
+     Every caption sits in a fixed min-h-4 block so a cell gaining or losing one
+     does not move the row, and the captions are words rather than colour: none
+     of these three is a state the record is in, so none of them takes a dot. -->
+<form data-kui="permission-matrix/inherited" method="post" class="overflow-hidden rounded-xl border border-zinc-300 bg-white">
+  <div class="border-b border-zinc-200 px-4 py-3">
+    <h3 id="pm-i-h" class="text-[14px]/5 font-semibold">Buying roles — what each one inherits and what it overrides</h3>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">3 roles in one chain · 6 permissions · a locked tick is set on the role above and changed there</p>
+  </div>
+
+  <table class="w-full text-[13px]/5" aria-labelledby="pm-i-h">
+    <thead>
+      <tr class="border-b border-zinc-200 text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+        <th scope="col" class="px-4 py-2.5 text-left font-medium">Permission</th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Buyer</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">The base role</span>
+        </th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Senior buyer</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">Inherits Buyer</span>
+        </th>
+        <th scope="col" class="w-36 px-2 py-2.5 font-medium">
+          <span class="block">Purchase head</span>
+          <span class="mt-0.5 block text-[11px]/4 font-normal tracking-normal normal-case text-zinc-500">Inherits Senior buyer</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Raise a purchase order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.raise:buyer" checked aria-label="Raise a purchase order — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Raise a purchase order — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Raise a purchase order — Purchase head, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve up to ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approve5:buyer" aria-label="Approve up to ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approve5:senior" checked aria-label="Approve up to ₹5,00,000 — Senior buyer, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Approve up to ₹5,00,000 — Purchase head, comes with Senior buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Senior buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal tabular-nums">Approve over ₹5,00,000</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:buyer" aria-label="Approve over ₹5,00,000 — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:senior" aria-label="Approve over ₹5,00,000 — Senior buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.approveover:head" checked aria-label="Approve over ₹5,00,000 — Purchase head, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Cancel an approved order</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="po.cancel:buyer" checked aria-label="Cancel an approved order — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Cancel an approved order — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Cancel an approved order — Purchase head, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+      </tr>
+      <tr class="border-b border-zinc-100 hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Change a rate contract</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.rate:buyer" checked aria-label="Change a rate contract — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" checked disabled aria-label="Change a rate contract — Senior buyer, comes with Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 flex min-h-4 items-center justify-center gap-1 text-[11px]/4 text-zinc-500"><i data-lucide="lock" class="size-3 shrink-0"></i>From Buyer</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" aria-label="Change a rate contract — Purchase head, revoked on this role although Buyer grants it" class="size-4 accent-zinc-700">
+          <input type="hidden" name="revoke" value="vm.rate:head">
+          <span class="mt-1 block min-h-4 text-[11px]/4 font-medium text-zinc-900">Revoked here</span>
+        </td>
+      </tr>
+      <tr class="hover:bg-zinc-100">
+        <th scope="row" class="px-4 py-2.5 text-left font-normal">Create a vendor</th>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.create:buyer" aria-label="Create a vendor — Buyer" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500"></span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" name="perm" value="vm.create:senior" checked aria-label="Create a vendor — Senior buyer, set on this role" class="size-4 accent-zinc-700">
+          <span class="mt-1 block min-h-4 text-[11px]/4 text-zinc-500">Set here</span>
+        </td>
+        <td class="px-2 py-2.5 text-center">
+          <input type="checkbox" aria-label="Create a vendor — Purchase head, revoked on this role although Senior buyer grants it" class="size-4 accent-zinc-700">
+          <input type="hidden" name="revoke" value="vm.create:head">
+          <span class="mt-1 block min-h-4 text-[11px]/4 font-medium text-zinc-900">Revoked here</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="hidden" name="scope" value="buyer,senior,head">
+
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-zinc-200 px-4 py-3">
+    <button type="submit" class="inline-flex h-9 shrink-0 items-center rounded-lg border border-transparent bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save the chain</button>
+    <p class="min-w-0 flex-1 text-[12px]/4 tabular-nums text-zinc-500">A revocation is stored as a decision, not as a blank, so editing Buyer later cannot hand back the 2 permissions Purchase head has given up.</p>
+  </div>
+</form>

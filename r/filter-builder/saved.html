@@ -1,0 +1,157 @@
+<!-- A saved view is a stored query and a name, nothing cleverer. Picking one
+     replaces the whole condition set; the count beside the name is what makes
+     the row worth reading before anything is pressed.
+
+     They are a nav of buttons with aria-current, not a tablist and not a
+     radiogroup. A tablist promises panels that switch and arrow keys that own
+     the row, and there are no panels here — there is one register that gets a
+     different query. A radiogroup makes the same promise about arrows and puts
+     four named places behind one tab stop.
+
+     The second state is the reason this variant exists: the view has been
+     edited and the page has to say so in two places. The strip below carries
+     the three answers — write the change into the view, keep the view and make
+     a new one, throw the change away — because they are three different
+     intentions and a single Save picks one of them silently. The word "edited"
+     also goes inside the pill, because the strip scrolls away and the pill does
+     not, and a register whose pill says "Overdue receipts" while the conditions
+     say something else is how a saved view quietly becomes a lie.
+
+     Reset restores every condition the view holds and not only the one that was
+     touched. A view is one query and half of it is not a state anybody asked
+     for.
+
+     The pills sit inside a list, so they are surfaces rather than shapes and
+     step once off the white panel they cross. -->
+<div data-kui="filter-builder/saved" class="max-w-3xl"
+     x-data="{
+       view: 'mine',
+       views: [
+         { id: 'mine', name: 'My open POs', count: 12, conds: [
+           { id: 1, field: 'Status', op: 'is', v: 'Open' },
+           { id: 2, field: 'Raised by', op: 'is', v: 'A Prabhu' }
+         ] },
+         { id: 'late', name: 'Overdue receipts', count: 4, conds: [
+           { id: 1, field: 'Status', op: 'is', v: 'Overdue' },
+           { id: 2, field: 'GRN reference', op: 'is blank', v: '' }
+         ] },
+         { id: 'big', name: 'Above ₹5,00,000', count: 23, conds: [
+           { id: 1, field: 'Order value', op: 'is over', v: '5,00,000' }
+         ] },
+         { id: 'all', name: 'All orders', count: 1438, conds: [] }
+       ],
+       draft: [],
+       init() { this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       get current() { return this.views.find(v => v.id === this.view) },
+       get dirty() { return JSON.stringify(this.draft) !== JSON.stringify(this.current.conds) },
+       pick(id) { this.view = id; this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       reset() { this.draft = JSON.parse(JSON.stringify(this.current.conds)) },
+       save() { this.current.conds = JSON.parse(JSON.stringify(this.draft)) }
+     }">
+
+  <nav aria-label="Saved views">
+    <ul role="list" class="flex flex-wrap items-center gap-1.5">
+      <template x-for="v in views" :key="v.id">
+        <li>
+          <button type="button" @click="pick(v.id)" :aria-current="v.id === view ? 'true' : 'false'"
+                  class="flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px]/5 hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                  :class="v.id === view ? 'bg-zinc-200 font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300' : 'text-zinc-600'">
+            <span x-text="v.name"></span>
+            <span class="tabular-nums text-zinc-500" x-text="v.count.toLocaleString('en-IN')"></span>
+            <span x-show="v.id === view && dirty" x-cloak class="text-[12px]/4 font-medium text-zinc-600">· edited</span>
+          </button>
+        </li>
+      </template>
+    </ul>
+  </nav>
+
+  <div x-show="dirty" x-cloak role="status"
+       class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-zinc-200 bg-white px-3 py-2">
+    <p class="min-w-0 text-[13px]/5 text-zinc-600">
+      <span class="font-medium text-zinc-900" x-text="current.name"></span> has been changed and the change is not saved.
+    </p>
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      <button type="button" @click="save()"
+              class="inline-flex h-8 items-center rounded-lg bg-zinc-700 px-3 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save to this view</button>
+      <button type="button"
+              class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Save as a new view</button>
+      <button type="button" @click="reset()"
+              class="rounded-sm text-[13px]/5 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Reset</button>
+    </div>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Conditions in <span x-text="current.name"></span></h3>
+      <p class="text-[12px]/4 tabular-nums text-zinc-500" x-text="current.count.toLocaleString('en-IN') + ' orders when this view was saved'"></p>
+    </div>
+
+    <div>
+      <template x-for="(c, i) in draft" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>Status</option>
+                <option>Raised by</option>
+                <option>Order value</option>
+                <option>GRN reference</option>
+                <option>Plant</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>is</option>
+                <option>is not</option>
+                <option>is over</option>
+                <option>is blank</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <template x-if="c.op === 'is blank'">
+              <p class="px-0.5 py-1.5 text-[13px]/5 text-zinc-500">This operator takes no value.</p>
+            </template>
+            <template x-if="c.op !== 'is blank'">
+              <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <input type="text" x-model="c.v" :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                       class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none">
+              </div>
+            </template>
+          </div>
+
+          <button type="button" @click="draft.splice(i, 1)"
+                  :aria-label="'Remove condition ' + (i + 1) + ', ' + c.field + ' ' + c.op + ' ' + c.v"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+
+      <p x-show="!draft.length" x-cloak class="px-3 py-4 text-[13px]/5 text-zinc-500">
+        This view holds no conditions. It is the whole register.
+      </p>
+    </div>
+
+    <div class="border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="draft.push({ id: Date.now(), field: 'Status', op: 'is', v: '' })"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+      </button>
+    </div>
+  </div>
+</div>

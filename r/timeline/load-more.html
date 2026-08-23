@@ -1,0 +1,82 @@
+<!-- A vendor master carries four years of amendments and a record page is
+     not the place to walk them. Four entries are drawn, the rest are behind a
+     control, and the control says how many — "18 older entries" rather than
+     "Load more", because on a record with four years behind it the difference
+     between the next three and the next three hundred is what decides whether
+     anybody presses at all.
+
+     Entries append downwards and nothing is ever inserted above what is on
+     screen. Newer entries arrive on a reload; this control only ever extends
+     the strip into the past, so the entry somebody is reading stays where it
+     was put.
+
+     The count is a role="status" that was in the document before the first
+     press, so each batch is announced rather than arriving silently below the
+     fold with the button moving down the page as the only sign.
+
+     Focus is the trap. When the last batch lands the button is removed and
+     replaced by a sentence, and a browser drops focus from a removed element
+     to the body — so the handler moves it to the count, which is tabindex="-1"
+     for exactly that reason and is also the sentence saying what happened.
+
+     What this gives up is the citable URL: there is no page number, so a
+     colleague cannot be sent the strip at the depth it was read to. That is
+     acceptable on a record strip and wrong on the audit screen, which is why
+     that page pages by default. -->
+<div data-kui="timeline/load-more" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       shown: 4, step: 6, total: 22,
+       entries: [
+         { id: 'e01', at: '04 Sep 2026, 14:22', iso: '2026-09-04T14:22+05:30', rel: '2 hours ago', who: 'Meena Iyer', what: 'revised the payment terms from 30 days to 45 days.', dot: 'bg-zinc-500' },
+         { id: 'e02', at: '03 Sep 2026, 17:05', iso: '2026-09-03T17:05+05:30', rel: 'yesterday', who: 'Nilesh Patil', what: 'approved the vendor for the structural steel category.', dot: 'bg-emerald-600' },
+         { id: 'e03', at: '03 Sep 2026, 11:48', iso: '2026-09-03T11:48+05:30', rel: 'yesterday', who: 'Sanjay Rane', what: 'recorded the plant visit of 28 Aug 2026 and attached the assessment.', dot: 'bg-zinc-500' },
+         { id: 'e04', at: '02 Sep 2026, 16:20', iso: '2026-09-02T16:20+05:30', rel: '2 days ago', who: 'Ritu Deshpande', what: 'sent the category approval to the plant head.', dot: 'bg-amber-500' },
+         { id: 'e05', at: '29 Aug 2026, 10:04', iso: '2026-08-29T10:04+05:30', rel: '6 days ago', who: 'Meena Iyer', what: 'updated the bank account after the cancelled cheque was verified.', dot: 'bg-zinc-500' },
+         { id: 'e06', at: '27 Aug 2026, 15:31', iso: '2026-08-27T15:31+05:30', rel: '8 days ago', who: 'Meena Iyer', what: 'recorded the MSME registration, valid to 31 Mar 2027.', dot: 'bg-zinc-500' },
+         { id: 'e07', at: '21 Aug 2026, 09:12', iso: '2026-08-21T09:12+05:30', rel: '2 weeks ago', who: 'Farida Qureshi', what: 'failed lot 26-104 on carbon content and raised a rejection.', dot: 'bg-red-600' },
+         { id: 'e08', at: '18 Aug 2026, 12:40', iso: '2026-08-18T12:40+05:30', rel: '2 weeks ago', who: 'Ritu Deshpande', what: 'renewed rate contract RC-2026-0042 to 31 Mar 2027.', dot: 'bg-zinc-500' },
+         { id: 'e09', at: '11 Aug 2026, 08:22', iso: '2026-08-11T08:22+05:30', rel: '3 weeks ago', who: 'Suresh Kadam', what: 'posted GRN-4712 against PO-2026-0388 in full.', dot: 'bg-emerald-600' },
+         { id: 'e10', at: '04 Aug 2026, 17:58', iso: '2026-08-04T17:58+05:30', rel: 'a month ago', who: 'Meena Iyer', what: 'released the August payment run for this vendor, ₹41,20,000.', dot: 'bg-zinc-500' }
+       ],
+       get visible() { return this.entries.slice(0, this.shown) },
+       more() {
+         const finishes = this.shown + this.step >= this.total;
+         this.shown = Math.min(this.shown + this.step, this.total);
+         if (finishes) this.$nextTick(() => this.$refs.count.focus());
+       }
+     }">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">Sharma Steel &amp; Alloys · history</h2>
+    <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Newest first · older entries are appended below</p>
+  </div>
+
+  <ol role="list" class="px-5 py-4">
+    <template x-for="e in visible" :key="e.id">
+      <li class="group flex gap-3 pb-4 last:pb-0">
+        <span class="flex shrink-0 flex-col items-center" aria-hidden="true">
+          <span class="flex h-5 items-center"><span class="size-1.5 rounded-full" :class="e.dot"></span></span>
+          <span class="w-px flex-1 bg-zinc-200 group-last:hidden"></span>
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px]/5 tabular-nums">
+            <span class="font-medium" x-text="e.who"></span><span x-text="' ' + e.what"></span>
+          </p>
+          <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">
+            <time :datetime="e.iso" x-text="e.at"></time><span x-text="' · ' + e.rel"></span>
+          </p>
+        </div>
+      </li>
+    </template>
+  </ol>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 px-5 py-2.5">
+    <p role="status" x-ref="count" tabindex="-1"
+       class="text-[13px]/5 tabular-nums text-zinc-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+       x-text="shown >= total ? 'All ' + total + ' entries shown' : 'Showing ' + shown + ' of ' + total + ' entries'">Showing 4 of 22 entries</p>
+    <button type="button" x-show="shown &lt; total" x-cloak @click="more()"
+            class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+      <i data-lucide="chevron-down" class="size-4" aria-hidden="true"></i>
+      <span x-text="Math.min(step, total - shown) + ' older entries'">6 older entries</span>
+    </button>
+  </div>
+</div>

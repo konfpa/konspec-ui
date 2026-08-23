@@ -1,0 +1,133 @@
+<!-- A costed bill of material: the hierarchy in the first column and quantity,
+     rate and amount in the rest. This is the shape to reach for when the
+     branches are not headings but records with figures of their own — an
+     accordion or a grouped table cannot do it, because both put the group name
+     on a row of its own shape rather than in the first cell of a row like every
+     other.
+
+     Rows are flat, because a table cannot nest: <tbody> inside <tbody> is not
+     markup. So the whole hierarchy is carried by the attributes —
+     role="treegrid" on the table, aria-level, aria-posinset, aria-setsize and
+     aria-expanded on each row — and by the indent spans in the first cell. Take
+     posinset from the rendered index rather than from the node's siblings and
+     the second child of a branch is announced as 4 of 9.
+
+     A branch's amount is summed from the records under it, recursively, from
+     the same array the child rows paint from. Summing the visible rows instead
+     is how a works order came to show one figure on the manager's screen and
+     another on the storekeeper's: collapse a branch and the total changed. The
+     roll-up survives the collapse precisely because it never looked at what was
+     on screen.
+
+     Rate is blank on a branch, not zero. A sub-assembly has no rate — it has
+     the cost of what is under it — and a 0.00 in a rate column is a number
+     somebody will eventually multiply by something.
+
+     Quantity here is per assembly. The 2 on SA-1155 means the tank takes two of
+     them, so the amounts under it are already multiplied by that 2 and the
+     quantities are not. Say which basis the columns are on in the header, or a
+     buyer reading the rate against the quantity gets a different answer to the
+     one in the amount column.
+
+     The panel scrolls sideways below the width four columns need, and carries
+     the three things that come with that: relative, so the sr-only cell heading
+     cannot escape the clip and widen the page; role="region" with tabindex and
+     a name, because Chromium will not give an overflow container keyboard focus
+     on its own; and a line of text saying so, because there is no gradient and
+     no arrow in this system.
+
+     One tab stop, a roving tabindex on the rows, and the arrow keys move
+     between rows rather than between cells. That is the whole contract only
+     because these cells are read-only figures — put a control in a cell and a
+     treegrid owes the user cell navigation too. -->
+<div data-kui="tree-view/columns" class="overflow-hidden rounded-xl border border-zinc-300 bg-white"
+     x-data="{
+       active: 'fg',
+       open: ['fg', 'shell', 'lid'],
+       nodes: [
+         { id: 'fg',    parent: null,    code: 'FG-2200', name: 'Water tank 1000 L',        qty: '1 no',      rate: null, amount: 0 },
+         { id: 'shell', parent: 'fg',    code: 'SA-1140', name: 'Tank shell assembly',      qty: '1 no',      rate: null, amount: 0 },
+         { id: 'rm01',  parent: 'shell', code: 'RM-3301', name: 'HDPE, blow moulding',      qty: '62.500 kg', rate: 138,  amount: 8625 },
+         { id: 'rm02',  parent: 'shell', code: 'RM-3312', name: 'Masterbatch, blue 2%',     qty: '1.250 kg',  rate: 420,  amount: 525 },
+         { id: 'pt71',  parent: 'shell', code: 'PT-4471', name: 'Outlet boss, brass',       qty: '1 no',      rate: 310,  amount: 310 },
+         { id: 'lid',   parent: 'fg',    code: 'SA-1155', name: 'Lid and gasket assembly',  qty: '2 nos',     rate: null, amount: 0 },
+         { id: 'pt02',  parent: 'lid',   code: 'PT-4402', name: 'Lid, moulded, 400 mm',     qty: '1 no',      rate: 640,  amount: 1280 },
+         { id: 'pt18',  parent: 'lid',   code: 'PT-4418', name: 'Gasket, EPDM 3 mm',        qty: '1 no',      rate: 95,   amount: 190 },
+         { id: 'hw01',  parent: 'fg',    code: 'HW-5501', name: 'Outlet nipple, GI, 1 in',  qty: '1 no',      rate: 210,  amount: 210 },
+         { id: 'pk20',  parent: 'fg',    code: 'PK-6620', name: 'Stretch film, 23 micron',  qty: '0.180 kg',  rate: 165,  amount: 30 }
+       ],
+       by(id) { return this.nodes.find(n => n.id === id) },
+       kids(id) { return this.nodes.filter(n => n.parent === id) },
+       level(n) { let d = 1, p = n.parent; while (p) { d++; p = this.by(p).parent } return d },
+       sibs(n) { return this.nodes.filter(x => x.parent === n.parent) },
+       pos(n) { return this.sibs(n).findIndex(x => x.id === n.id) + 1 },
+       isOpen(n) { return this.open.includes(n.id) },
+       shown(n) { let p = n.parent; while (p) { if (!this.open.includes(p)) return false; p = this.by(p).parent } return true },
+       get rows() { return this.nodes.filter(n => this.shown(n)) },
+       roll(n) { const k = this.kids(n.id); return k.length ? k.reduce((s, c) => s + this.roll(c), 0) : n.amount },
+       money(v) { return '₹' + v.toLocaleString('en-IN') },
+       go(id) { this.active = id; this.$nextTick(() => this.$root.querySelector('#tv-c-' + id).focus()) },
+       openIt(n) { if (!this.isOpen(n)) this.open = [...this.open, n.id] },
+       close(n) { this.open = this.open.filter(x => x !== n.id); if (!this.shown(this.by(this.active))) this.go(n.id) },
+       step(d) { const r = this.rows, i = r.findIndex(n => n.id === this.active), j = i + d; if (j >= 0 && j < r.length) this.go(r[j].id) },
+       right(n) { if (!this.kids(n.id).length) return; if (!this.isOpen(n)) { this.openIt(n) } else { this.go(this.kids(n.id)[0].id) } },
+       left(n) { if (this.kids(n.id).length && this.isOpen(n)) { this.close(n) } else if (n.parent) { this.go(n.parent) } }
+     }">
+  <div class="flex items-baseline justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+    <h3 class="min-w-0 truncate text-[13px]/5 font-medium">Costed bill of material — FG-2200, rev 4</h3>
+    <p class="shrink-0 text-[12px]/4 tabular-nums text-zinc-600" x-text="money(roll(by('fg'))) + ' per tank'">₹11,170 per tank</p>
+  </div>
+
+  <div role="region" tabindex="0" aria-label="Costed bill of material, scrolls sideways"
+       class="relative overflow-x-auto focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+    <table role="treegrid" aria-label="Costed bill of material for FG-2200" class="w-full min-w-[560px] text-[13px]/5"
+           @keydown.down.prevent="step(1)"
+           @keydown.up.prevent="step(-1)"
+           @keydown.right.prevent="right(by(active))"
+           @keydown.left.prevent="left(by(active))"
+           @keydown.home.prevent="go(rows[0].id)"
+           @keydown.end.prevent="go(rows[rows.length - 1].id)">
+      <thead>
+        <tr class="border-b border-zinc-200 bg-zinc-50 text-left text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">
+          <th scope="col" class="px-3 py-2.5 font-medium">Component</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium whitespace-nowrap">Qty per assembly</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium">Rate</th>
+          <th scope="col" class="px-3 py-2.5 text-right font-medium">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="n in rows" :key="n.id">
+          <tr :id="'tv-c-' + n.id" :tabindex="active === n.id ? 0 : -1"
+              :aria-level="level(n)" :aria-setsize="sibs(n).length" :aria-posinset="pos(n)"
+              x-effect="kids(n.id).length ? $el.setAttribute('aria-expanded', isOpen(n)) : $el.removeAttribute('aria-expanded')"
+              @click="go(n.id)"
+              class="border-b border-zinc-100 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <td class="py-1.5 pr-3 pl-3">
+              <span class="flex min-h-6 items-center">
+                <template x-for="i in level(n) - 1" :key="i"><span aria-hidden="true" class="w-6 shrink-0"></span></template>
+                <span aria-hidden="true" @click.stop="kids(n.id).length && (isOpen(n) ? close(n) : openIt(n)); go(n.id)"
+                      class="flex size-6 shrink-0 items-center justify-center text-zinc-500">
+                  <template x-if="kids(n.id).length">
+                    <span class="flex transition-transform motion-reduce:transition-none" :class="isOpen(n) && 'rotate-90'"><i data-lucide="chevron-right" class="size-4"></i></span>
+                  </template>
+                </span>
+                <span class="ml-2 min-w-0 truncate"><span class="font-medium tabular-nums" x-text="n.code"></span> <span class="text-zinc-600" x-text="n.name"></span></span>
+              </span>
+            </td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="n.qty"></td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap text-zinc-600" x-text="n.rate === null ? '—' : money(n.rate)"></td>
+            <td class="px-3 py-1.5 text-right tabular-nums whitespace-nowrap" :class="kids(n.id).length && 'font-medium'" x-text="money(roll(n))"></td>
+          </tr>
+        </template>
+      </tbody>
+      <tfoot>
+        <tr class="bg-zinc-50">
+          <th scope="row" colspan="3" class="px-3 py-2.5 text-left text-[12px]/4 font-medium">Material cost per tank</th>
+          <td class="px-3 py-2.5 text-right text-[13px]/5 font-medium tabular-nums whitespace-nowrap" x-text="money(roll(by('fg')))">₹11,170</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <p class="border-t border-zinc-200 px-4 py-2 text-[12px]/4 text-zinc-500">Four columns below 560px: the table scrolls sideways inside this panel. Up and down walk the rows, right and left open and close a sub-assembly.</p>
+</div>

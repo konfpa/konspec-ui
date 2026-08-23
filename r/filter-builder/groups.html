@@ -1,0 +1,166 @@
+<!-- Two levels and no more. Conditions inside a group, groups joined to each
+     other, and that is the last Add group button this component will ever have.
+
+     The reason is the limit of the shape rather than a preference. Two levels
+     covers every query anybody has actually brought to this — open orders from
+     these three vendors OR anything over ₹10,00,000, at Silvassa, due this
+     month — and a third is where a filter stops being a form and becomes a
+     query language, which needs precedence rules, brackets somebody can see,
+     and a way to read the whole thing back. A row of selects has none of those.
+     Where the third level is genuinely needed, the honest answer is a saved
+     report written by somebody who can read SQL, and the panel says so at the
+     foot rather than growing another button.
+
+     So there is no Add group inside a group. The control exists once, at the
+     outer level, and its absence inside the band is the whole enforcement.
+
+     Each group is a real fieldset with a legend that names it and its joiner —
+     "Group 1, any of these" — because a screen reader hearing nine selects in a
+     row has nothing to tell it that four of them are bracketed.
+
+     The group band is bg-zinc-50, a band recessed inside the white panel, so
+     the nesting is one step of fill rather than a second border inside a
+     border. -->
+<div data-kui="filter-builder/groups" class="max-w-3xl"
+     x-data="{
+       nextG: 3, nextC: 7, outer: 'and',
+       fields: [['status', 'Status'], ['vendor', 'Vendor'], ['plant', 'Plant'], ['amount', 'Order value'], ['due', 'Delivery date']],
+       groups: [
+         { id: 1, join: 'or', conds: [
+           { id: 1, field: 'vendor', op: 'is', v: 'Gujarat Polymers Ltd' },
+           { id: 2, field: 'vendor', op: 'is', v: 'Sharma Extrusions' },
+           { id: 3, field: 'amount', op: 'is over', v: '10,00,000' }
+         ] },
+         { id: 2, join: 'and', conds: [
+           { id: 4, field: 'plant', op: 'is', v: 'Silvassa' },
+           { id: 5, field: 'status', op: 'is not', v: 'Closed' },
+           { id: 6, field: 'due', op: 'is before', v: '31 Aug 2026' }
+         ] }
+       ],
+       label(id) { const f = this.fields.find(x => x[0] === id); return f ? f[1] : id },
+       sentence(c) { return this.label(c.field) + ' ' + c.op + ' ' + (c.v || 'nothing yet') },
+       addCond(g) {
+         const c = { id: this.nextC++, field: 'status', op: 'is', v: '' };
+         g.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-g-f-' + c.id).focus());
+       },
+       addGroup() {
+         const g = { id: this.nextG++, join: 'and', conds: [{ id: this.nextC++, field: 'status', op: 'is', v: '' }] };
+         this.groups.push(g);
+         this.$nextTick(() => document.getElementById('fb-g-f-' + g.conds[0].id).focus());
+       },
+       removeCond(g, i) { g.conds.splice(i, 1); if (!g.conds.length) this.groups = this.groups.filter(x => x !== g) },
+       removeGroup(gi) { this.groups.splice(gi, 1) }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Purchase orders matching every group below</h3>
+    </div>
+
+    <div class="space-y-2 p-3">
+      <template x-for="(g, gi) in groups" :key="g.id">
+        <div>
+          <div x-show="gi > 0" x-cloak class="flex items-center gap-2 py-1.5">
+            <span class="text-[12px]/4 font-medium tracking-wider text-zinc-600 uppercase" x-text="outer"></span>
+            <span class="flex-1 border-t border-zinc-200" aria-hidden="true"></span>
+          </div>
+
+          <fieldset class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 pt-2 pb-3">
+            <legend class="px-1 text-[12px]/4 text-zinc-600">
+              Group <span class="tabular-nums" x-text="gi + 1"></span>, <span x-text="g.join === 'or' ? 'any of these' : 'all of these'"></span>
+            </legend>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
+              <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                <select x-model="g.join" :aria-label="'Join every condition in group ' + (gi + 1) + ' with'"
+                        class="block w-full min-w-0 appearance-none bg-transparent py-1 pr-7 pl-2 text-[12px]/4 outline-none">
+                  <option value="and">Match all of these</option>
+                  <option value="or">Match any of these</option>
+                </select>
+                <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-zinc-600">
+                  <i data-lucide="chevron-down" class="size-3"></i>
+                </span>
+              </div>
+              <button type="button" @click="removeGroup(gi)" :aria-label="'Remove group ' + (gi + 1)"
+                      class="inline-flex h-7 items-center gap-1.5 rounded-lg px-2 text-[12px]/4 font-medium text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <i data-lucide="trash-2" class="size-3.5"></i>Remove group
+              </button>
+            </div>
+
+            <div class="space-y-2">
+              <template x-for="(c, ci) in g.conds" :key="c.id">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="w-10 shrink-0 text-[12px]/4 text-zinc-500" x-text="ci === 0 ? 'Where' : g.join"></span>
+
+                  <div class="min-w-0 flex-1 basis-32">
+                    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <select :id="'fb-g-f-' + c.id" x-model="c.field"
+                              :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', field'"
+                              class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                        <template x-for="f in fields" :key="f[0]">
+                          <option :value="f[0]" x-text="f[1]"></option>
+                        </template>
+                      </select>
+                      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                        <i data-lucide="chevron-down" class="size-3.5"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1 basis-28">
+                    <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <select x-model="c.op" :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', operator for ' + label(c.field)"
+                              class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                        <option value="is">is</option>
+                        <option value="is not">is not</option>
+                        <option value="is over">is over</option>
+                        <option value="is before">is before</option>
+                      </select>
+                      <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                        <i data-lucide="chevron-down" class="size-3.5"></i>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1 basis-44">
+                    <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+                      <input type="text" x-model="c.v" placeholder="Type a value"
+                             :aria-label="'Group ' + (gi + 1) + ', condition ' + (ci + 1) + ', value for ' + label(c.field)"
+                             class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+                    </div>
+                  </div>
+
+                  <button type="button" @click="removeCond(g, ci)"
+                          :aria-label="'Remove group ' + (gi + 1) + ' condition ' + (ci + 1) + ', ' + sentence(c)"
+                          class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                    <i data-lucide="x" class="size-4"></i>
+                  </button>
+                </div>
+              </template>
+            </div>
+
+            <button type="button" @click="addCond(g)"
+                    class="mt-2 inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition to this group
+            </button>
+          </fieldset>
+        </div>
+      </template>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-zinc-200 px-3 py-2.5">
+      <button type="button" @click="addGroup()"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add group
+      </button>
+      <p class="min-w-0 text-[12px]/4 tabular-nums text-zinc-500">
+        <span x-text="groups.length"></span> groups, joined with <span class="font-medium text-zinc-700" x-text="outer"></span>. A group cannot hold another group.
+      </p>
+    </div>
+  </div>
+
+  <p class="mt-2 text-[12px]/4 text-zinc-500">
+    A question that needs a third level is a saved report. Ask Reporting for one rather than nesting further — this builder has no way to draw the brackets.
+  </p>
+</div>

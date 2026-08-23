@@ -1,0 +1,52 @@
+<!-- A history has two empties and collapsing them into "No activity" is the
+     defect. The first record has genuinely had nothing happen to it yet and
+     the sentence says what will put the first entry there; the second has
+     twenty-two entries and a filter is hiding all of them, and the only
+     useful control is the one that drops the filter.
+
+     Both are empty-state's compact shape rather than a full-size one, because
+     this is a region inside a record page and not the whole screen — a
+     size-10 well and a 36px button is more vertical space than a section
+     footer has. What is not dropped is the distinction between them.
+
+     The panel heading stays and the empty sentence sits under it as a
+     paragraph rather than a second heading. A heading inside a 110px box adds
+     a level to the outline nobody navigates by.
+
+     The count line is still a role="status" and still says zero in words. A
+     region that empties itself when a filter changes and says nothing has
+     told a screen-reader user that the page stopped responding. -->
+<div data-kui="timeline/empty" class="grid max-w-3xl gap-4 sm:grid-cols-2">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0433 · history</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">No entries yet</p>
+    </div>
+    <div class="flex flex-col items-center px-5 py-8 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="history" class="size-4 text-zinc-600" aria-hidden="true"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">Nothing has happened to this order</p>
+      <p class="mt-0.5 text-[12px]/4 text-zinc-500">It is still a draft. The first entry lands here when it is submitted for approval.</p>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="border-b border-zinc-200 px-5 py-3">
+      <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+      <p role="status" class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">0 of 22 entries · notes</p>
+    </div>
+    <div class="flex flex-col items-center px-5 py-8 text-center">
+      <span class="flex size-8 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="filter-x" class="size-4 text-zinc-600" aria-hidden="true"></i>
+      </span>
+      <p class="mt-2 text-[13px]/5 font-medium">No notes on this order</p>
+      <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-500">Twenty-two other entries are hidden by the filter — approvals, amendments and receipts.</p>
+      <button type="button"
+              class="mt-2 rounded text-[12px]/4 font-medium text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+        Show every kind of event
+      </button>
+    </div>
+  </div>
+</div>

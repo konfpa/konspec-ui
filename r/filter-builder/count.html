@@ -1,0 +1,88 @@
+<!-- The count is the only feedback this component gives and it is worthless
+     unless it says what it is counting out of. "24 orders" after an Apply does
+     not tell a buyer whether the query was sharp or whether the register is
+     quiet this month; "24 of 1,438 orders" does.
+
+     With no conditions in force the line stops being a fraction. "1,438 of
+     1,438" reads as a filter still on and somebody goes looking for it.
+
+     The third state is the one that has to be drawn separately: a result larger
+     than the register will ever put on screen. 18,204 rows behind a page of 50
+     is a query that has narrowed nothing, and reporting it in the same sentence
+     as a working count is how a user reads a broken filter as a good one. The
+     line says both figures, names the condition that is not cutting anything,
+     and offers the two narrowings the register knows how to suggest.
+
+     The warning mark is amber-700 because it is a 1.5px stroke and not a disc —
+     a 6px dot at that meaning is amber-500, and the two shades are the same
+     meaning at two weights. Nothing here takes a tinted field behind the text:
+     the alert rule holds, and a full-width amber band over a count shouts
+     louder than the count deserves.
+
+     All three lines are the same role="status" element rather than three that
+     appear and disappear. A live region that is rendered when its message
+     changes has not changed and is announced to nobody. -->
+<div data-kui="filter-builder/count" class="max-w-3xl space-y-3"
+     x-data="{
+       state: 'narrow',
+       total: 1438, page: 50,
+       counts: { none: 1438, narrow: 24, wide: 18204 },
+       get n() { return this.counts[this.state] },
+       get line() {
+         if (this.state === 'none') return this.total.toLocaleString('en-IN') + ' orders';
+         return this.n.toLocaleString('en-IN') + ' of ' + this.total.toLocaleString('en-IN') + ' orders match';
+       }
+     }">
+
+  <div role="group" aria-label="Preview a result size" class="flex flex-wrap items-center gap-2">
+    <button type="button" @click="state = 'none'" :aria-pressed="state === 'none'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Nothing filtered</button>
+    <button type="button" @click="state = 'narrow'" :aria-pressed="state === 'narrow'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">A sharp query</button>
+    <button type="button" @click="state = 'wide'" :aria-pressed="state === 'wide'"
+            class="inline-flex h-8 items-center rounded-lg border border-zinc-300 bg-white px-3 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">A query across every plant</button>
+  </div>
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Purchase order register</h3>
+      <p role="status" class="text-[12px]/4 font-medium tabular-nums text-zinc-700" x-text="line"></p>
+    </div>
+
+    <div class="px-3 py-2.5">
+      <p x-show="state === 'none'" x-cloak class="text-[13px]/5 tabular-nums text-zinc-600">
+        Every order across Silvassa, Nashik and Vadodara, in FY 2026–27. Add a condition to cut it.
+      </p>
+
+      <p x-show="state === 'narrow'" class="text-[13px]/5 tabular-nums text-zinc-600">
+        Three conditions in force. The register draws all 24 on one page, so what is on screen is the whole answer.
+      </p>
+
+      <div x-show="state === 'wide'" x-cloak class="flex items-start gap-2.5">
+        <i data-lucide="alert-triangle" class="mt-0.5 size-4 shrink-0 text-amber-700"></i>
+        <div class="min-w-0">
+          <p class="text-[13px]/5 font-medium tabular-nums">18,204 orders match and the register draws 50 at a time</p>
+          <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">
+            That is more rows than there are in FY 2026–27, so the conditions are reaching back through earlier years. <span class="font-medium text-zinc-900">Delivery date is after 01 Apr 2020</span> is not cutting anything — every open order passes it.
+          </p>
+          <div class="mt-2.5 flex flex-wrap items-center gap-2">
+            <button type="button"
+                    class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Add: raised in FY 2026–27 <span class="pl-1.5 text-zinc-500">1,438</span>
+            </button>
+            <button type="button"
+                    class="inline-flex h-8 items-center rounded-lg border border-zinc-200 bg-white px-3 text-[13px]/5 font-medium tabular-nums hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+              Add: plant is Silvassa <span class="pl-1.5 text-zinc-500">612</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-zinc-200 bg-zinc-50 px-3 py-2">
+      <p class="text-[12px]/4 tabular-nums text-zinc-500">
+        An export of this query writes every matching row, not the 50 on screen. The count above is what it will contain.
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<!-- An unfiltered register and a builder with nothing in it, which is the
+     state the component opens in on a screen nobody has saved a view for.
+
+     It is the empty-state shape and not a bare Add condition button, because
+     the question the user has at this moment is not "how do I add a row" — the
+     button says that — but "what can I ask about". So the well, the sentence
+     and then three conditions a buyer actually writes, each of which composes
+     itself when pressed and lands focus in the row it made.
+
+     The count line says the whole register rather than a fraction of itself.
+     "1,438 of 1,438 orders" reads as a filter that is still on and somebody
+     will go looking for it.
+
+     There is no create action here in any state. A register with no conditions
+     is showing everything, and a New order button under a screen somebody is
+     about to filter is how the same order gets raised twice — the same rule
+     empty-state draws for a filtered register, and it is sharper here because
+     the builder is on screen precisely when nothing is known yet.
+
+     The suggested conditions are buttons and not links: they compose a query in
+     place, they do not navigate, and each one names the count it would produce
+     so pressing one is not a guess. -->
+<div data-kui="filter-builder/empty" class="max-w-3xl"
+     x-data="{
+       conds: [],
+       total: 1438,
+       suggestions: [
+         { label: 'Open orders over ₹1,00,000', count: 212, cond: { field: 'Order value', op: 'is over', v: '1,00,000' } },
+         { label: 'Overdue at Silvassa', count: 17, cond: { field: 'Status', op: 'is', v: 'Overdue' } },
+         { label: 'Raised by me this quarter', count: 46, cond: { field: 'Raised by', op: 'is', v: 'A Prabhu' } }
+       ],
+       use(s) {
+         const c = Object.assign({ id: Date.now() }, s.cond);
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-e-f-' + c.id).focus());
+       },
+       add() {
+         const c = { id: Date.now(), field: 'Status', op: 'is', v: '' };
+         this.conds.push(c);
+         this.$nextTick(() => document.getElementById('fb-e-f-' + c.id).focus());
+       }
+     }">
+
+  <div class="rounded-xl border border-zinc-300 bg-white">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200 px-3 py-2.5">
+      <h3 class="text-[13px]/5 font-medium">Filter purchase orders</h3>
+      <p role="status" class="text-[12px]/4 tabular-nums text-zinc-500"
+         x-text="conds.length ? 'Conditions are being written — nothing is applied yet' : total.toLocaleString('en-IN') + ' orders, nothing filtered'"></p>
+    </div>
+
+    <div x-show="!conds.length" class="px-6 py-10 text-center">
+      <span class="mx-auto flex size-10 items-center justify-center rounded-full bg-zinc-200 ring-1 ring-inset ring-zinc-300">
+        <i data-lucide="list-filter" class="size-5 text-zinc-600"></i>
+      </span>
+      <h4 class="mt-3 text-[16px]/6 font-semibold">No conditions yet</h4>
+      <p class="mx-auto mt-1 max-w-md text-[13px]/5 tabular-nums text-zinc-600">
+        The register is showing all 1,438 purchase orders across Silvassa, Nashik and Vadodara. A condition is a field, an operator and a value; add as many as the question needs.
+      </p>
+
+      <div class="mt-4 flex justify-center">
+        <button type="button" @click="add()"
+                class="inline-flex h-9 items-center gap-2 rounded-lg bg-zinc-700 px-4 text-[13px]/5 font-medium text-white hover:bg-zinc-800 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4"></i>Add a condition
+        </button>
+      </div>
+
+      <div class="mx-auto mt-6 max-w-md border-t border-zinc-100 pt-4">
+        <p class="text-[11px]/4 font-medium tracking-wider text-zinc-600 uppercase">Or start from one of these</p>
+        <ul role="list" class="mt-2 space-y-1">
+          <template x-for="s in suggestions" :key="s.label">
+            <li>
+              <button type="button" @click="use(s)"
+                      class="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+                <span class="min-w-0 truncate" x-text="s.label"></span>
+                <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500" x-text="s.count + ' orders'"></span>
+              </button>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </div>
+
+    <div x-show="conds.length" x-cloak>
+      <template x-for="(c, i) in conds" :key="c.id">
+        <div class="flex flex-wrap items-center gap-2 border-b border-zinc-100 px-3 py-2.5 last:border-0">
+          <span class="w-14 shrink-0 text-[12px]/4 text-zinc-500" x-text="i === 0 ? 'Where' : 'and'"></span>
+
+          <div class="min-w-0 flex-1 basis-36">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select :id="'fb-e-f-' + c.id" x-model="c.field" :aria-label="'Condition ' + (i + 1) + ', field'"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>Status</option>
+                <option>Vendor</option>
+                <option>Order value</option>
+                <option>Raised by</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-28">
+            <div class="relative rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <select x-model="c.op" :aria-label="'Condition ' + (i + 1) + ', operator for ' + c.field"
+                      class="block w-full min-w-0 appearance-none bg-transparent py-1.5 pr-8 pl-2.5 text-[13px]/5 outline-none">
+                <option>is</option>
+                <option>is not</option>
+                <option>is over</option>
+              </select>
+              <span aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-600">
+                <i data-lucide="chevron-down" class="size-3.5"></i>
+              </span>
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1 basis-44">
+            <div class="rounded-lg border border-zinc-200 bg-white focus-within:border-zinc-700 focus-within:outline-3 focus-within:outline-offset-2 focus-within:outline-zinc-700/15">
+              <input type="text" x-model="c.v" placeholder="Type a value"
+                     :aria-label="'Condition ' + (i + 1) + ', value for ' + c.field"
+                     class="block w-full min-w-0 bg-transparent px-2.5 py-1.5 text-[13px]/5 tabular-nums outline-none placeholder:text-zinc-500">
+            </div>
+          </div>
+
+          <button type="button" @click="conds.splice(i, 1)" :aria-label="'Remove condition ' + (i + 1)"
+                  class="ml-auto flex size-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="x" class="size-4"></i>
+          </button>
+        </div>
+      </template>
+
+      <div class="border-t border-zinc-200 px-3 py-2.5">
+        <button type="button" @click="add()"
+                class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[13px]/5 font-medium hover:bg-zinc-200 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
+          <i data-lucide="plus" class="size-4 text-zinc-600"></i>Add condition
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

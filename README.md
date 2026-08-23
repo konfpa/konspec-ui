@@ -10,8 +10,8 @@
 **A component library for internal data applications — written for the agents that build them.**
 
 [![CI](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/konfpa/konspec-ui/actions/workflows/ci.yml)
-[![components](https://img.shields.io/badge/components-74-18181b?style=flat-square)](#components)
-[![variants](https://img.shields.io/badge/variants-860-18181b?style=flat-square)](#components)
+[![components](https://img.shields.io/badge/components-78-18181b?style=flat-square)](#components)
+[![variants](https://img.shields.io/badge/variants-916-18181b?style=flat-square)](#components)
 [![build step](https://img.shields.io/badge/build_step-none-18181b?style=flat-square)](#running-it-locally)
 [![licence](https://img.shields.io/badge/licence-MIT-18181b?style=flat-square)](LICENSE)
 
@@ -47,7 +47,7 @@ it got a silently truncated response in which the components above the cut
 looked complete and the ones below it looked absent. It now returns the table
 above instead.
 
-`llms.txt` is 54 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
+`llms.txt` is 55 KB and written to be read in full. It carries the rules that break things when ignored, the seven type sizes, the surface and text tokens, the locked status mapping, and the closed list of components with their variant ids. Because it lists those ids, an agent that has read it can build any `r/<id>/<variant>.html` URL directly and never needs an index: one read, then a few small ones.
 
 Copy the HTML **verbatim**, then edit the copy. Do not reconstruct a component from its description — the descriptions exist to tell you which one to fetch, not what it looks like.
 
@@ -78,7 +78,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 <!-- components:start -->
 ## Components
 
-**74 components · 860 variants · 74 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**78 components · 916 variants · 78 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -105,6 +105,7 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Attachment | `attachment` | 13 | [open](https://konfpa.github.io/konspec-ui/components/attachment.html) |
 | Calendar | `calendar` | 14 | [open](https://konfpa.github.io/konspec-ui/components/calendar.html) |
 | Questionnaire | `questionnaire` | 14 | [open](https://konfpa.github.io/konspec-ui/components/questionnaire.html) |
+| Filter builder | `filter-builder` | 14 | [open](https://konfpa.github.io/konspec-ui/components/filter-builder.html) |
 
 ### Data display
 
@@ -120,6 +121,9 @@ Every rule in `llms.txt` exists because breaking it produced a visible defect at
 | Skeleton | `skeleton` | 15 | [open](https://konfpa.github.io/konspec-ui/components/skeleton.html) |
 | Marker | `marker` | 14 | [open](https://konfpa.github.io/konspec-ui/components/marker.html) |
 | Spinner | `spinner` | 14 | [open](https://konfpa.github.io/konspec-ui/components/spinner.html) |
+| Timeline | `timeline` | 15 | [open](https://konfpa.github.io/konspec-ui/components/timeline.html) |
+| Permission matrix | `permission-matrix` | 13 | [open](https://konfpa.github.io/konspec-ui/components/permission-matrix.html) |
+| Tree view | `tree-view` | 14 | [open](https://konfpa.github.io/konspec-ui/components/tree-view.html) |
 
 ### Feedback
 
@@ -206,7 +210,7 @@ node tools/build.js --check    # fail if the generated files are stale
 node tools/sweep.js            # load every page in a browser and check it runs
 ```
 
-`build.js` reads the markup and is plain Node with no dependencies. `sweep.js` reads the rendered page — it opens all 75 pages in headless Chromium at 1280px and again at 390px, and fails on a console error, an icon that never hydrated, an element still cloaked after Alpine booted, a control that draws no focus outline, or a page wider than the phone. It needs `npm ci` and `npx playwright install chromium` first; nothing this repo publishes does.
+`build.js` reads the markup and is plain Node with no dependencies. `sweep.js` reads the rendered page — it opens all 79 pages in headless Chromium at 1280px and again at 390px, and fails on a console error, an icon that never hydrated, an element still cloaked after Alpine booted, a control that draws no focus outline, or a page wider than the phone. It needs `npm ci` and `npx playwright install chromium` first; nothing this repo publishes does.
 
 Never hand-edit a generated file. The landing page and the component pages render from the same two sources, so a component only has to be described once.
 

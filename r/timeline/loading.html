@@ -1,0 +1,68 @@
+<!-- The marker column is the thing to get right. It is a column of its own
+     and the eye reads down it, so a skeleton whose dots sit at a different x
+     from the real ones moves every line of text sideways when the data lands —
+     the one axis nobody thinks to check.
+
+     The dot is drawn as a real size-1.5 disc in the same flex h-5 items-center
+     box the loaded strip uses, not as a grey block: at six pixels a block and
+     a disc are the same shape, and keeping the box is what keeps the x. It is
+     zinc-300 rather than a status colour, which says the state is not known
+     yet without claiming one — a skeleton with an emerald dot in it has
+     guessed that the order was received.
+
+     The rail is drawn too, in the same zinc-200, because it is the strongest
+     line in the region and a strip that grows one when the entries arrive
+     reads as the layout shifting rather than as content filling in.
+
+     Each row is a 20px line, mt-0.5 and a 16px second line inside pb-4, which
+     is the loaded entry exactly. The panel is aria-busy, the pulse is
+     motion-reduce:animate-none, and the one thing announced is a role="status"
+     saying what is loading — the bars themselves are aria-hidden. -->
+<div data-kui="timeline/loading" class="max-w-2xl overflow-hidden rounded-xl border border-zinc-300 bg-white" aria-busy="true">
+  <div class="border-b border-zinc-200 px-5 py-3">
+    <h2 class="text-[14px]/5 font-semibold tabular-nums">PO-2026-0418 · history</h2>
+    <p role="status" class="sr-only">Loading the history for PO-2026-0418</p>
+  </div>
+
+  <div class="animate-pulse px-5 py-4 motion-reduce:animate-none" aria-hidden="true">
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-full rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-40 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-3/4 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-36 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3 pb-4">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+        <span class="w-px flex-1 bg-zinc-200"></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-5/6 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-44 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+    <div class="group flex gap-3">
+      <span class="flex shrink-0 flex-col items-center">
+        <span class="flex h-5 items-center"><span class="size-1.5 rounded-full bg-zinc-300"></span></span>
+      </span>
+      <div class="min-w-0 flex-1">
+        <div class="flex h-5 items-center"><div class="h-2.5 w-2/3 rounded bg-zinc-200"></div></div>
+        <div class="mt-0.5 flex h-4 items-center"><div class="h-2 w-32 rounded bg-zinc-200"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
