@@ -29,6 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The published site, which had been stuck on the previous version.** GitHub
+  Pages runs Jekyll unless told not to, Liquid claims the same `{% %}`
+  delimiters Django does, and a changelog entry that quoted a Django tag in
+  prose was a Liquid syntax error — so every deploy since the 0.4.0 release
+  failed and the live site went on serving 0.3.0. A `.nojekyll` file turns the
+  whole stage off; the pages are static HTML and never needed it.
 - The landing page's type-scale column was 599px wide at 390px and took the
   whole page out to 648px. A grid item will not shrink below its min-content
   without `min-w-0`, and the specimen row sets its own font size.

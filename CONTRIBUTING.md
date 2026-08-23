@@ -76,6 +76,12 @@ node tools/sweep.js select     # or just the one you are working on
 `serve.py` exists only to send `charset=utf-8`; `python -m http.server` defaults
 to windows-1252 and turns every em dash into `â€"`.
 
+`.nojekyll` is why the site publishes at all. GitHub Pages runs Jekyll by
+default, Liquid uses the same `{% %}` delimiters Django does, and this repo
+writes Django tags in prose — one `{% if %}` in a changelog entry took the whole
+deploy down and left the live site on the previous version. Nothing here needs
+Jekyll: the pages are static HTML that Pages should serve untouched.
+
 There is no npm install and no build step for *consumers*, and `tools/build.js`
 is still plain Node with no dependencies. The `npm ci` above buys one thing: a
 browser for `tools/sweep.js`. Nothing this repo publishes needs it.
