@@ -227,6 +227,7 @@ keeping it to yourself in one screen.
 - **Timeline** `timeline` — What happened to one record, in order — the history strip on a purchase order, the audit trail on a vendor master, the QC events on a batch. Each entry is an actor, a verb, a time, and where it matters what the value was before. Variants: default, dense, grouped, changes, status, comment, system, pending, load-more, filter, inline, empty, loading, htmx, django.
 - **Permission matrix** `permission-matrix` — A grid of roles down one axis and permissions down the other, with the granted cell as a real checkbox. The screen an admin uses to say who may approve a purchase order over ₹5,00,000. Variants: default, scroll, groups, inherited, readonly, compare, dirty, phone, empty, loading, failed, htmx, django.
 - **Tree view** `tree-view` — Records that nest, drawn as rows that expand to reveal the rows underneath them. A bill of material exploded into its sub-assemblies, a chart of accounts, a plant broken down to the bin — every row still a record with its own code and its own figures. Variants: default, guides, expand-all, keyboard, selection, columns, lazy, search, actions, status, empty, phone, htmx, django.
+- **Log** `log` — A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits. Variants: default, streaming, levels.
 
 ### Feedback
 
@@ -292,7 +293,7 @@ thing that answers the question.
 
 | endpoint | size | cost | what it is |
 |---|---|--:|---|
-| [r/index.json](r/index.json) | 144 KB | ~41k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
+| [r/index.json](r/index.json) | 145 KB | ~41k tokens | The spec and every component summarised, with variant ids. No markup. The largest thing you are ever asked to fetch whole. |
 | `r/<id>.json` | median 17 KB, largest 27 KB (`sidebar`) | ~5k tokens / ~8k tokens | One component: rules, anatomy, behaviour, accessibility, and the id and name of every variant. No markup. |
 | `r/<id>/<variant>.html` | median 6 KB, largest 45 KB (`app-shell/default`) | ~2k tokens / ~13k tokens | The markup, raw. No JSON envelope, no escaping, paste as-is. |
 | `r/<id>.full.json` | median 99 KB, largest 189 KB (`search-page`) | ~28k tokens / ~54k tokens | The component and every variant's html in one file — what `r/<id>.json` used to be. Back-compat; you want the two rows above. |
@@ -303,7 +304,7 @@ file you can build a variant URL yourself and skip r/index.json entirely:
 `GET /r/button/variants.html` returns the markup for button/variants and nothing
 else. That is the common path — one read of llms.txt, then a few small ones.
 
-Read the ids; do not guess them. Only 44 of the 78 components have a variant
+Read the ids; do not guess them. Only 45 of the 79 components have a variant
 called `default`, and 34 do not, so a guessed URL is a 404 rather
 than a fallback. The ids are listed above precisely because they are not
 predictable from the component name.

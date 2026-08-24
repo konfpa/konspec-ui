@@ -1,0 +1,72 @@
+{
+  "id": "log",
+  "name": "Log",
+  "category": "data",
+  "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits.",
+  "when_to_use": "Something is producing lines over time and the reader's question is \"what is it doing right now / what did it just do\" — an import running, a deploy, a background job, a device's console. Reach for timeline instead the moment the lines are discrete business events with an actor and a verb (approved, amended, received): a timeline is a handful of sentences about a record, this is hundreds of raw lines a process wrote. Reach for table when the lines are really rows to be sorted and filtered — a delivery log an admin searches by status code is a table with a mono column, not this. And a toast or alert reports one outcome after the fact; this is the stream the outcome came out of.",
+  "rules": [
+    "Autoscroll pins to the bottom only while the reader is already at the bottom. The instant they scroll up to read something, new lines stop yanking the viewport down — track it with a scrollTop/scrollHeight check on scroll, not a flag that only ever gets set to true, or the log becomes unreadable the moment it has more than a screenful.",
+    "A \"Jump to latest\" pill appears the moment the reader scrolls away from the bottom and disappears the moment they return to it. Without it there is no way back to live tailing except scrolling by hand, which the reader has no way of knowing is even possible.",
+    "Lines append as DOM nodes; the log never re-renders its full text on every new line. A process that writes a few lines a second and re-joins the whole buffer into one string each time will visibly stutter and eventually drop frames past a few thousand lines.",
+    "Cap the buffer — a few thousand lines is plenty — and drop from the top, not the bottom. An unbounded buffer is a slow memory leak in the one tab most likely to stay open all afternoon.",
+    "Level is colour on the text plus a plain-word prefix (ERROR, WARN), never colour alone — the same rule every status mark in this system follows, and it is the difference between a log that is scannable in a screenshot pasted into a ticket and one that is not.",
+    "The container is role=\"log\" aria-live=\"polite\", not role=\"status\". status implies a summary of current state; log is the ARIA role for exactly this — a sequence of appended messages a reader may or may not be looking at. It is polite regardless of level, because an error mid-stream is still one of many lines, not an interruption."
+  ],
+  "anatomy": [
+    {
+      "part": "Panel",
+      "description": "rounded-xl border border-zinc-800 bg-zinc-900. Dark regardless of the page's theme — a log is read like a terminal, and level colours are tuned against that background."
+    },
+    {
+      "part": "Toolbar",
+      "description": "Title, a live/paused pill, and Copy and Clear actions, in a border-b border-zinc-800 strip above the stream."
+    },
+    {
+      "part": "Stream",
+      "description": "The scrolling region itself: role=\"log\" aria-live=\"polite\", max-h bound, overflow-y-auto, font-mono text-[12px]/5, p-4."
+    },
+    {
+      "part": "Line",
+      "description": "flex gap-3 per row: a tabular-nums timestamp in text-zinc-600, an optional level word, the message in text-zinc-300, wrapped with break-words so a long line never forces the panel wider."
+    },
+    {
+      "part": "Jump to latest",
+      "description": "A pill pinned to the bottom-right of the stream, shown only once the reader has scrolled away from the bottom."
+    }
+  ],
+  "behaviour": [
+    "New lines append at the bottom in the order they arrive; nothing already on screen reorders or renumbers.",
+    "While the reader is scrolled to the bottom, the stream stays pinned there as lines land. The instant they scroll up, autoscroll stops and does not resume until they scroll back down or press Jump to latest.",
+    "The buffer is capped; once full, the oldest line is dropped for each new one appended.",
+    "Copy takes the whole visible buffer as plain text, timestamps included, in one paste-ready block.",
+    "Paused (a closed connection, a finished job) is a state in the toolbar pill, not a change to any line already drawn."
+  ],
+  "accessibility": [
+    "The stream carries role=\"log\" aria-live=\"polite\", the ARIA role written for an appending sequence of messages — the reader is not expected to have every line read aloud, only to be able to land on the region and read what is there.",
+    "Colour on a level is never the only signal: ERROR and WARN are written words before they are a colour, so the line survives greyscale and a screen reader alike.",
+    "The timestamp is real text content, not a tooltip or a title attribute, so it is read, copied and searched with the line it belongs to.",
+    "Jump to latest is a real, focusable button with a label naming what it does, not an icon alone."
+  ],
+  "related": [
+    "timeline",
+    "table",
+    "skeleton"
+  ],
+  "variants": [
+    {
+      "id": "default",
+      "name": "Static stream",
+      "html": "<div class=\"overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900\">\n  <div class=\"flex items-center justify-between border-b border-zinc-800 px-4 py-2.5\">\n    <span class=\"text-[13px]/5 font-medium text-zinc-200\">Build output</span>\n    <div class=\"flex items-center gap-1.5\">\n      <button class=\"rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200\">Copy</button>\n      <button class=\"rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200\">Clear</button>\n    </div>\n  </div>\n  <div role=\"log\" aria-live=\"polite\" class=\"max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5\">\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:11</span><span class=\"break-words text-zinc-300\">Installing dependencies…</span></div>\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:14</span><span class=\"break-words text-zinc-300\">Resolved 214 packages</span></div>\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:19</span><span class=\"shrink-0 font-semibold text-amber-400\">WARN</span><span class=\"break-words text-zinc-300\">Peer dependency \"react\" not found, using ^18.2.0</span></div>\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:26</span><span class=\"break-words text-zinc-300\">Compiling…</span></div>\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:31</span><span class=\"shrink-0 font-semibold text-red-400\">ERROR</span><span class=\"break-words text-zinc-300\">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span></div>\n    <div class=\"flex gap-3\"><span class=\"shrink-0 tabular-nums text-zinc-600\">14:02:31</span><span class=\"shrink-0 font-semibold text-red-400\">ERROR</span><span class=\"break-words text-zinc-300\">Build failed with 1 error</span></div>\n  </div>\n</div>"
+    },
+    {
+      "id": "streaming",
+      "name": "Live, autoscrolling",
+      "html": "<div x-data=\"{\n       lines: [{ t: '14:02:11', level: null, msg: 'Deploy started' }],\n       pinned: true,\n       tick: null,\n       next() {\n         const words = ['Uploading build artifact…', 'Warming instance 2 of 4…', 'Health check passed on instance 1', 'Draining old instances…', 'Instance 3 of 4 ready'];\n         this.lines.push({ t: new Date().toLocaleTimeString('en-GB'), level: null, msg: words[this.lines.length % words.length] });\n         if (this.lines.length > 200) this.lines.shift();\n         this.$nextTick(() => { if (this.pinned) this.$refs.stream.scrollTop = this.$refs.stream.scrollHeight; });\n       },\n       onScroll() { const s = this.$refs.stream; this.pinned = s.scrollHeight - s.scrollTop - s.clientHeight < 24; },\n       start() { this.tick = setInterval(() => this.next(), 1500); }\n     }\"\n     x-init=\"start()\" @scroll.passive=\"$refs.stream === $event.target && onScroll()\"\n     class=\"overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900\">\n  <div class=\"flex items-center justify-between border-b border-zinc-800 px-4 py-2.5\">\n    <span class=\"text-[13px]/5 font-medium text-zinc-200\">Deploy — production</span>\n    <span class=\"flex items-center gap-1.5 text-[11px]/4 font-medium text-emerald-400\">\n      <span class=\"size-1.5 animate-pulse rounded-full bg-emerald-400\"></span>Live\n    </span>\n  </div>\n  <div class=\"relative\">\n    <div x-ref=\"stream\" @scroll.passive=\"onScroll()\" role=\"log\" aria-live=\"polite\"\n         class=\"max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5\">\n      <template x-for=\"(l, i) in lines\" :key=\"i\">\n        <div class=\"flex gap-3\">\n          <span class=\"shrink-0 tabular-nums text-zinc-600\" x-text=\"l.t\"></span>\n          <span class=\"break-words text-zinc-300\" x-text=\"l.msg\"></span>\n        </div>\n      </template>\n    </div>\n    <button x-show=\"!pinned\" x-cloak\n            @click=\"pinned = true; $refs.stream.scrollTop = $refs.stream.scrollHeight\"\n            class=\"absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-zinc-700 px-3 py-1.5 text-[11px]/4 font-medium text-zinc-100 shadow-lg hover:bg-zinc-800\">\n      ↓ Jump to latest\n    </button>\n  </div>\n</div>"
+    },
+    {
+      "id": "levels",
+      "name": "Filterable by level",
+      "html": "<div x-data=\"{\n       filter: 'all',\n       lines: [\n         { t: '09:14:02', level: 'info', msg: 'Worker started, pid 4821' },\n         { t: '09:14:05', level: 'info', msg: 'Connected to queue \"grn-imports\"' },\n         { t: '09:14:09', level: 'warn', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },\n         { t: '09:14:12', level: 'info', msg: 'Job grn-4417 completed in 1.8s' },\n         { t: '09:14:18', level: 'error', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },\n         { t: '09:14:19', level: 'info', msg: 'Job grn-4419 completed in 0.6s' }\n       ]\n     }\" class=\"overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900\">\n  <div class=\"flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-2.5\">\n    <span class=\"text-[13px]/5 font-medium text-zinc-200\">Import worker</span>\n    <div class=\"flex items-center gap-1 rounded-lg bg-zinc-900 p-0.5\" role=\"group\" aria-label=\"Filter by level\">\n      <template x-for=\"lv in ['all', 'info', 'warn', 'error']\" :key=\"lv\">\n        <button @click=\"filter = lv\" :aria-pressed=\"filter === lv\" x-text=\"lv\"\n                class=\"rounded-md px-2.5 py-1 text-[11px]/4 font-medium capitalize transition\"\n                :class=\"filter === lv ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-zinc-200'\"></button>\n      </template>\n    </div>\n  </div>\n  <div role=\"log\" aria-live=\"polite\" class=\"max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5\">\n    <template x-for=\"l in lines.filter(l => filter === 'all' || l.level === filter)\" :key=\"l.t + l.msg\">\n      <div class=\"flex gap-3\">\n        <span class=\"shrink-0 tabular-nums text-zinc-600\" x-text=\"l.t\"></span>\n        <span class=\"w-12 shrink-0 font-semibold uppercase\"\n              :class=\"{ info: 'text-zinc-500', warn: 'text-amber-400', error: 'text-red-400' }[l.level]\"\n              x-text=\"l.level\"></span>\n        <span class=\"break-words text-zinc-300\" x-text=\"l.msg\"></span>\n      </div>\n    </template>\n  </div>\n</div>"
+    }
+  ]
+}

@@ -1382,6 +1382,32 @@
       "detail": "r/tree-view.json"
     },
     {
+      "id": "log",
+      "name": "Log",
+      "category": "data",
+      "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits.",
+      "related": [
+        "timeline",
+        "table",
+        "skeleton"
+      ],
+      "variants": [
+        {
+          "id": "default",
+          "name": "Static stream"
+        },
+        {
+          "id": "streaming",
+          "name": "Live, autoscrolling"
+        },
+        {
+          "id": "levels",
+          "name": "Filterable by level"
+        }
+      ],
+      "detail": "r/log.json"
+    },
+    {
       "id": "alert",
       "name": "Alert",
       "category": "feedback",

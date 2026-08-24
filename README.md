@@ -49,7 +49,7 @@ Do not recreate a component from a prose description or invent an undocumented v
 <!-- components:start -->
 ## Components
 
-**78 components · 916 variants · 78 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**79 components · 919 variants · 79 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -95,6 +95,7 @@ Do not recreate a component from a prose description or invent an undocumented v
 | Timeline | `timeline` | 15 | [open](https://konfpa.github.io/konspec-ui/components/timeline.html) |
 | Permission matrix | `permission-matrix` | 13 | [open](https://konfpa.github.io/konspec-ui/components/permission-matrix.html) |
 | Tree view | `tree-view` | 14 | [open](https://konfpa.github.io/konspec-ui/components/tree-view.html) |
+| Log | `log` | 3 | [open](https://konfpa.github.io/konspec-ui/components/log.html) |
 
 ### Feedback
 

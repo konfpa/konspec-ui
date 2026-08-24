@@ -1,0 +1,17 @@
+<div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Build output</span>
+    <div class="flex items-center gap-1.5">
+      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Copy</button>
+      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Clear</button>
+    </div>
+  </div>
+  <div role="log" aria-live="polite" class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:11</span><span class="break-words text-zinc-300">Installing dependencies…</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:14</span><span class="break-words text-zinc-300">Resolved 214 packages</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:19</span><span class="shrink-0 font-semibold text-amber-400">WARN</span><span class="break-words text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:26</span><span class="break-words text-zinc-300">Compiling…</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">Build failed with 1 error</span></div>
+  </div>
+</div>
