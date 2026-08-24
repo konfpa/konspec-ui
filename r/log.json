@@ -3,55 +3,100 @@
   "name": "Log",
   "category": "data",
   "markup": "No html in this file. Each variant below carries the path to its own markup at r/log/<variant>.html — fetch the one you need.",
-  "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits.",
-  "when_to_use": "Something is producing lines over time and the reader's question is \"what is it doing right now / what did it just do\" — an import running, a deploy, a background job, a device's console. Reach for timeline instead the moment the lines are discrete business events with an actor and a verb (approved, amended, received): a timeline is a handful of sentences about a record, this is hundreds of raw lines a process wrote. Reach for table when the lines are really rows to be sorted and filtered — a delivery log an admin searches by status code is a table with a mono column, not this. And a toast or alert reports one outcome after the fact; this is the stream the outcome came out of.",
+  "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing in it is a record the user edits.",
+  "when_to_use": "Something is producing lines over time and the reader's question is \"what is it doing right now, or what did it just do\" — an import running, a deploy, a background worker, a device console. Reach for timeline instead the moment the lines are discrete business events with an actor and a verb (approved, amended, received): a timeline is a handful of sentences about one record, this is hundreds of raw lines a process wrote and did not write for anybody in particular. Reach for table when the lines are really rows to be sorted and filtered — a delivery log an admin searches by status code is a table with a mono column, not this — and note that the structured variant here is the boundary case: it is still a stream, and the moment a column header wants to be sortable it has stopped being one. Reach for progress when the only thing the reader wants is how far along it is, because a progress bar answers that in one glance and a log makes them read for it; the job variant here is the two together, which is usually the honest answer for an import. And a toast or an alert reports one outcome after the fact — this is the stream that outcome came out of, and it stays on screen after the outcome lands rather than being replaced by it.",
   "rules": [
     "Autoscroll pins to the bottom only while the reader is already at the bottom. The instant they scroll up to read something, new lines stop yanking the viewport down — track it with a scrollTop/scrollHeight check on scroll, not a flag that only ever gets set to true, or the log becomes unreadable the moment it has more than a screenful.",
-    "A \"Jump to latest\" pill appears the moment the reader scrolls away from the bottom and disappears the moment they return to it. Without it there is no way back to live tailing except scrolling by hand, which the reader has no way of knowing is even possible.",
-    "Lines append as DOM nodes; the log never re-renders its full text on every new line. A process that writes a few lines a second and re-joins the whole buffer into one string each time will visibly stutter and eventually drop frames past a few thousand lines.",
-    "Cap the buffer — a few thousand lines is plenty — and drop from the top, not the bottom. An unbounded buffer is a slow memory leak in the one tab most likely to stay open all afternoon.",
-    "Level is colour on the text plus a plain-word prefix (ERROR, WARN), never colour alone — the same rule every status mark in this system follows, and it is the difference between a log that is scannable in a screenshot pasted into a ticket and one that is not.",
-    "The container is role=\"log\" aria-live=\"polite\", not role=\"status\". status implies a summary of current state; log is the ARIA role for exactly this — a sequence of appended messages a reader may or may not be looking at. It is polite regardless of level, because an error mid-stream is still one of many lines, not an interruption."
+    "A \"Jump to latest\" pill appears the moment the reader scrolls away from the bottom, and it carries the number of lines that have landed since they left. Without the pill there is no way back to live tailing except scrolling by hand, which the reader has no way of knowing is even possible; without the figure on it, the reader cannot tell a stream that has moved on by four lines from one that has moved on by four hundred, and those are different decisions about whether to give up their place.",
+    "Lines append as DOM nodes and are keyed by a sequence number the producer assigns, never by the array index. The buffer is capped, so it shifts, and under an index key every surviving node's text changes on every append: Alpine rewrites the whole visible list once a second, the selection the reader had made disappears, and a stream that writes a few lines a second visibly stutters. A monotonic id moves one node in and one out.",
+    "Cap the buffer — a few thousand lines is plenty — and drop from the top, not the bottom. An unbounded buffer is a slow memory leak in the one tab most likely to stay open all afternoon. Say the cap somewhere when it bites, because a reader scrolling up to find the start of the run and hitting a wall assumes the log is broken rather than trimmed.",
+    "The message takes wrap-anywhere, not break-words. break-words does not change the element's min-content width, so one unbreakable token — a bundle hash, a base64 payload, a Windows path, a minified stack frame — holds the flex row open at its own width, the panel grows to fit it and at 390px the whole page scrolls sideways. Nothing in a log line is under this system's control, and the one class that shortens min-content is the one to write.",
+    "The stream is a scroller with no focusable content in it, so it carries tabindex=\"0\" and an accessible name. Chromium will not give keyboard focus to an overflow container on its own, and without this the log cannot be scrolled at all without a mouse — which, in a component whose entire job is to be read, is the whole component gone. It draws the on-dark focus outline like anything else on this panel.",
+    "Never render a log line through x-html, innerHTML or a template filter marked safe. A log line is the least trusted string in the application: it is whatever a vendor's webhook, a customer's filename or an attacker's user agent put into it, and it arrives with angle brackets in it as a matter of routine. Search highlighting is the case that tempts everybody, and it is done by splitting the string into before, match and after and rendering three text nodes — the same shape tree-view/search uses — never by wrapping the match in a tag and assigning the result.",
+    "role=\"log\" is the container role, and aria-live is a decision about rate rather than a constant. A stream that appends occasionally takes aria-live=\"polite\", which is the ARIA default for the role and reads each new line once. A stream running at several lines a second takes aria-live=\"off\" and a role=\"status\" element beside it that says \"streaming, 1,284 lines\" and updates on a timer, because a live region reading forty lines a minute makes every other control on the page unusable and the reader cannot interrupt it. Neither of them is \"assertive\": an error mid-stream is still one of many lines, not an interruption.",
+    "Level is a word before it is a colour, and the word sits in a fixed-width column so every message starts at the same character. Colour alone does not survive greyscale, a screenshot pasted into a ticket, or a reader who cannot separate the amber line from the red one; a ragged left edge on the message column does not survive being scanned at all, which is the only way anybody reads four hundred lines. A line with no level keeps the empty column rather than closing it up.",
+    "This panel is the one dark surface in the library and it is not a dark theme. It is dark because a log is read the way a terminal is read, and because the level colours were picked against it. What follows from that is that the on-dark row of the text scale applies inside it and nowhere else: secondary text is zinc-400, not zinc-600. The first version of this component set its timestamps at zinc-600, which measures 2.3:1 against zinc-900 — the timestamp is real content people quote, and it was effectively unreadable. Nothing textual on this panel goes dimmer than zinc-400, level words take the -400 step of their hue rather than the -600 and -700 marks used on white, and the focus outline is outline-white at a negative offset because zinc-700/15 has nothing to sit against here.",
+    "A state pill on the toolbar is the same graphite shape as every other status pill in the system, with the colour in its 6px dot. Live in green text and Failed in red text is the traffic-light mistake made in the one place where it is most tempting, and a red word at the top of a console reads as an outage to somebody walking past a screen showing a build that failed a test.",
+    "Clear empties this view and nothing else, and the control has to say so. A log panel is the closest thing on screen to the run itself, so a bare \"Clear\" is read as destroying the output — people have stopped clicking it for that reason, and people have clicked it and then filed a ticket asking for the run back. Announce the outcome in a role=\"status\" that names where the log still is, and never put a Clear on a finished run, which has nothing to clear and everything to lose.",
+    "A run that ends does not turn into a different component. The panel stays, the pill changes, and the last lines stay on screen — replacing a failed run's output with an alert takes away the only thing that explains the failure, and putting the alert above the log while the log scrolls underneath it is what the failure summary strip is for. The strip names the counts and offers a jump to the first error; it does not paraphrase the error, because the line itself is the evidence.",
+    "An empty log is two different sentences and they lead to different actions. \"Waiting for output\" means the job is alive and has not said anything yet, and the reader should stay; \"the job finished and produced no output\" means there is nothing coming and the reader should go and look at the job's own result. A single blank panel for both is how somebody comes to sit watching a job that finished eleven minutes ago.",
+    "Do not paginate a log and do not sort one. Both are the shape of a table applied to a stream: a log has exactly one order, which is the order the lines were written in, and a \"page 3 of 40\" over the top of it hides the one line that matters behind a control that has to be operated to find out. Where the reader genuinely needs to work through the lines as records — filtering by status code, sorting by duration — the answer is table, and the log stays as the raw stream behind it."
   ],
   "anatomy": [
     {
       "part": "Panel",
-      "description": "rounded-xl border border-zinc-800 bg-zinc-900. Dark regardless of the page's theme — a log is read like a terminal, and level colours are tuned against that background."
+      "description": "overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900. Dark regardless of the page's theme, and the only dark surface in the library — the on-dark step of every token applies inside it."
     },
     {
       "part": "Toolbar",
-      "description": "Title, a live/paused pill, and Copy and Clear actions, in a border-b border-zinc-800 strip above the stream."
+      "description": "A border-b border-zinc-800 strip: the run's name on the left, the state pill and the controls on the right. Controls are borderless shapes, text-zinc-400, hovering to zinc-800."
+    },
+    {
+      "part": "State pill",
+      "description": "Graphite — bg-zinc-800, ring-1 ring-inset ring-zinc-700, text-zinc-300 — with a 6px dot carrying the colour. Live, Paused, Failed and Finished are the same shape and differ only in the dot and the word."
     },
     {
       "part": "Stream",
-      "description": "The scrolling region itself: role=\"log\" aria-live=\"polite\", max-h bound, overflow-y-auto, font-mono text-[12px]/5, p-4."
+      "description": "The scrolling region: role=\"log\", aria-live, tabindex=\"0\", an accessible name, a max-h bound, overflow-y-auto, font-mono text-[12px]/5 and p-4."
     },
     {
       "part": "Line",
-      "description": "flex gap-3 per row: a tabular-nums timestamp in text-zinc-600, an optional level word, the message in text-zinc-300, wrapped with break-words so a long line never forces the panel wider."
+      "description": "flex gap-3. Nothing in it is a control, and the row is a plain div rather than a list item — a log is not a list of things, it is a transcript."
+    },
+    {
+      "part": "Timestamp",
+      "description": "shrink-0 tabular-nums text-zinc-400. Real text so it is read, copied and searched with the line it belongs to."
+    },
+    {
+      "part": "Level",
+      "description": "w-12 shrink-0 font-semibold uppercase, in the -400 step of its hue. A line with no level keeps the same empty w-12 span, aria-hidden, so the messages line up."
+    },
+    {
+      "part": "Message",
+      "description": "min-w-0 flex-1 wrap-anywhere text-zinc-300. wrap-anywhere rather than break-words, because a log line contains tokens with no space in them."
+    },
+    {
+      "part": "Gutter",
+      "description": "The optional line-number column: w-10 shrink-0 select-none text-right tabular-nums text-zinc-400, aria-hidden. select-none so copying the block does not drag the numbers into the paste."
     },
     {
       "part": "Jump to latest",
-      "description": "A pill pinned to the bottom-right of the stream, shown only once the reader has scrolled away from the bottom."
+      "description": "A pill pinned to the bottom of the stream, shown only once the reader has scrolled away from the bottom, carrying the count of what has landed since."
+    },
+    {
+      "part": "Summary strip",
+      "description": "The band between the toolbar and the stream on a run that failed or dropped its connection: the counts, and one action — jump to the first error, or reconnect."
+    },
+    {
+      "part": "Detail well",
+      "description": "On a structured line, the expanded body: rounded-lg bg-zinc-800 p-3, holding headers or a payload. It is the only nested surface on this panel."
     }
   ],
   "behaviour": [
-    "New lines append at the bottom in the order they arrive; nothing already on screen reorders or renumbers.",
-    "While the reader is scrolled to the bottom, the stream stays pinned there as lines land. The instant they scroll up, autoscroll stops and does not resume until they scroll back down or press Jump to latest.",
+    "New lines append at the bottom in the order they arrive; nothing already on screen reorders, renumbers or moves.",
+    "While the reader is at the bottom, the stream stays pinned there as lines land. The instant they scroll up, autoscroll stops and does not resume until they scroll back down or press Jump to latest, which also clears the count on it.",
     "The buffer is capped; once full, the oldest line is dropped for each new one appended.",
-    "Copy takes the whole visible buffer as plain text, timestamps included, in one paste-ready block.",
-    "Paused (a closed connection, a finished job) is a state in the toolbar pill, not a change to any line already drawn."
+    "Filtering by level, or by a search term, hides lines and never reorders them — the lines still shown keep their timestamps, so the gaps are visible as gaps.",
+    "Copy takes the whole buffer as plain text, timestamps included, in one paste-ready block; Download takes the same string as a file. Clear empties this view only, and says so.",
+    "Paused, disconnected and finished are states of the toolbar pill and the summary strip. None of them changes a line already drawn.",
+    "A step group opens and closes without the stream losing its scroll position, and a step that failed opens on arrival.",
+    "A structured line expands in place. The line stays where it is and the detail pushes the lines below it down; nothing opens in an overlay."
   ],
   "accessibility": [
-    "The stream carries role=\"log\" aria-live=\"polite\", the ARIA role written for an appending sequence of messages — the reader is not expected to have every line read aloud, only to be able to land on the region and read what is there.",
-    "Colour on a level is never the only signal: ERROR and WARN are written words before they are a colour, so the line survives greyscale and a screen reader alike.",
-    "The timestamp is real text content, not a tooltip or a title attribute, so it is read, copied and searched with the line it belongs to.",
-    "Jump to latest is a real, focusable button with a label naming what it does, not an icon alone."
+    "The stream carries role=\"log\" with an accessible name. aria-live is polite where lines are occasional and off where they are not, with a role=\"status\" summary in its place — a live region reading a fast stream is a page nobody else can use.",
+    "The stream is focusable — tabindex=\"0\" — because it scrolls and contains no controls, and it draws focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white like everything else on this panel.",
+    "Colour on a level is never the only signal: ERROR and WARN are written words in a fixed column before they are a colour, so the line survives greyscale and a screen reader alike.",
+    "The timestamp is real text content, not a title attribute or a tooltip, so it is read, copied and searched with the line it belongs to.",
+    "Line numbers are aria-hidden and select-none: they are a visual index for citing a line, they are not part of what the line says, and they must not land in a paste.",
+    "Jump to latest is a real, focusable button whose name says what it does and how much is waiting, not an icon on its own.",
+    "A filter, a search and a Clear each announce their result through a role=\"status\" — how many lines are shown of how many, or where the log still is — because removing lines from a live region announces nothing at all.",
+    "Every control on this panel is a real button with a name; the state pill is not a control and is not focusable."
   ],
   "related": [
     "timeline",
+    "progress",
     "table",
-    "skeleton"
+    "empty-state"
   ],
   "variants": [
     {
@@ -60,14 +105,79 @@
       "markup": "r/log/default.html"
     },
     {
+      "id": "levels",
+      "name": "Filterable by level",
+      "markup": "r/log/levels.html"
+    },
+    {
+      "id": "numbered",
+      "name": "Numbered lines",
+      "markup": "r/log/numbered.html"
+    },
+    {
+      "id": "wrap",
+      "name": "Wrap or do not wrap",
+      "markup": "r/log/wrap.html"
+    },
+    {
+      "id": "search",
+      "name": "Find in the stream",
+      "markup": "r/log/search.html"
+    },
+    {
+      "id": "elapsed",
+      "name": "Clock, elapsed or neither",
+      "markup": "r/log/elapsed.html"
+    },
+    {
+      "id": "steps",
+      "name": "Collapsible steps",
+      "markup": "r/log/steps.html"
+    },
+    {
+      "id": "structured",
+      "name": "Structured lines with detail",
+      "markup": "r/log/structured.html"
+    },
+    {
+      "id": "actions",
+      "name": "Copy, download, clear",
+      "markup": "r/log/actions.html"
+    },
+    {
       "id": "streaming",
       "name": "Live, autoscrolling",
       "markup": "r/log/streaming.html"
     },
     {
-      "id": "levels",
-      "name": "Filterable by level",
-      "markup": "r/log/levels.html"
+      "id": "paused",
+      "name": "Paused by the reader",
+      "markup": "r/log/paused.html"
+    },
+    {
+      "id": "disconnected",
+      "name": "The connection dropped",
+      "markup": "r/log/disconnected.html"
+    },
+    {
+      "id": "job",
+      "name": "A job, with its progress above it",
+      "markup": "r/log/job.html"
+    },
+    {
+      "id": "failed",
+      "name": "Ended in failure",
+      "markup": "r/log/failed.html"
+    },
+    {
+      "id": "empty",
+      "name": "Waiting, and nothing to show",
+      "markup": "r/log/empty.html"
+    },
+    {
+      "id": "inline",
+      "name": "An excerpt inside a record",
+      "markup": "r/log/inline.html"
     }
   ]
 }

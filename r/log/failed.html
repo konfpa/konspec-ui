@@ -1,0 +1,76 @@
+<!-- The run failed, and the panel is still a log. Swapping it for an alert
+     takes away the only thing that explains the failure; putting the alert
+     above it and letting the stream scroll underneath is this strip, which
+     names the counts and offers one action.
+
+     The strip does not paraphrase the error. Whatever it said would be a second
+     version of a sentence that is already on screen, and the two drift the
+     first time somebody edits one of them. What it does instead is take the
+     reader to the line, because the error in a four-hundred-line log is the one
+     thing that is hard to find and the reason the page was opened.
+
+     Jump moves the scroll AND the focus. Scrolling alone leaves a keyboard
+     reader where they were, being told nothing happened; the target line takes
+     tabindex="-1" so focus can land on it without adding a stop to the tab
+     order. offsetTop is measured against the stream, which is why the stream
+     carries relative — without it the offset resolves against whatever ancestor
+     happens to be positioned and the jump lands somewhere else entirely.
+
+     The error line is marked with a full-bleed band as well as the word ERROR,
+     because after a jump the reader needs to see where they landed.
+
+     The stream here is deliberately longer than the box. A failure summary over
+     a log that fits on screen is a control with nothing to do, and the run this
+     component is for has four hundred lines under the one that matters. -->
+<div data-kui="log/failed"
+     x-data="{
+       jump() {
+         const s = this.$refs.stream, e = this.$refs.err;
+         s.scrollTop = e.offsetTop - 8;
+         e.focus();
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Build output — deploy 4417</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed after 3m 04s
+    </span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 text-zinc-400">
+      <span class="font-medium text-zinc-200">1 error and 2 warnings.</span>
+      Nothing was deployed and the running instances were left alone.
+    </p>
+    <button type="button" @click="jump()"
+            class="flex shrink-0 items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 py-1 text-[11px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="arrow-down-to-line" class="size-3.5"></i>Jump to the first error
+    </button>
+  </div>
+
+  <div x-ref="stream" role="log" aria-live="polite" tabindex="0" aria-label="Build output for deploy 4417, failed"
+       class="relative max-h-64 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Installing dependencies…</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:14</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:19</span><span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span><span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Chunk orders.js is 1.4 MB, above the 1 MB budget</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:34</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:41</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/vendors.4b17e0c9a2d8f3516b7c04e9d18a2f37.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:49</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/reports.7c02e4b1f9a63d85c0142e7bd9384f16.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:58</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Optimising 1,204 static files</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:06</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Wrote the asset manifest, 41 entries</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:18</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Collected 416 tests across 61 modules</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:19</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_po.py — 88 passed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:20</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_grn.py — 41 passed, 1 failed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:21</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">stores/test_issue.py — 63 passed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div x-ref="err" tabindex="-1" class="-mx-4 flex gap-3 bg-zinc-800 px-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-100">orders/test_grn.py::test_duplicate_challan_is_rejected — AssertionError: expected ValidationError, got GRN-26-0451</span>
+    </div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:24</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Pipeline stopped, deploy step skipped</span></div>
+  </div>
+</div>

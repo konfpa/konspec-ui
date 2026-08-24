@@ -1,0 +1,48 @@
+<!-- Two ways to read the same lines, and both of them are needed. Wrapped is
+     the default because nothing is hidden. Unwrapped is what somebody comparing
+     a column of near-identical lines wants — a table of timings, a diff of two
+     configs — where wrapping breaks the alignment that is the reason they are
+     looking.
+
+     Unwrapped means the stream scrolls sideways, which is allowed: the rule is
+     that the PAGE may not, and a region that does needs a name, tabindex="0"
+     and a line of text saying so. This one already has the first two for its own
+     sake, so the sentence is the only thing the mode adds. It sits under the
+     stream and not over it, because there are no gradients or arrows in this
+     system and a fade over the last column hides the character it is pointing at.
+
+     whitespace-pre with min-w-max on the row is what actually stops the wrap: a
+     flex row shrinks to its container otherwise, and the message wraps however
+     the class list says it must not. -->
+<div data-kui="log/wrap" x-data="{ wrap: true }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Nightly reconciliation</span>
+    <button type="button" @click="wrap = !wrap" :aria-pressed="wrap"
+            class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+            :class="wrap ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'">
+      <i data-lucide="wrap-text" class="size-3.5"></i>Wrap long lines
+    </button>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Nightly reconciliation output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+       :class="wrap ? '' : 'overflow-x-auto'">
+    <template x-for="l in [
+      { id: 1, t: '02:00:04', msg: 'Opening statement HDFC-0042 for 01 Aug 2026 to 31 Aug 2026, 1,284 entries, opening balance 41,08,552.00' },
+      { id: 2, t: '02:00:19', msg: 'Matched 1,196 entries on UTR, 61 on amount and date, 27 left unmatched' },
+      { id: 3, t: '02:00:20', msg: 'Unmatched: 8841/25-26, 8847/25-26, 8852/25-26, 8861/25-26, 8874/25-26, 8880/25-26, 8891/25-26, 8894/25-26, 8902/25-26, 8917/25-26, 8920/25-26, 8931/25-26, 8944/25-26, 8951/25-26, 8968/25-26' },
+      { id: 4, t: '02:00:22', msg: 'Wrote /var/exports/recon/2026-08/hdfc-0042-unmatched-20260901T020022Z.csv' },
+      { id: 5, t: '02:00:22', msg: 'Closing balance 39,71,004.00, ledger 39,71,004.00, variance 0.00' }
+    ]" :key="l.id">
+      <div class="flex gap-3" :class="wrap ? '' : 'min-w-max'">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="text-zinc-300" :class="wrap ? 'min-w-0 flex-1 wrap-anywhere' : 'whitespace-pre'" x-text="l.msg"></span>
+      </div>
+    </template>
+  </div>
+
+  <p x-show="!wrap" x-cloak class="border-t border-zinc-800 px-4 py-2 text-[12px]/4 text-zinc-400">
+    Long lines run past the edge — the stream scrolls sideways, the page does not.
+  </p>
+</div>

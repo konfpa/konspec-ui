@@ -1,38 +1,85 @@
-<div x-data="{
-       lines: [{ t: '14:02:11', level: null, msg: 'Deploy started' }],
-       pinned: true,
-       tick: null,
-       next() {
-         const words = ['Uploading build artifact…', 'Warming instance 2 of 4…', 'Health check passed on instance 1', 'Draining old instances…', 'Instance 3 of 4 ready'];
-         this.lines.push({ t: new Date().toLocaleTimeString('en-GB'), level: null, msg: words[this.lines.length % words.length] });
-         if (this.lines.length > 200) this.lines.shift();
-         this.$nextTick(() => { if (this.pinned) this.$refs.stream.scrollTop = this.$refs.stream.scrollHeight; });
+<!-- Four things here are the difference between a log that tails and one that
+     fights the reader.
+
+     pinned is derived from the scroll position on every scroll event, not set
+     once and left true. A flag that only ever goes true drags the viewport back
+     to the bottom every time a line lands, which makes the log unreadable the
+     moment it is longer than a screen.
+
+     The key is a sequence number the producer assigns. The buffer is capped and
+     therefore shifts, and under :key="i" every surviving node's text changes on
+     every append: Alpine rewrites the whole visible list once a second, and any
+     selection the reader had made disappears with it.
+
+     The pill carries the count of what has landed since they scrolled away, so
+     the reader can tell four lines from four hundred before deciding to give up
+     their place. It is a real button with a name, not an arrow.
+
+     The seed fills the box. A stream that starts with three lines in a 320px
+     panel is not tailing at all for its first half minute — nothing overflows,
+     so there is no bottom to be pinned to and no way to reach the pill. Send
+     the last screenful with the page and the log is doing its actual job from
+     the first paint.
+
+     init() and destroy() are the Alpine lifecycle pair, and the second one is
+     not optional: a setInterval started in x-init and never cleared keeps
+     running after the element is gone — after a tab swap, an htmx swap, a
+     dialog close — appending to a component nobody can see, for as long as the
+     page is open. -->
+<div data-kui="log/streaming"
+     x-data="{
+       seq: 14, pinned: true, missed: 0, tick: null,
+       lines: [
+         { id: 1,  t: '14:02:11', msg: 'Deploy 4417 started' },
+         { id: 2,  t: '14:02:12', msg: 'Pulled image registry.internal/orders:4417' },
+         { id: 3,  t: '14:02:19', msg: 'Ran 41 migrations' },
+         { id: 4,  t: '14:02:24', msg: 'Collected 1,204 static files' },
+         { id: 5,  t: '14:02:31', msg: 'Warmed cache for 6 plants' },
+         { id: 6,  t: '14:02:38', msg: 'Instance 1 of 4 accepting traffic' },
+         { id: 7,  t: '14:02:44', msg: 'Health check passed on instance 1' },
+         { id: 8,  t: '14:02:51', msg: 'Instance 2 of 4 accepting traffic' },
+         { id: 9,  t: '14:02:57', msg: 'Health check passed on instance 2' },
+         { id: 10, t: '14:03:04', msg: 'Draining old instances, 12 requests in flight' },
+         { id: 11, t: '14:03:11', msg: 'Old instance 1 drained' },
+         { id: 12, t: '14:03:17', msg: 'Old instance 2 drained' },
+         { id: 13, t: '14:03:22', msg: 'Rotating access log' },
+         { id: 14, t: '14:03:29', msg: 'Instance 3 of 4 accepting traffic' }
+       ],
+       say: ['Uploading build artifact', 'Warming instance 2 of 4', 'Health check passed on instance 1', 'Draining old instances', 'Instance 3 of 4 ready', 'Rotating access log'],
+       init() { this.tick = setInterval(() =&gt; this.append(), 1600) },
+       destroy() { clearInterval(this.tick) },
+       append() {
+         this.seq++;
+         this.lines.push({ id: this.seq, t: new Date().toLocaleTimeString('en-GB'), msg: this.say[this.seq % this.say.length] });
+         if (this.lines.length &gt; 500) this.lines.shift();
+         if (this.pinned) this.$nextTick(() =&gt; this.toBottom()); else this.missed++;
        },
-       onScroll() { const s = this.$refs.stream; this.pinned = s.scrollHeight - s.scrollTop - s.clientHeight < 24; },
-       start() { this.tick = setInterval(() => this.next(), 1500); }
+       toBottom() { const s = this.$refs.stream; s.scrollTop = s.scrollHeight; this.pinned = true; this.missed = 0 },
+       onScroll() { const s = this.$refs.stream; this.pinned = s.scrollHeight - s.scrollTop - s.clientHeight &lt; 24; if (this.pinned) this.missed = 0 }
      }"
-     x-init="start()" @scroll.passive="$refs.stream === $event.target && onScroll()"
      class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
-    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy — production</span>
-    <span class="flex items-center gap-1.5 text-[11px]/4 font-medium text-emerald-400">
-      <span class="size-1.5 animate-pulse rounded-full bg-emerald-400"></span>Live
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — production</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 animate-pulse rounded-full bg-emerald-600 motion-reduce:animate-none" aria-hidden="true"></span>Live
     </span>
   </div>
+
   <div class="relative">
-    <div x-ref="stream" @scroll.passive="onScroll()" role="log" aria-live="polite"
-         class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-      <template x-for="(l, i) in lines" :key="i">
+    <div x-ref="stream" @scroll.passive="onScroll()" role="log" aria-live="polite" tabindex="0" aria-label="Deploy 4417 output, live"
+         class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+      <template x-for="l in lines" :key="l.id">
         <div class="flex gap-3">
-          <span class="shrink-0 tabular-nums text-zinc-600" x-text="l.t"></span>
-          <span class="break-words text-zinc-300" x-text="l.msg"></span>
+          <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+          <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
         </div>
       </template>
     </div>
-    <button x-show="!pinned" x-cloak
-            @click="pinned = true; $refs.stream.scrollTop = $refs.stream.scrollHeight"
-            class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-zinc-700 px-3 py-1.5 text-[11px]/4 font-medium text-zinc-100 shadow-lg hover:bg-zinc-800">
-      ↓ Jump to latest
+
+    <button type="button" x-show="!pinned" x-cloak @click="toBottom()"
+            class="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-zinc-700 px-3 py-1.5 text-[11px]/4 font-medium text-zinc-100 shadow-lg hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="arrow-down" class="size-3"></i>
+      <span x-text="missed ? 'Jump to latest — ' + missed + (missed === 1 ? ' new line' : ' new lines') : 'Jump to latest'">Jump to latest</span>
     </button>
   </div>
 </div>

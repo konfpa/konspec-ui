@@ -1,0 +1,51 @@
+<!-- Three ways to stamp a line, and the choice is not cosmetic. The wall clock
+     is what somebody correlates against another system — a vendor's webhook
+     log, a plant's shift record — and it is the only one that survives being
+     pasted into a ticket. Elapsed is what somebody looking for the slow step
+     wants, because the answer is a subtraction the clock makes them do in their
+     head. Neither is for a log being read as text, where a column of numbers is
+     six characters of noise on every line.
+
+     Both figures come off the same record: the line carries an absolute t and
+     an ms offset, so switching the mode cannot change what the log says. A
+     stream that stores only its elapsed offsets loses the ability to say when
+     anything happened the moment the page is reloaded.
+
+     Elapsed is padded to a fixed width and tabular-nums for the same reason the
+     clock is: the point of the column is that the eye can compare down it. -->
+<div data-kui="log/elapsed"
+     x-data="{
+       mode: 'elapsed',
+       modes: [['clock', 'Clock'], ['elapsed', 'Elapsed'], ['none', 'None']],
+       lines: [
+         { id: 1, t: '14:02:11', ms: 0,     msg: 'Deploy 4417 started' },
+         { id: 2, t: '14:02:14', ms: 3120,  msg: 'Pulled image registry.internal/orders:4417' },
+         { id: 3, t: '14:02:26', ms: 15480, msg: 'Ran 41 migrations' },
+         { id: 4, t: '14:03:58', ms: 107310, msg: 'Warmed instance 1 of 4' },
+         { id: 5, t: '14:04:02', ms: 111020, msg: 'Health check passed on instance 1' },
+         { id: 6, t: '14:04:29', ms: 138440, msg: 'All instances live, old ones drained' }
+       ],
+       stamp(l) { return this.mode === 'clock' ? l.t : '+' + (l.ms / 1000).toFixed(3) + 's' }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — 2m 18s</span>
+    <div class="flex items-center gap-1" role="group" aria-label="Timestamps">
+      <template x-for="m in modes" :key="m[0]">
+        <button type="button" @click="mode = m[0]" :aria-pressed="mode === m[0]" x-text="m[1]"
+                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                :class="mode === m[0] ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"></button>
+      </template>
+    </div>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Deploy 4417 output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span x-show="mode !== 'none'" class="w-[9ch] shrink-0 text-right tabular-nums text-zinc-400" x-text="stamp(l)"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<!-- Pause stops the view, not the process. The lines keep arriving and go into
+     a buffer, the strip says how many are waiting, and Resume appends them all
+     and returns to tailing. A pause that dropped the lines instead would be a
+     hole in the middle of the log with nothing on screen saying so, which is
+     the one thing a log may never do.
+
+     The strip is where the state is written, in words, with the time it started
+     — not a greyed-out stream, which says the lines already drawn are somehow
+     less true than they were a moment ago. They are exactly as true; it is the
+     view that has stopped.
+
+     One button, and its label is the action rather than the state: Pause when
+     it is running, Resume when it is not. A button labelled with the state
+     leaves the reader guessing whether it says what will happen or what is
+     already happening. -->
+<div data-kui="log/paused"
+     x-data="{
+       seq: 3, paused: false, buffer: [], at: '', tick: null,
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:05', msg: 'Connected to queue grn-imports' },
+         { id: 3, t: '09:14:12', msg: 'Job grn-4417 completed in 1.8s' }
+       ],
+       say: ['Job grn-4418 completed in 0.9s', 'Job grn-4419 completed in 0.6s', 'Prefetching 50 jobs', 'Job grn-4420 completed in 1.2s', 'Heartbeat ok'],
+       init() { this.tick = setInterval(() =&gt; this.append(), 1600) },
+       destroy() { clearInterval(this.tick) },
+       append() {
+         this.seq++;
+         const line = { id: this.seq, t: new Date().toLocaleTimeString('en-GB'), msg: this.say[this.seq % this.say.length] };
+         if (this.paused) { this.buffer.push(line); return }
+         this.lines.push(line);
+         if (this.lines.length &gt; 500) this.lines.shift();
+         this.$nextTick(() =&gt; { const s = this.$refs.stream; s.scrollTop = s.scrollHeight });
+       },
+       pause() { this.paused = true; this.at = new Date().toLocaleTimeString('en-GB') },
+       resume() {
+         this.paused = false;
+         this.lines.push(...this.buffer.splice(0));
+         this.$nextTick(() =&gt; { const s = this.$refs.stream; s.scrollTop = s.scrollHeight });
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Import worker</span>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 rounded-full" :class="paused ? 'bg-amber-500' : 'bg-emerald-600 animate-pulse motion-reduce:animate-none'" aria-hidden="true"></span>
+        <span x-text="paused ? 'Paused' : 'Live'">Live</span>
+      </span>
+      <button type="button" @click="paused ? resume() : pause()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span x-show="!paused" class="flex"><i data-lucide="pause" class="size-3.5"></i></span>
+        <span x-show="paused" x-cloak class="flex"><i data-lucide="play" class="size-3.5"></i></span>
+        <span x-text="paused ? 'Resume' : 'Pause'">Pause</span>
+      </button>
+    </div>
+  </div>
+
+  <p x-show="paused" x-cloak role="status"
+     class="border-b border-zinc-800 px-4 py-2 text-[12px]/4 text-zinc-400">
+    Paused at <span class="tabular-nums" x-text="at"></span>. The worker is still running —
+    <span class="tabular-nums text-zinc-200" x-text="buffer.length"></span>
+    <span x-text="buffer.length === 1 ? 'line is' : 'lines are'">lines are</span> waiting, and Resume appends all of them.
+  </p>
+
+  <div x-ref="stream" role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+  </div>
+</div>

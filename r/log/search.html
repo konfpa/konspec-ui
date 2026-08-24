@@ -1,0 +1,64 @@
+<!-- The highlight is three text nodes — before, match, after — and never
+     x-html. A log line is the least trusted string in the application: it is
+     whatever a vendor's webhook or somebody's filename put there, angle
+     brackets and all, and wrapping the match in a tag and assigning the result
+     is how a log becomes an injection point. Splitting the string costs three
+     spans and cannot execute anything.
+
+     The field filters rather than stepping match to match, because a log is read
+     by scanning and a next/previous pair makes the reader operate a control to
+     see what is already three lines up. The count is a role="status", so the
+     result of typing is announced; removing lines from a live region is not.
+
+     Matching is case-insensitive on a lowercased copy, and the slice comes off
+     the original, so the highlight shows the line's own casing rather than the
+     query's. -->
+<div data-kui="log/search"
+     x-data="{
+       q: 'vend-0982',
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:09', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 3, t: '09:14:18', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 4, t: '09:14:19', msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 5, t: '09:14:31', msg: 'Job grn-4423 failed: vendor VEND-0982 not found' },
+         { id: 6, t: '09:14:44', msg: 'Queue drained, 6 jobs, 2 failures' }
+       ],
+       term() { return this.q.trim().toLowerCase() },
+       at(l) { return this.term() ? l.msg.toLowerCase().indexOf(this.term()) : -1 },
+       hit(l) { return this.at(l) &gt; -1 },
+       pre(l) { const i = this.at(l); return i &lt; 0 ? l.msg : l.msg.slice(0, i) },
+       mid(l) { const i = this.at(l); return i &lt; 0 ? '' : l.msg.slice(i, i + this.term().length) },
+       post(l) { const i = this.at(l); return i &lt; 0 ? '' : l.msg.slice(i + this.term().length) },
+       get shown() { return this.term() ? this.lines.filter(l =&gt; this.hit(l)) : this.lines }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="shrink-0 text-[13px]/5 font-medium text-zinc-200">Import worker</span>
+    <label for="log-s-q" class="sr-only">Find in the log</label>
+    <div class="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg bg-zinc-800 px-2.5 sm:max-w-xs focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-white">
+      <i data-lucide="search" class="size-3.5 shrink-0 text-zinc-400"></i>
+      <input id="log-s-q" x-ref="q" type="search" x-model="q" placeholder="Find in the log"
+             class="min-w-0 flex-1 bg-transparent font-mono text-[12px]/5 text-zinc-200 outline-none placeholder:font-sans placeholder:text-zinc-400">
+      <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q?.focus()" aria-label="Clear the search"
+              class="flex size-5 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="x" class="size-3.5"></i>
+      </button>
+    </div>
+    <p role="status" class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400"
+       x-text="term() ? shown.length + (shown.length === 1 ? ' line matches' : ' lines match') : lines.length + ' lines'">2 lines match</p>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in shown" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300"><span x-text="pre(l)"></span><mark x-show="hit(l)" class="rounded-sm bg-zinc-700 px-0.5 text-white" x-text="mid(l)"></mark><span x-text="post(l)"></span></span>
+      </div>
+    </template>
+    <p x-show="!shown.length" x-cloak class="text-zinc-400">
+      Nothing in the buffer matches “<span x-text="q"></span>”. Only the lines still in this view are searched — the run has 1,284 in all.
+    </p>
+  </div>
+</div>

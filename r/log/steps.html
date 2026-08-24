@@ -1,0 +1,106 @@
+<!-- Output grouped by the step that wrote it, which is what anybody reading a
+     build actually wants: not four hundred lines, but which of the six things
+     failed. Each step is a disclosure — a real button with aria-expanded and an
+     aria-controls naming the panel it opens — and the step that failed is open
+     on arrival, because it is the reason the page was opened.
+
+     Every step keeps its own stream with its own role="log" and its own name.
+     One role="log" around the lot would announce lines from a step whose
+     heading is off screen, and the name is what makes "3 lines" mean the tests
+     rather than the deploy.
+
+     The element x-collapse animates carries no padding, no border and no
+     background: the plugin measures scrollHeight, and padding on the animated
+     element is height that is there at 0% as well, so the panel snaps open the
+     last few pixels instead of easing. Padding goes on the stream inside it.
+
+     A step that never ran is not a disclosure. It keeps its row and its dot
+     and it is a div: a disabled button there announces a control that could
+     have been opened, and there is nothing under it to open.
+
+     The dot takes the token fill — emerald-600, red-600 — and the state is also
+     the word beside the duration, so a step that is skipped rather than passed
+     is not two greys apart from one that ran. -->
+<div data-kui="log/steps"
+     x-data="{
+       open: ['tests'],
+       isOpen(id) { return this.open.includes(id) },
+       toggle(id) { this.open = this.isOpen(id) ? this.open.filter(x =&gt; x !== id) : [...this.open, id] }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Pipeline 4417 — orders</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed in 3m 04s
+    </span>
+  </div>
+
+  <div class="divide-y divide-zinc-800">
+    <div>
+      <button type="button" @click="toggle('deps')" :aria-expanded="isOpen('deps')" aria-controls="log-sp-deps"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('deps') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Install dependencies</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Passed · 12.4s</span>
+      </button>
+      <div id="log-sp-deps" x-show="isOpen('deps')" x-cloak x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Install dependencies output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:23</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Linked 214 packages in 12.4s</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="toggle('build')" :aria-expanded="isOpen('build')" aria-controls="log-sp-build"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('build') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Compile assets</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Passed · 48.9s</span>
+      </button>
+      <div id="log-sp-build" x-show="isOpen('build')" x-cloak x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Compile assets output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="toggle('tests')" :aria-expanded="isOpen('tests')" aria-controls="log-sp-tests"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('tests') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Run tests</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Failed · 1m 42s</span>
+      </button>
+      <div id="log-sp-tests" x-show="isOpen('tests')" x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Run tests output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="w-12 shrink-0 font-semibold text-red-400">FAIL</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_grn.py::test_duplicate_challan_is_rejected</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">AssertionError: expected ValidationError, got GRN-26-0451</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex w-full items-center gap-3 px-4 py-2">
+        <span class="flex size-4 shrink-0" aria-hidden="true"></span>
+        <span class="size-1.5 shrink-0 rounded-full bg-zinc-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-400">Deploy to production</span>
+        <span class="shrink-0 text-[11px]/4 text-zinc-400">Skipped — tests failed</span>
+      </div>
+    </div>
+  </div>
+</div>

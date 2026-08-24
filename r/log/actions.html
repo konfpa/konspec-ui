@@ -1,0 +1,86 @@
+<!-- The three things a reader does with a log that is not the reading of it,
+     and each one has to say what it did. Copy and Download are the same string
+     — the buffer as plain text, timestamps in it — because a log pasted into a
+     ticket without its times is a set of sentences nobody can line up against
+     anything else.
+
+     Clear is the dangerous one, and only because of what people think it means.
+     This panel is the closest thing on screen to the run, so a bare "Clear" is
+     read as destroying the output: it is why some people will not press it, and
+     why the people who do press it file a ticket asking for the run back. The
+     confirmation names where the log still is. There is no Clear on a finished
+     run at all — nothing to gain, everything to lose.
+
+     The status line stays in the DOM whether or not it has anything to say —
+     a live region toggled with x-show is removed from the accessibility tree
+     and announces nothing on the way back in — and takes its padding and its
+     border from a binding, so an empty one collapses instead of drawing a band
+     across the foot of the panel.
+
+     One role="status" carries all three outcomes. Three separate live regions
+     announce in an order nobody can predict, and a button that changes its own
+     label to "Copied" tells the reader the same thing twice while telling a
+     screen reader that the button is now called something else. -->
+<div data-kui="log/actions"
+     x-data="{
+       said: '',
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:09', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 3, t: '09:14:18', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 4, t: '09:14:19', msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 5, t: '09:14:44', msg: 'Queue drained, 6 jobs, 2 failures' }
+       ],
+       text() { return this.lines.map(l =&gt; l.t + '  ' + l.msg).join('\n') },
+       announce(s) { this.said = ''; this.$nextTick(() =&gt; { this.said = s }) },
+       copy() {
+         navigator.clipboard?.writeText(this.text());
+         this.announce('Copied ' + this.lines.length + ' lines to the clipboard.');
+       },
+       download() {
+         const a = document.createElement('a');
+         a.href = URL.createObjectURL(new Blob([this.text()], { type: 'text/plain' }));
+         a.download = 'grn-import-4417.log';
+         a.click();
+         URL.revokeObjectURL(a.href);
+         this.announce('Downloaded grn-import-4417.log.');
+       },
+       clear() {
+         this.lines = [];
+         this.announce('Cleared from this view. The full log is still on the run at Jobs, GRN import 4417.');
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">GRN import 4417</span>
+    <div class="flex items-center gap-1">
+      <button type="button" @click="copy()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="clipboard" class="size-3.5"></i>Copy
+      </button>
+      <button type="button" @click="download()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="download" class="size-3.5"></i>Download
+      </button>
+      <button type="button" @click="clear()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="eraser" class="size-3.5"></i>Clear this view
+      </button>
+    </div>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="GRN import 4417 output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+    <p x-show="!lines.length" x-cloak class="text-zinc-400">
+      Nothing in this view. The full log is still on the run — reload the page to fetch it again.
+    </p>
+  </div>
+
+  <p role="status" class="text-[12px]/4 text-zinc-400" :class="said &amp;&amp; 'border-t border-zinc-800 px-4 py-2'" x-text="said"></p>
+</div>

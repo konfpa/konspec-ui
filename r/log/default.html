@@ -1,17 +1,53 @@
-<div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
-    <span class="text-[13px]/5 font-medium text-zinc-200">Build output</span>
-    <div class="flex items-center gap-1.5">
-      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Copy</button>
-      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Clear</button>
-    </div>
+<!-- A finished run, rendered by the server. No Alpine, and no controls that
+     would need any: a log that has stopped has nothing to pause, nothing to
+     clear and nothing to jump to.
+
+     Three things here are the whole component and are repeated in every variant
+     below. The stream is tabindex="0" with a name, because Chromium will not
+     focus an overflow container on its own and a log nobody can scroll from a
+     keyboard is a log half the readers cannot get to the end of. The message
+     takes wrap-anywhere rather than break-words, because break-words leaves the
+     min-content width at the longest unbreakable token and the bundle path on
+     the fourth line would otherwise hold the panel open and scroll the page
+     sideways at 390px. And a line with no level keeps the empty w-12 span, so
+     every message starts at the same character. -->
+<div data-kui="log/default" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Build output — deploy 4417</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">6 lines · ended 14:02:31</span>
   </div>
-  <div role="log" aria-live="polite" class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:11</span><span class="break-words text-zinc-300">Installing dependencies…</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:14</span><span class="break-words text-zinc-300">Resolved 214 packages</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:19</span><span class="shrink-0 font-semibold text-amber-400">WARN</span><span class="break-words text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:26</span><span class="break-words text-zinc-300">Compiling…</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">Build failed with 1 error</span></div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Build output for deploy 4417"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Installing dependencies…</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:14</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:19</span>
+      <span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:31</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:31</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Build failed with 1 error</span>
+    </div>
   </div>
 </div>

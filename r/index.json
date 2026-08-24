@@ -1385,11 +1385,12 @@
       "id": "log",
       "name": "Log",
       "category": "data",
-      "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits.",
+      "description": "A scrolling, monospace stream of timestamped lines — build output, a job's stdout, a webhook's delivery attempts. It renders what a process said, in the order it said it, and nothing in it is a record the user edits.",
       "related": [
         "timeline",
+        "progress",
         "table",
-        "skeleton"
+        "empty-state"
       ],
       "variants": [
         {
@@ -1397,12 +1398,64 @@
           "name": "Static stream"
         },
         {
+          "id": "levels",
+          "name": "Filterable by level"
+        },
+        {
+          "id": "numbered",
+          "name": "Numbered lines"
+        },
+        {
+          "id": "wrap",
+          "name": "Wrap or do not wrap"
+        },
+        {
+          "id": "search",
+          "name": "Find in the stream"
+        },
+        {
+          "id": "elapsed",
+          "name": "Clock, elapsed or neither"
+        },
+        {
+          "id": "steps",
+          "name": "Collapsible steps"
+        },
+        {
+          "id": "structured",
+          "name": "Structured lines with detail"
+        },
+        {
+          "id": "actions",
+          "name": "Copy, download, clear"
+        },
+        {
           "id": "streaming",
           "name": "Live, autoscrolling"
         },
         {
-          "id": "levels",
-          "name": "Filterable by level"
+          "id": "paused",
+          "name": "Paused by the reader"
+        },
+        {
+          "id": "disconnected",
+          "name": "The connection dropped"
+        },
+        {
+          "id": "job",
+          "name": "A job, with its progress above it"
+        },
+        {
+          "id": "failed",
+          "name": "Ended in failure"
+        },
+        {
+          "id": "empty",
+          "name": "Waiting, and nothing to show"
+        },
+        {
+          "id": "inline",
+          "name": "An excerpt inside a record"
         }
       ],
       "detail": "r/log.json"

@@ -1,0 +1,49 @@
+<!-- Numbers are for citing a line in a ticket — "it starts at 1,284" — so they
+     are aria-hidden and select-none. They are not part of what the line says,
+     and a number dragged into a paste turns a copied stack trace into something
+     that cannot be searched for. The row carries the id instead, so a link to
+     one line is a URL rather than forty tab stops down a gutter.
+
+     The marked line is a full-bleed band and bleeds with -mx-4 px-4 against the
+     stream's own padding, so the fill reaches the panel edges rather than
+     stopping in a rectangle four pixels short of them. No hover on any of it:
+     hovering a log line does nothing, and a hover fill that leads nowhere reads
+     as a control that is broken. -->
+<div data-kui="log/numbered" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">grn-import.log</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">line 42 of 1,284</span>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="GRN import log, lines 38 to 44"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div id="log-n-38" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">38</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,196 — GRN-26-0441 posted, 12 lines</span>
+    </div>
+    <div id="log-n-39" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">39</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,197 — GRN-26-0442 posted, 4 lines</span>
+    </div>
+    <div id="log-n-40" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">40</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,198 — skipped, duplicate challan 8841/25-26</span>
+    </div>
+    <div id="log-n-41" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">41</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,199 — GRN-26-0443 posted, 9 lines</span>
+    </div>
+    <div id="log-n-42" class="-mx-4 flex gap-3 bg-zinc-800 px-4">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-200">42</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-100">Row 1,200 — aborted: rate 0.00 on item RM-3301, which is not a free-issue item<span class="sr-only"> (the line this link points at)</span></span>
+    </div>
+    <div id="log-n-43" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">43</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Rolling back the batch, 1,199 rows</span>
+    </div>
+    <div id="log-n-44" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">44</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Import ended with 1 error</span>
+    </div>
+  </div>
+</div>

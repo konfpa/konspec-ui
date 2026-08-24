@@ -1,0 +1,40 @@
+<!-- A stream that stops because the socket died looks exactly like a stream
+     that stops because the job finished, and the two are opposite facts. So the
+     panel says which, in words, with the time of the last line it actually
+     received — that time is the only thing the reader can trust, and it is what
+     they will quote when they ask why nothing has run since.
+
+     Reconnect is a real button and not a countdown alone. Automatic retry with
+     a timer is right, but a reader watching a stalled deploy will press
+     something, and if the only thing on offer is the browser reload they lose
+     the buffer as well.
+
+     The strip is graphite with the colour in the dot, like every other state in
+     this system. A red band across a console reads as an outage to anybody
+     walking past the screen, and a dropped websocket on one tab is not one. -->
+<div data-kui="log/disconnected" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — production</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Disconnected
+    </span>
+  </div>
+
+  <div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 text-zinc-400">
+      The stream stopped at <span class="tabular-nums text-zinc-200">14:03:58</span>, 41 seconds ago. The deploy itself is unaffected — this is the connection to it. Retrying in 4s.
+    </p>
+    <button type="button"
+            class="flex shrink-0 items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 py-1 text-[11px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="refresh-cw" class="size-3.5"></i>Reconnect now
+    </button>
+  </div>
+
+  <div role="log" aria-live="off" tabindex="0" aria-label="Deploy 4417 output, disconnected"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:58</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Warming instance 1 of 4</span></div>
+    <p class="mt-2 border-t border-zinc-800 pt-2 text-zinc-400">— stream ends here; anything the deploy wrote after 14:03:58 has not been received —</p>
+  </div>
+</div>

@@ -1,33 +1,58 @@
-<div x-data="{
+<!-- The filter is a latched button group, so each button carries aria-pressed
+     and the group carries a name. The buttons sit straight on the toolbar with
+     no track behind them: a zinc-800 track would need its shapes to hover to
+     zinc-800 as well, which is the fill they would be sitting on, and a control
+     that hovers to its own background loses its surface instead of gaining one.
+
+     Filtering removes lines from a live region, and a removal announces
+     nothing. So the count beside the group is a role="status" and it is the
+     thing that speaks — n of m lines — and a filter that matches nothing gets a
+     sentence rather than an empty panel with a header on it.
+
+     Keyed by l.id and not by timestamp-plus-text. Two identical lines a second
+     apart are ordinary in a log, and two identical keys in one x-for is a
+     silently wrong list. -->
+<div data-kui="log/levels"
+     x-data="{
        filter: 'all',
        lines: [
-         { t: '09:14:02', level: 'info', msg: 'Worker started, pid 4821' },
-         { t: '09:14:05', level: 'info', msg: 'Connected to queue "grn-imports"' },
-         { t: '09:14:09', level: 'warn', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
-         { t: '09:14:12', level: 'info', msg: 'Job grn-4417 completed in 1.8s' },
-         { t: '09:14:18', level: 'error', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
-         { t: '09:14:19', level: 'info', msg: 'Job grn-4419 completed in 0.6s' }
-       ]
-     }" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-2.5">
+         { id: 1, t: '09:14:02', level: 'info',  msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:05', level: 'info',  msg: 'Connected to queue grn-imports' },
+         { id: 3, t: '09:14:09', level: 'warn',  msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 4, t: '09:14:12', level: 'info',  msg: 'Job grn-4417 completed in 1.8s' },
+         { id: 5, t: '09:14:18', level: 'error', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 6, t: '09:14:19', level: 'info',  msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 7, t: '09:14:24', level: 'warn',  msg: 'Queue depth 812, above the 500 line watermark' }
+       ],
+       tone: { info: 'text-zinc-400', warn: 'text-amber-400', error: 'text-red-400' },
+       get shown() { return this.filter === 'all' ? this.lines : this.lines.filter(l =&gt; l.level === this.filter) }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
     <span class="text-[13px]/5 font-medium text-zinc-200">Import worker</span>
-    <div class="flex items-center gap-1 rounded-lg bg-zinc-900 p-0.5" role="group" aria-label="Filter by level">
+    <div class="flex items-center gap-1" role="group" aria-label="Filter by level">
       <template x-for="lv in ['all', 'info', 'warn', 'error']" :key="lv">
-        <button @click="filter = lv" :aria-pressed="filter === lv" x-text="lv"
-                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium capitalize transition"
-                :class="filter === lv ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-zinc-200'"></button>
+        <button type="button" @click="filter = lv" :aria-pressed="filter === lv" x-text="lv"
+                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium capitalize transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                :class="filter === lv ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"></button>
       </template>
     </div>
   </div>
-  <div role="log" aria-live="polite" class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-    <template x-for="l in lines.filter(l => filter === 'all' || l.level === filter)" :key="l.t + l.msg">
+
+  <p role="status" class="border-b border-zinc-800 px-4 py-1.5 text-[11px]/4 tabular-nums text-zinc-400"
+     x-text="filter === 'all' ? lines.length + ' lines' : shown.length + ' of ' + lines.length + ' lines'">7 lines</p>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in shown" :key="l.id">
       <div class="flex gap-3">
-        <span class="shrink-0 tabular-nums text-zinc-600" x-text="l.t"></span>
-        <span class="w-12 shrink-0 font-semibold uppercase"
-              :class="{ info: 'text-zinc-500', warn: 'text-amber-400', error: 'text-red-400' }[l.level]"
-              x-text="l.level"></span>
-        <span class="break-words text-zinc-300" x-text="l.msg"></span>
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="w-12 shrink-0 font-semibold uppercase" :class="tone[l.level]" x-text="l.level"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
       </div>
     </template>
+    <p x-show="!shown.length" x-cloak class="text-zinc-400">
+      No lines at this level. The worker wrote <span x-text="lines.length"></span> lines in all — clear the filter to see them.
+    </p>
   </div>
 </div>

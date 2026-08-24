@@ -1,0 +1,41 @@
+<!-- On a record page the log is not the screen, it is a paragraph of it: the
+     last few lines of the last run, enough to see whether to go and look
+     properly. The card around it is the ordinary white one — the dark panel is
+     the log itself and does not spread to its container.
+
+     Last lines, not first. A run that failed says why at the end, and an
+     excerpt that started at the top would show the same four setup lines for
+     every run on the register.
+
+     The excerpt does not scroll and does not tail. Two scrolling regions on a
+     record page compete for the wheel, and a strip that moves while somebody is
+     reading the fields beside it is worse than one that is a few seconds stale.
+     The link is what takes them to the live one, and it names the run rather
+     than saying "view".
+
+     It keeps role="log" and the aria-live is off, because this is a static
+     excerpt of something that has already happened. Keep the tabindex only if
+     the excerpt can overflow; this one is capped at five lines, so it does
+     not. -->
+<div data-kui="log/inline" class="max-w-lg rounded-xl border border-zinc-300 bg-white p-5">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+    <h3 class="text-[13px]/5 font-medium">Last run</h3>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed
+    </span>
+  </div>
+  <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Deploy 4417 · 16 Aug 2026, 14:02 · 3m 04s</p>
+
+  <div role="log" aria-live="off" aria-label="Last five lines of deploy 4417"
+       class="mt-3 rounded-lg bg-zinc-900 p-3 font-mono text-[12px]/5">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-red-400">AssertionError: expected ValidationError, got GRN-26-0451</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:24</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Pipeline stopped, deploy step skipped</span></div>
+  </div>
+
+  <p class="mt-3 text-[12px]/4">
+    <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the full log for deploy 4417</a>
+    <span class="text-zinc-500">— 1,284 lines</span>
+  </p>
+</div>

@@ -1,0 +1,63 @@
+<!-- Where each line is an event with fields rather than a sentence — a webhook
+     attempt, an API call, a device reading. The summary row is the log line and
+     the detail is what the row would have been if it had been printed in full:
+     the same event, not a different one, so nothing in the well contradicts the
+     row above it.
+
+     It expands in place. An overlay over a stream loses the reader's place in
+     it, and the one question they are answering is what happened either side of
+     this attempt.
+
+     This is the boundary with table, and the boundary is sorting. The moment
+     somebody wants these rows ordered by duration or grouped by status code
+     they have stopped reading a stream, and the answer is a table with a mono
+     column — not a header bar bolted onto this, which would promise an order a
+     log cannot have.
+
+     The status is the graphite pill with colour in the dot, exactly as it is on
+     white, because 502 in red text down a column of attempts is a wall of red
+     that stops reading as anything by the fourth row. -->
+<div data-kui="log/structured"
+     x-data="{
+       open: null,
+       rows: [
+         { id: 1, t: '11:04:02', verb: 'POST', path: '/hooks/grn-posted', code: 202, ms: 184, dot: 'bg-emerald-600', body: '{ &quot;grn&quot;: &quot;GRN-26-0442&quot;, &quot;lines&quot;: 4, &quot;posted_at&quot;: &quot;2026-08-16T11:04:01+05:30&quot; }', note: 'Accepted' },
+         { id: 2, t: '11:06:18', verb: 'POST', path: '/hooks/grn-posted', code: 502, ms: 30012, dot: 'bg-red-600', body: '&lt;html&gt;&lt;head&gt;&lt;title&gt;502 Bad Gateway&lt;/title&gt;&lt;/head&gt;&lt;body&gt;upstream timed out&lt;/body&gt;&lt;/html&gt;', note: 'Attempt 1 of 5 · retrying in 60s' },
+         { id: 3, t: '11:07:19', verb: 'POST', path: '/hooks/grn-posted', code: 502, ms: 30008, dot: 'bg-red-600', body: '&lt;html&gt;&lt;head&gt;&lt;title&gt;502 Bad Gateway&lt;/title&gt;&lt;/head&gt;&lt;body&gt;upstream timed out&lt;/body&gt;&lt;/html&gt;', note: 'Attempt 2 of 5 · retrying in 120s' },
+         { id: 4, t: '11:09:20', verb: 'POST', path: '/hooks/grn-posted', code: 202, ms: 211, dot: 'bg-emerald-600', body: '{ &quot;grn&quot;: &quot;GRN-26-0442&quot;, &quot;lines&quot;: 4, &quot;posted_at&quot;: &quot;2026-08-16T11:04:01+05:30&quot; }', note: 'Accepted on attempt 3' }
+       ]
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Webhook — Sharma Extrusions</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">4 attempts · delivered 11:09:20</span>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Webhook delivery attempts"
+       class="max-h-80 overflow-y-auto py-1 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="r in rows" :key="r.id">
+      <div>
+        <button type="button" @click="open = open === r.id ? null : r.id" :aria-expanded="open === r.id"
+                :aria-controls="'log-x-' + r.id"
+                class="flex w-full items-center gap-3 px-4 py-1 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === r.id &amp;&amp; 'rotate-90'">
+            <i data-lucide="chevron-right" class="size-3.5 text-zinc-400"></i>
+          </span>
+          <span class="shrink-0 tabular-nums text-zinc-400" x-text="r.t"></span>
+          <span class="shrink-0 font-semibold text-zinc-400" x-text="r.verb"></span>
+          <span class="min-w-0 flex-1 truncate text-zinc-300" x-text="r.path"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-300 ring-1 ring-inset ring-zinc-700">
+            <span class="size-1.5 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.code"></span>
+          </span>
+          <span class="hidden shrink-0 tabular-nums text-zinc-400 sm:inline" x-text="(r.ms / 1000).toFixed(2) + 's'"></span>
+        </button>
+        <div :id="'log-x-' + r.id" x-show="open === r.id" x-cloak x-collapse.duration.200ms>
+          <div class="px-4 pt-1 pb-3">
+            <p class="text-[11px]/4 text-zinc-400" x-text="r.note"></p>
+            <pre class="mt-1.5 rounded-lg bg-zinc-800 p-3 text-[12px]/5 whitespace-pre-wrap wrap-anywhere text-zinc-300"><code x-text="r.body"></code></pre>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>

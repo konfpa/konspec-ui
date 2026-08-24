@@ -1,0 +1,54 @@
+<!-- Two blank panels that mean opposite things, and a single empty box for
+     both is how somebody comes to sit watching a job that finished eleven
+     minutes ago.
+
+     Waiting is a live state: the job is alive, it has not written anything yet,
+     and the reader should stay. It keeps the Live pill, it keeps aria-live, and
+     the sentence says what it is waiting for.
+
+     Finished-with-no-output is a dead state and needs somewhere to go. The job
+     did run, it wrote nothing, and the thing the reader actually wants is the
+     job's own result — so the panel says so and links to it. Its stream is
+     aria-live="off", because nothing is coming.
+
+     Neither takes tabindex="0": the region does not scroll, and a focus stop
+     that scrolls nothing is a stop for nothing. The tabindex goes on wherever
+     the stream can overflow, which is every other variant here.
+
+     Neither of them draws a big icon or an illustration. This is a region
+     inside a screen, not the empty-state component, and a graphic in a 320px
+     panel takes the space the sentence needed. -->
+<div data-kui="log/empty" class="grid gap-4 sm:grid-cols-2">
+
+  <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+      <span class="text-[13px]/5 font-medium text-zinc-200">GRN import 4419</span>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 animate-pulse rounded-full bg-emerald-600 motion-reduce:animate-none" aria-hidden="true"></span>Queued
+      </span>
+    </div>
+    <div role="log" aria-live="polite" aria-label="GRN import 4419 output"
+         class="flex min-h-40 items-center justify-center p-6">
+      <p class="max-w-[38ch] text-center text-[13px]/5 text-zinc-400">
+        Waiting for the worker to pick this job up. Lines appear here as it writes them — you can leave the page open.
+      </p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+      <span class="text-[13px]/5 font-medium text-zinc-200">Nightly reconciliation</span>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Finished 02:00:22
+      </span>
+    </div>
+    <div role="log" aria-live="off" aria-label="Nightly reconciliation output"
+         class="flex min-h-40 items-center justify-center p-6">
+      <p class="max-w-[38ch] text-center text-[13px]/5 text-zinc-400">
+        The run finished in 18 seconds and wrote nothing to its log. It matched 1,284 entries with no variance —
+        <a href="#" class="text-zinc-200 underline underline-offset-2 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">open the run</a>
+        for the figures.
+      </p>
+    </div>
+  </div>
+</div>

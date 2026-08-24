@@ -18254,128 +18254,1083 @@ register(
 },
 {
   id: 'log', name: 'Log', category: 'data',
-  description: 'A scrolling, monospace stream of timestamped lines — build output, a job\'s stdout, a webhook\'s delivery attempts. It renders what a process said, in the order it said it, and nothing about it is a record the user edits.',
-  when: 'Something is producing lines over time and the reader\'s question is "what is it doing right now / what did it just do" — an import running, a deploy, a background job, a device\'s console. Reach for timeline instead the moment the lines are discrete business events with an actor and a verb (approved, amended, received): a timeline is a handful of sentences about a record, this is hundreds of raw lines a process wrote. Reach for table when the lines are really rows to be sorted and filtered — a delivery log an admin searches by status code is a table with a mono column, not this. And a toast or alert reports one outcome after the fact; this is the stream the outcome came out of.',
+  description: 'A scrolling, monospace stream of timestamped lines — build output, a job\'s stdout, a webhook\'s delivery attempts. It renders what a process said, in the order it said it, and nothing in it is a record the user edits.',
+  when: 'Something is producing lines over time and the reader\'s question is "what is it doing right now, or what did it just do" — an import running, a deploy, a background worker, a device console. Reach for timeline instead the moment the lines are discrete business events with an actor and a verb (approved, amended, received): a timeline is a handful of sentences about one record, this is hundreds of raw lines a process wrote and did not write for anybody in particular. Reach for table when the lines are really rows to be sorted and filtered — a delivery log an admin searches by status code is a table with a mono column, not this — and note that the structured variant here is the boundary case: it is still a stream, and the moment a column header wants to be sortable it has stopped being one. Reach for progress when the only thing the reader wants is how far along it is, because a progress bar answers that in one glance and a log makes them read for it; the job variant here is the two together, which is usually the honest answer for an import. And a toast or an alert reports one outcome after the fact — this is the stream that outcome came out of, and it stays on screen after the outcome lands rather than being replaced by it.',
   notes: [
     'Autoscroll pins to the bottom only while the reader is already at the bottom. The instant they scroll up to read something, new lines stop yanking the viewport down — track it with a scrollTop/scrollHeight check on scroll, not a flag that only ever gets set to true, or the log becomes unreadable the moment it has more than a screenful.',
-    'A "Jump to latest" pill appears the moment the reader scrolls away from the bottom and disappears the moment they return to it. Without it there is no way back to live tailing except scrolling by hand, which the reader has no way of knowing is even possible.',
-    'Lines append as DOM nodes; the log never re-renders its full text on every new line. A process that writes a few lines a second and re-joins the whole buffer into one string each time will visibly stutter and eventually drop frames past a few thousand lines.',
-    'Cap the buffer — a few thousand lines is plenty — and drop from the top, not the bottom. An unbounded buffer is a slow memory leak in the one tab most likely to stay open all afternoon.',
-    'Level is colour on the text plus a plain-word prefix (ERROR, WARN), never colour alone — the same rule every status mark in this system follows, and it is the difference between a log that is scannable in a screenshot pasted into a ticket and one that is not.',
-    'The container is role="log" aria-live="polite", not role="status". status implies a summary of current state; log is the ARIA role for exactly this — a sequence of appended messages a reader may or may not be looking at. It is polite regardless of level, because an error mid-stream is still one of many lines, not an interruption.'
+    'A "Jump to latest" pill appears the moment the reader scrolls away from the bottom, and it carries the number of lines that have landed since they left. Without the pill there is no way back to live tailing except scrolling by hand, which the reader has no way of knowing is even possible; without the figure on it, the reader cannot tell a stream that has moved on by four lines from one that has moved on by four hundred, and those are different decisions about whether to give up their place.',
+    'Lines append as DOM nodes and are keyed by a sequence number the producer assigns, never by the array index. The buffer is capped, so it shifts, and under an index key every surviving node\'s text changes on every append: Alpine rewrites the whole visible list once a second, the selection the reader had made disappears, and a stream that writes a few lines a second visibly stutters. A monotonic id moves one node in and one out.',
+    'Cap the buffer — a few thousand lines is plenty — and drop from the top, not the bottom. An unbounded buffer is a slow memory leak in the one tab most likely to stay open all afternoon. Say the cap somewhere when it bites, because a reader scrolling up to find the start of the run and hitting a wall assumes the log is broken rather than trimmed.',
+    'The message takes wrap-anywhere, not break-words. break-words does not change the element\'s min-content width, so one unbreakable token — a bundle hash, a base64 payload, a Windows path, a minified stack frame — holds the flex row open at its own width, the panel grows to fit it and at 390px the whole page scrolls sideways. Nothing in a log line is under this system\'s control, and the one class that shortens min-content is the one to write.',
+    'The stream is a scroller with no focusable content in it, so it carries tabindex="0" and an accessible name. Chromium will not give keyboard focus to an overflow container on its own, and without this the log cannot be scrolled at all without a mouse — which, in a component whose entire job is to be read, is the whole component gone. It draws the on-dark focus outline like anything else on this panel.',
+    'Never render a log line through x-html, innerHTML or a template filter marked safe. A log line is the least trusted string in the application: it is whatever a vendor\'s webhook, a customer\'s filename or an attacker\'s user agent put into it, and it arrives with angle brackets in it as a matter of routine. Search highlighting is the case that tempts everybody, and it is done by splitting the string into before, match and after and rendering three text nodes — the same shape tree-view/search uses — never by wrapping the match in a tag and assigning the result.',
+    'role="log" is the container role, and aria-live is a decision about rate rather than a constant. A stream that appends occasionally takes aria-live="polite", which is the ARIA default for the role and reads each new line once. A stream running at several lines a second takes aria-live="off" and a role="status" element beside it that says "streaming, 1,284 lines" and updates on a timer, because a live region reading forty lines a minute makes every other control on the page unusable and the reader cannot interrupt it. Neither of them is "assertive": an error mid-stream is still one of many lines, not an interruption.',
+    'Level is a word before it is a colour, and the word sits in a fixed-width column so every message starts at the same character. Colour alone does not survive greyscale, a screenshot pasted into a ticket, or a reader who cannot separate the amber line from the red one; a ragged left edge on the message column does not survive being scanned at all, which is the only way anybody reads four hundred lines. A line with no level keeps the empty column rather than closing it up.',
+    'This panel is the one dark surface in the library and it is not a dark theme. It is dark because a log is read the way a terminal is read, and because the level colours were picked against it. What follows from that is that the on-dark row of the text scale applies inside it and nowhere else: secondary text is zinc-400, not zinc-600. The first version of this component set its timestamps at zinc-600, which measures 2.3:1 against zinc-900 — the timestamp is real content people quote, and it was effectively unreadable. Nothing textual on this panel goes dimmer than zinc-400, level words take the -400 step of their hue rather than the -600 and -700 marks used on white, and the focus outline is outline-white at a negative offset because zinc-700/15 has nothing to sit against here.',
+    'A state pill on the toolbar is the same graphite shape as every other status pill in the system, with the colour in its 6px dot. Live in green text and Failed in red text is the traffic-light mistake made in the one place where it is most tempting, and a red word at the top of a console reads as an outage to somebody walking past a screen showing a build that failed a test.',
+    'Clear empties this view and nothing else, and the control has to say so. A log panel is the closest thing on screen to the run itself, so a bare "Clear" is read as destroying the output — people have stopped clicking it for that reason, and people have clicked it and then filed a ticket asking for the run back. Announce the outcome in a role="status" that names where the log still is, and never put a Clear on a finished run, which has nothing to clear and everything to lose.',
+    'A run that ends does not turn into a different component. The panel stays, the pill changes, and the last lines stay on screen — replacing a failed run\'s output with an alert takes away the only thing that explains the failure, and putting the alert above the log while the log scrolls underneath it is what the failure summary strip is for. The strip names the counts and offers a jump to the first error; it does not paraphrase the error, because the line itself is the evidence.',
+    'An empty log is two different sentences and they lead to different actions. "Waiting for output" means the job is alive and has not said anything yet, and the reader should stay; "the job finished and produced no output" means there is nothing coming and the reader should go and look at the job\'s own result. A single blank panel for both is how somebody comes to sit watching a job that finished eleven minutes ago.',
+    'Do not paginate a log and do not sort one. Both are the shape of a table applied to a stream: a log has exactly one order, which is the order the lines were written in, and a "page 3 of 40" over the top of it hides the one line that matters behind a control that has to be operated to find out. Where the reader genuinely needs to work through the lines as records — filtering by status code, sorting by duration — the answer is table, and the log stays as the raw stream behind it.'
   ],
   anatomy: [
-    ['Panel', 'rounded-xl border border-zinc-800 bg-zinc-900. Dark regardless of the page\'s theme — a log is read like a terminal, and level colours are tuned against that background.'],
-    ['Toolbar', 'Title, a live/paused pill, and Copy and Clear actions, in a border-b border-zinc-800 strip above the stream.'],
-    ['Stream', 'The scrolling region itself: role="log" aria-live="polite", max-h bound, overflow-y-auto, font-mono text-[12px]/5, p-4.'],
-    ['Line', 'flex gap-3 per row: a tabular-nums timestamp in text-zinc-600, an optional level word, the message in text-zinc-300, wrapped with break-words so a long line never forces the panel wider.'],
-    ['Jump to latest', 'A pill pinned to the bottom-right of the stream, shown only once the reader has scrolled away from the bottom.']
+    ['Panel', 'overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900. Dark regardless of the page\'s theme, and the only dark surface in the library — the on-dark step of every token applies inside it.'],
+    ['Toolbar', 'A border-b border-zinc-800 strip: the run\'s name on the left, the state pill and the controls on the right. Controls are borderless shapes, text-zinc-400, hovering to zinc-800.'],
+    ['State pill', 'Graphite — bg-zinc-800, ring-1 ring-inset ring-zinc-700, text-zinc-300 — with a 6px dot carrying the colour. Live, Paused, Failed and Finished are the same shape and differ only in the dot and the word.'],
+    ['Stream', 'The scrolling region: role="log", aria-live, tabindex="0", an accessible name, a max-h bound, overflow-y-auto, font-mono text-[12px]/5 and p-4.'],
+    ['Line', 'flex gap-3. Nothing in it is a control, and the row is a plain div rather than a list item — a log is not a list of things, it is a transcript.'],
+    ['Timestamp', 'shrink-0 tabular-nums text-zinc-400. Real text so it is read, copied and searched with the line it belongs to.'],
+    ['Level', 'w-12 shrink-0 font-semibold uppercase, in the -400 step of its hue. A line with no level keeps the same empty w-12 span, aria-hidden, so the messages line up.'],
+    ['Message', 'min-w-0 flex-1 wrap-anywhere text-zinc-300. wrap-anywhere rather than break-words, because a log line contains tokens with no space in them.'],
+    ['Gutter', 'The optional line-number column: w-10 shrink-0 select-none text-right tabular-nums text-zinc-400, aria-hidden. select-none so copying the block does not drag the numbers into the paste.'],
+    ['Jump to latest', 'A pill pinned to the bottom of the stream, shown only once the reader has scrolled away from the bottom, carrying the count of what has landed since.'],
+    ['Summary strip', 'The band between the toolbar and the stream on a run that failed or dropped its connection: the counts, and one action — jump to the first error, or reconnect.'],
+    ['Detail well', 'On a structured line, the expanded body: rounded-lg bg-zinc-800 p-3, holding headers or a payload. It is the only nested surface on this panel.']
   ],
   behaviour: [
-    'New lines append at the bottom in the order they arrive; nothing already on screen reorders or renumbers.',
-    'While the reader is scrolled to the bottom, the stream stays pinned there as lines land. The instant they scroll up, autoscroll stops and does not resume until they scroll back down or press Jump to latest.',
+    'New lines append at the bottom in the order they arrive; nothing already on screen reorders, renumbers or moves.',
+    'While the reader is at the bottom, the stream stays pinned there as lines land. The instant they scroll up, autoscroll stops and does not resume until they scroll back down or press Jump to latest, which also clears the count on it.',
     'The buffer is capped; once full, the oldest line is dropped for each new one appended.',
-    'Copy takes the whole visible buffer as plain text, timestamps included, in one paste-ready block.',
-    'Paused (a closed connection, a finished job) is a state in the toolbar pill, not a change to any line already drawn.'
+    'Filtering by level, or by a search term, hides lines and never reorders them — the lines still shown keep their timestamps, so the gaps are visible as gaps.',
+    'Copy takes the whole buffer as plain text, timestamps included, in one paste-ready block; Download takes the same string as a file. Clear empties this view only, and says so.',
+    'Paused, disconnected and finished are states of the toolbar pill and the summary strip. None of them changes a line already drawn.',
+    'A step group opens and closes without the stream losing its scroll position, and a step that failed opens on arrival.',
+    'A structured line expands in place. The line stays where it is and the detail pushes the lines below it down; nothing opens in an overlay.'
   ],
   a11y: [
-    'The stream carries role="log" aria-live="polite", the ARIA role written for an appending sequence of messages — the reader is not expected to have every line read aloud, only to be able to land on the region and read what is there.',
-    'Colour on a level is never the only signal: ERROR and WARN are written words before they are a colour, so the line survives greyscale and a screen reader alike.',
-    'The timestamp is real text content, not a tooltip or a title attribute, so it is read, copied and searched with the line it belongs to.',
-    'Jump to latest is a real, focusable button with a label naming what it does, not an icon alone.'
+    'The stream carries role="log" with an accessible name. aria-live is polite where lines are occasional and off where they are not, with a role="status" summary in its place — a live region reading a fast stream is a page nobody else can use.',
+    'The stream is focusable — tabindex="0" — because it scrolls and contains no controls, and it draws focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white like everything else on this panel.',
+    'Colour on a level is never the only signal: ERROR and WARN are written words in a fixed column before they are a colour, so the line survives greyscale and a screen reader alike.',
+    'The timestamp is real text content, not a title attribute or a tooltip, so it is read, copied and searched with the line it belongs to.',
+    'Line numbers are aria-hidden and select-none: they are a visual index for citing a line, they are not part of what the line says, and they must not land in a paste.',
+    'Jump to latest is a real, focusable button whose name says what it does and how much is waiting, not an icon on its own.',
+    'A filter, a search and a Clear each announce their result through a role="status" — how many lines are shown of how many, or where the log still is — because removing lines from a live region announces nothing at all.',
+    'Every control on this panel is a real button with a name; the state pill is not a control and is not focusable.'
   ],
-  related: ['timeline', 'table', 'skeleton'],
+  related: ['timeline', 'progress', 'table', 'empty-state'],
   variants: [
     { id: 'default', name: 'Static stream', code:
-`<div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
-    <span class="text-[13px]/5 font-medium text-zinc-200">Build output</span>
-    <div class="flex items-center gap-1.5">
-      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Copy</button>
-      <button class="rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200">Clear</button>
+`<!-- A finished run, rendered by the server. No Alpine, and no controls that
+     would need any: a log that has stopped has nothing to pause, nothing to
+     clear and nothing to jump to.
+
+     Three things here are the whole component and are repeated in every variant
+     below. The stream is tabindex="0" with a name, because Chromium will not
+     focus an overflow container on its own and a log nobody can scroll from a
+     keyboard is a log half the readers cannot get to the end of. The message
+     takes wrap-anywhere rather than break-words, because break-words leaves the
+     min-content width at the longest unbreakable token and the bundle path on
+     the fourth line would otherwise hold the panel open and scroll the page
+     sideways at 390px. And a line with no level keeps the empty w-12 span, so
+     every message starts at the same character. -->
+<div data-kui="log/default" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Build output — deploy 4417</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">6 lines · ended 14:02:31</span>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Build output for deploy 4417"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Installing dependencies…</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:14</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:19</span>
+      <span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span>
+      <span aria-hidden="true" class="w-12 shrink-0"></span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:31</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span>
+    </div>
+    <div class="flex gap-3">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:02:31</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Build failed with 1 error</span>
     </div>
   </div>
-  <div role="log" aria-live="polite" class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:11</span><span class="break-words text-zinc-300">Installing dependencies…</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:14</span><span class="break-words text-zinc-300">Resolved 214 packages</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:19</span><span class="shrink-0 font-semibold text-amber-400">WARN</span><span class="break-words text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:26</span><span class="break-words text-zinc-300">Compiling…</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">TypeError: Cannot read properties of undefined (reading 'map') at src/orders/list.tsx:42</span></div>
-    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-600">14:02:31</span><span class="shrink-0 font-semibold text-red-400">ERROR</span><span class="break-words text-zinc-300">Build failed with 1 error</span></div>
-  </div>
 </div>` },
-    { id: 'streaming', name: 'Live, autoscrolling', code:
-`<div x-data="{
-       lines: [{ t: '14:02:11', level: null, msg: 'Deploy started' }],
-       pinned: true,
-       tick: null,
-       next() {
-         const words = ['Uploading build artifact…', 'Warming instance 2 of 4…', 'Health check passed on instance 1', 'Draining old instances…', 'Instance 3 of 4 ready'];
-         this.lines.push({ t: new Date().toLocaleTimeString('en-GB'), level: null, msg: words[this.lines.length % words.length] });
-         if (this.lines.length > 200) this.lines.shift();
-         this.$nextTick(() => { if (this.pinned) this.$refs.stream.scrollTop = this.$refs.stream.scrollHeight; });
-       },
-       onScroll() { const s = this.$refs.stream; this.pinned = s.scrollHeight - s.scrollTop - s.clientHeight < 24; },
-       start() { this.tick = setInterval(() => this.next(), 1500); }
-     }"
-     x-init="start()" @scroll.passive="$refs.stream === $event.target && onScroll()"
-     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
-    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy — production</span>
-    <span class="flex items-center gap-1.5 text-[11px]/4 font-medium text-emerald-400">
-      <span class="size-1.5 animate-pulse rounded-full bg-emerald-400"></span>Live
-    </span>
-  </div>
-  <div class="relative">
-    <div x-ref="stream" @scroll.passive="onScroll()" role="log" aria-live="polite"
-         class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-      <template x-for="(l, i) in lines" :key="i">
-        <div class="flex gap-3">
-          <span class="shrink-0 tabular-nums text-zinc-600" x-text="l.t"></span>
-          <span class="break-words text-zinc-300" x-text="l.msg"></span>
-        </div>
-      </template>
-    </div>
-    <button x-show="!pinned" x-cloak
-            @click="pinned = true; $refs.stream.scrollTop = $refs.stream.scrollHeight"
-            class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-zinc-700 px-3 py-1.5 text-[11px]/4 font-medium text-zinc-100 shadow-lg hover:bg-zinc-800">
-      ↓ Jump to latest
-    </button>
-  </div>
-</div>` },
-    { id: 'levels', name: 'Filterable by level', code:
-`<div x-data="{
+
+    { id: 'levels', name: 'Filterable by level', tagNew: true, code:
+`<!-- The filter is a latched button group, so each button carries aria-pressed
+     and the group carries a name. The buttons sit straight on the toolbar with
+     no track behind them: a zinc-800 track would need its shapes to hover to
+     zinc-800 as well, which is the fill they would be sitting on, and a control
+     that hovers to its own background loses its surface instead of gaining one.
+
+     Filtering removes lines from a live region, and a removal announces
+     nothing. So the count beside the group is a role="status" and it is the
+     thing that speaks — n of m lines — and a filter that matches nothing gets a
+     sentence rather than an empty panel with a header on it.
+
+     Keyed by l.id and not by timestamp-plus-text. Two identical lines a second
+     apart are ordinary in a log, and two identical keys in one x-for is a
+     silently wrong list. -->
+<div data-kui="log/levels"
+     x-data="{
        filter: 'all',
        lines: [
-         { t: '09:14:02', level: 'info', msg: 'Worker started, pid 4821' },
-         { t: '09:14:05', level: 'info', msg: 'Connected to queue "grn-imports"' },
-         { t: '09:14:09', level: 'warn', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
-         { t: '09:14:12', level: 'info', msg: 'Job grn-4417 completed in 1.8s' },
-         { t: '09:14:18', level: 'error', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
-         { t: '09:14:19', level: 'info', msg: 'Job grn-4419 completed in 0.6s' }
-       ]
-     }" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-2.5">
+         { id: 1, t: '09:14:02', level: 'info',  msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:05', level: 'info',  msg: 'Connected to queue grn-imports' },
+         { id: 3, t: '09:14:09', level: 'warn',  msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 4, t: '09:14:12', level: 'info',  msg: 'Job grn-4417 completed in 1.8s' },
+         { id: 5, t: '09:14:18', level: 'error', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 6, t: '09:14:19', level: 'info',  msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 7, t: '09:14:24', level: 'warn',  msg: 'Queue depth 812, above the 500 line watermark' }
+       ],
+       tone: { info: 'text-zinc-400', warn: 'text-amber-400', error: 'text-red-400' },
+       get shown() { return this.filter === 'all' ? this.lines : this.lines.filter(l =&gt; l.level === this.filter) }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
     <span class="text-[13px]/5 font-medium text-zinc-200">Import worker</span>
-    <div class="flex items-center gap-1 rounded-lg bg-zinc-900 p-0.5" role="group" aria-label="Filter by level">
+    <div class="flex items-center gap-1" role="group" aria-label="Filter by level">
       <template x-for="lv in ['all', 'info', 'warn', 'error']" :key="lv">
-        <button @click="filter = lv" :aria-pressed="filter === lv" x-text="lv"
-                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium capitalize transition"
-                :class="filter === lv ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-zinc-200'"></button>
+        <button type="button" @click="filter = lv" :aria-pressed="filter === lv" x-text="lv"
+                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium capitalize transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                :class="filter === lv ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"></button>
       </template>
     </div>
   </div>
-  <div role="log" aria-live="polite" class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5">
-    <template x-for="l in lines.filter(l => filter === 'all' || l.level === filter)" :key="l.t + l.msg">
+
+  <p role="status" class="border-b border-zinc-800 px-4 py-1.5 text-[11px]/4 tabular-nums text-zinc-400"
+     x-text="filter === 'all' ? lines.length + ' lines' : shown.length + ' of ' + lines.length + ' lines'">7 lines</p>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in shown" :key="l.id">
       <div class="flex gap-3">
-        <span class="shrink-0 tabular-nums text-zinc-600" x-text="l.t"></span>
-        <span class="w-12 shrink-0 font-semibold uppercase"
-              :class="{ info: 'text-zinc-500', warn: 'text-amber-400', error: 'text-red-400' }[l.level]"
-              x-text="l.level"></span>
-        <span class="break-words text-zinc-300" x-text="l.msg"></span>
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="w-12 shrink-0 font-semibold uppercase" :class="tone[l.level]" x-text="l.level"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+    <p x-show="!shown.length" x-cloak class="text-zinc-400">
+      No lines at this level. The worker wrote <span x-text="lines.length"></span> lines in all — clear the filter to see them.
+    </p>
+  </div>
+</div>` },
+
+    { id: 'numbered', name: 'Numbered lines', tagNew: true, code:
+`<!-- Numbers are for citing a line in a ticket — "it starts at 1,284" — so they
+     are aria-hidden and select-none. They are not part of what the line says,
+     and a number dragged into a paste turns a copied stack trace into something
+     that cannot be searched for. The row carries the id instead, so a link to
+     one line is a URL rather than forty tab stops down a gutter.
+
+     The marked line is a full-bleed band and bleeds with -mx-4 px-4 against the
+     stream's own padding, so the fill reaches the panel edges rather than
+     stopping in a rectangle four pixels short of them. No hover on any of it:
+     hovering a log line does nothing, and a hover fill that leads nowhere reads
+     as a control that is broken. -->
+<div data-kui="log/numbered" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">grn-import.log</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">line 42 of 1,284</span>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="GRN import log, lines 38 to 44"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div id="log-n-38" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">38</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,196 — GRN-26-0441 posted, 12 lines</span>
+    </div>
+    <div id="log-n-39" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">39</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,197 — GRN-26-0442 posted, 4 lines</span>
+    </div>
+    <div id="log-n-40" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">40</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,198 — skipped, duplicate challan 8841/25-26</span>
+    </div>
+    <div id="log-n-41" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">41</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 1,199 — GRN-26-0443 posted, 9 lines</span>
+    </div>
+    <div id="log-n-42" class="-mx-4 flex gap-3 bg-zinc-800 px-4">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-200">42</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-100">Row 1,200 — aborted: rate 0.00 on item RM-3301, which is not a free-issue item<span class="sr-only"> (the line this link points at)</span></span>
+    </div>
+    <div id="log-n-43" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">43</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Rolling back the batch, 1,199 rows</span>
+    </div>
+    <div id="log-n-44" class="flex gap-3">
+      <span aria-hidden="true" class="w-10 shrink-0 select-none text-right tabular-nums text-zinc-400">44</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Import ended with 1 error</span>
+    </div>
+  </div>
+</div>` },
+
+    { id: 'wrap', name: 'Wrap or do not wrap', tagNew: true, code:
+`<!-- Two ways to read the same lines, and both of them are needed. Wrapped is
+     the default because nothing is hidden. Unwrapped is what somebody comparing
+     a column of near-identical lines wants — a table of timings, a diff of two
+     configs — where wrapping breaks the alignment that is the reason they are
+     looking.
+
+     Unwrapped means the stream scrolls sideways, which is allowed: the rule is
+     that the PAGE may not, and a region that does needs a name, tabindex="0"
+     and a line of text saying so. This one already has the first two for its own
+     sake, so the sentence is the only thing the mode adds. It sits under the
+     stream and not over it, because there are no gradients or arrows in this
+     system and a fade over the last column hides the character it is pointing at.
+
+     whitespace-pre with min-w-max on the row is what actually stops the wrap: a
+     flex row shrinks to its container otherwise, and the message wraps however
+     the class list says it must not. -->
+<div data-kui="log/wrap" x-data="{ wrap: true }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Nightly reconciliation</span>
+    <button type="button" @click="wrap = !wrap" :aria-pressed="wrap"
+            class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+            :class="wrap ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'">
+      <i data-lucide="wrap-text" class="size-3.5"></i>Wrap long lines
+    </button>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Nightly reconciliation output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+       :class="wrap ? '' : 'overflow-x-auto'">
+    <template x-for="l in [
+      { id: 1, t: '02:00:04', msg: 'Opening statement HDFC-0042 for 01 Aug 2026 to 31 Aug 2026, 1,284 entries, opening balance 41,08,552.00' },
+      { id: 2, t: '02:00:19', msg: 'Matched 1,196 entries on UTR, 61 on amount and date, 27 left unmatched' },
+      { id: 3, t: '02:00:20', msg: 'Unmatched: 8841/25-26, 8847/25-26, 8852/25-26, 8861/25-26, 8874/25-26, 8880/25-26, 8891/25-26, 8894/25-26, 8902/25-26, 8917/25-26, 8920/25-26, 8931/25-26, 8944/25-26, 8951/25-26, 8968/25-26' },
+      { id: 4, t: '02:00:22', msg: 'Wrote /var/exports/recon/2026-08/hdfc-0042-unmatched-20260901T020022Z.csv' },
+      { id: 5, t: '02:00:22', msg: 'Closing balance 39,71,004.00, ledger 39,71,004.00, variance 0.00' }
+    ]" :key="l.id">
+      <div class="flex gap-3" :class="wrap ? '' : 'min-w-max'">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="text-zinc-300" :class="wrap ? 'min-w-0 flex-1 wrap-anywhere' : 'whitespace-pre'" x-text="l.msg"></span>
       </div>
     </template>
   </div>
+
+  <p x-show="!wrap" x-cloak class="border-t border-zinc-800 px-4 py-2 text-[12px]/4 text-zinc-400">
+    Long lines run past the edge — the stream scrolls sideways, the page does not.
+  </p>
+</div>` },
+
+    { id: 'search', name: 'Find in the stream', tagNew: true, code:
+`<!-- The highlight is three text nodes — before, match, after — and never
+     x-html. A log line is the least trusted string in the application: it is
+     whatever a vendor's webhook or somebody's filename put there, angle
+     brackets and all, and wrapping the match in a tag and assigning the result
+     is how a log becomes an injection point. Splitting the string costs three
+     spans and cannot execute anything.
+
+     The field filters rather than stepping match to match, because a log is read
+     by scanning and a next/previous pair makes the reader operate a control to
+     see what is already three lines up. The count is a role="status", so the
+     result of typing is announced; removing lines from a live region is not.
+
+     Matching is case-insensitive on a lowercased copy, and the slice comes off
+     the original, so the highlight shows the line's own casing rather than the
+     query's. -->
+<div data-kui="log/search"
+     x-data="{
+       q: 'vend-0982',
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:09', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 3, t: '09:14:18', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 4, t: '09:14:19', msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 5, t: '09:14:31', msg: 'Job grn-4423 failed: vendor VEND-0982 not found' },
+         { id: 6, t: '09:14:44', msg: 'Queue drained, 6 jobs, 2 failures' }
+       ],
+       term() { return this.q.trim().toLowerCase() },
+       at(l) { return this.term() ? l.msg.toLowerCase().indexOf(this.term()) : -1 },
+       hit(l) { return this.at(l) &gt; -1 },
+       pre(l) { const i = this.at(l); return i &lt; 0 ? l.msg : l.msg.slice(0, i) },
+       mid(l) { const i = this.at(l); return i &lt; 0 ? '' : l.msg.slice(i, i + this.term().length) },
+       post(l) { const i = this.at(l); return i &lt; 0 ? '' : l.msg.slice(i + this.term().length) },
+       get shown() { return this.term() ? this.lines.filter(l =&gt; this.hit(l)) : this.lines }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="shrink-0 text-[13px]/5 font-medium text-zinc-200">Import worker</span>
+    <label for="log-s-q" class="sr-only">Find in the log</label>
+    <div class="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-lg bg-zinc-800 px-2.5 sm:max-w-xs focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-white">
+      <i data-lucide="search" class="size-3.5 shrink-0 text-zinc-400"></i>
+      <input id="log-s-q" x-ref="q" type="search" x-model="q" placeholder="Find in the log"
+             class="min-w-0 flex-1 bg-transparent font-mono text-[12px]/5 text-zinc-200 outline-none placeholder:font-sans placeholder:text-zinc-400">
+      <button type="button" x-show="q" x-cloak @click="q = ''; $refs.q?.focus()" aria-label="Clear the search"
+              class="flex size-5 shrink-0 items-center justify-center rounded text-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="x" class="size-3.5"></i>
+      </button>
+    </div>
+    <p role="status" class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400"
+       x-text="term() ? shown.length + (shown.length === 1 ? ' line matches' : ' lines match') : lines.length + ' lines'">2 lines match</p>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in shown" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300"><span x-text="pre(l)"></span><mark x-show="hit(l)" class="rounded-sm bg-zinc-700 px-0.5 text-white" x-text="mid(l)"></mark><span x-text="post(l)"></span></span>
+      </div>
+    </template>
+    <p x-show="!shown.length" x-cloak class="text-zinc-400">
+      Nothing in the buffer matches “<span x-text="q"></span>”. Only the lines still in this view are searched — the run has 1,284 in all.
+    </p>
+  </div>
+</div>` },
+
+    { id: 'elapsed', name: 'Clock, elapsed or neither', tagNew: true, code:
+`<!-- Three ways to stamp a line, and the choice is not cosmetic. The wall clock
+     is what somebody correlates against another system — a vendor's webhook
+     log, a plant's shift record — and it is the only one that survives being
+     pasted into a ticket. Elapsed is what somebody looking for the slow step
+     wants, because the answer is a subtraction the clock makes them do in their
+     head. Neither is for a log being read as text, where a column of numbers is
+     six characters of noise on every line.
+
+     Both figures come off the same record: the line carries an absolute t and
+     an ms offset, so switching the mode cannot change what the log says. A
+     stream that stores only its elapsed offsets loses the ability to say when
+     anything happened the moment the page is reloaded.
+
+     Elapsed is padded to a fixed width and tabular-nums for the same reason the
+     clock is: the point of the column is that the eye can compare down it. -->
+<div data-kui="log/elapsed"
+     x-data="{
+       mode: 'elapsed',
+       modes: [['clock', 'Clock'], ['elapsed', 'Elapsed'], ['none', 'None']],
+       lines: [
+         { id: 1, t: '14:02:11', ms: 0,     msg: 'Deploy 4417 started' },
+         { id: 2, t: '14:02:14', ms: 3120,  msg: 'Pulled image registry.internal/orders:4417' },
+         { id: 3, t: '14:02:26', ms: 15480, msg: 'Ran 41 migrations' },
+         { id: 4, t: '14:03:58', ms: 107310, msg: 'Warmed instance 1 of 4' },
+         { id: 5, t: '14:04:02', ms: 111020, msg: 'Health check passed on instance 1' },
+         { id: 6, t: '14:04:29', ms: 138440, msg: 'All instances live, old ones drained' }
+       ],
+       stamp(l) { return this.mode === 'clock' ? l.t : '+' + (l.ms / 1000).toFixed(3) + 's' }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — 2m 18s</span>
+    <div class="flex items-center gap-1" role="group" aria-label="Timestamps">
+      <template x-for="m in modes" :key="m[0]">
+        <button type="button" @click="mode = m[0]" :aria-pressed="mode === m[0]" x-text="m[1]"
+                class="rounded-md px-2.5 py-1 text-[11px]/4 font-medium transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white motion-reduce:transition-none"
+                :class="mode === m[0] ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"></button>
+      </template>
+    </div>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Deploy 4417 output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span x-show="mode !== 'none'" class="w-[9ch] shrink-0 text-right tabular-nums text-zinc-400" x-text="stamp(l)"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+  </div>
+</div>` },
+    { id: 'steps', name: 'Collapsible steps', tagNew: true, code:
+`<!-- Output grouped by the step that wrote it, which is what anybody reading a
+     build actually wants: not four hundred lines, but which of the six things
+     failed. Each step is a disclosure — a real button with aria-expanded and an
+     aria-controls naming the panel it opens — and the step that failed is open
+     on arrival, because it is the reason the page was opened.
+
+     Every step keeps its own stream with its own role="log" and its own name.
+     One role="log" around the lot would announce lines from a step whose
+     heading is off screen, and the name is what makes "3 lines" mean the tests
+     rather than the deploy.
+
+     The element x-collapse animates carries no padding, no border and no
+     background: the plugin measures scrollHeight, and padding on the animated
+     element is height that is there at 0% as well, so the panel snaps open the
+     last few pixels instead of easing. Padding goes on the stream inside it.
+
+     A step that never ran is not a disclosure. It keeps its row and its dot
+     and it is a div: a disabled button there announces a control that could
+     have been opened, and there is nothing under it to open.
+
+     The dot takes the token fill — emerald-600, red-600 — and the state is also
+     the word beside the duration, so a step that is skipped rather than passed
+     is not two greys apart from one that ran. -->
+<div data-kui="log/steps"
+     x-data="{
+       open: ['tests'],
+       isOpen(id) { return this.open.includes(id) },
+       toggle(id) { this.open = this.isOpen(id) ? this.open.filter(x =&gt; x !== id) : [...this.open, id] }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Pipeline 4417 — orders</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed in 3m 04s
+    </span>
+  </div>
+
+  <div class="divide-y divide-zinc-800">
+    <div>
+      <button type="button" @click="toggle('deps')" :aria-expanded="isOpen('deps')" aria-controls="log-sp-deps"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('deps') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Install dependencies</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Passed · 12.4s</span>
+      </button>
+      <div id="log-sp-deps" x-show="isOpen('deps')" x-cloak x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Install dependencies output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:23</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Linked 214 packages in 12.4s</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="toggle('build')" :aria-expanded="isOpen('build')" aria-controls="log-sp-build"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('build') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-emerald-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Compile assets</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Passed · 48.9s</span>
+      </button>
+      <div id="log-sp-build" x-show="isOpen('build')" x-cloak x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Compile assets output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <button type="button" @click="toggle('tests')" :aria-expanded="isOpen('tests')" aria-controls="log-sp-tests"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="isOpen('tests') &amp;&amp; 'rotate-90'">
+          <i data-lucide="chevron-right" class="size-4 text-zinc-400"></i>
+        </span>
+        <span class="size-1.5 shrink-0 rounded-full bg-red-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-200">Run tests</span>
+        <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">Failed · 1m 42s</span>
+      </button>
+      <div id="log-sp-tests" x-show="isOpen('tests')" x-collapse.duration.200ms>
+        <div role="log" aria-live="polite" tabindex="0" aria-label="Run tests output"
+             class="max-h-48 overflow-y-auto px-4 pb-3 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="w-12 shrink-0 font-semibold text-red-400">FAIL</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_grn.py::test_duplicate_challan_is_rejected</span></div>
+          <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">AssertionError: expected ValidationError, got GRN-26-0451</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex w-full items-center gap-3 px-4 py-2">
+        <span class="flex size-4 shrink-0" aria-hidden="true"></span>
+        <span class="size-1.5 shrink-0 rounded-full bg-zinc-600" aria-hidden="true"></span>
+        <span class="min-w-0 flex-1 truncate text-[13px]/5 text-zinc-400">Deploy to production</span>
+        <span class="shrink-0 text-[11px]/4 text-zinc-400">Skipped — tests failed</span>
+      </div>
+    </div>
+  </div>
+</div>` },
+
+    { id: 'structured', name: 'Structured lines with detail', tagNew: true, code:
+`<!-- Where each line is an event with fields rather than a sentence — a webhook
+     attempt, an API call, a device reading. The summary row is the log line and
+     the detail is what the row would have been if it had been printed in full:
+     the same event, not a different one, so nothing in the well contradicts the
+     row above it.
+
+     It expands in place. An overlay over a stream loses the reader's place in
+     it, and the one question they are answering is what happened either side of
+     this attempt.
+
+     This is the boundary with table, and the boundary is sorting. The moment
+     somebody wants these rows ordered by duration or grouped by status code
+     they have stopped reading a stream, and the answer is a table with a mono
+     column — not a header bar bolted onto this, which would promise an order a
+     log cannot have.
+
+     The status is the graphite pill with colour in the dot, exactly as it is on
+     white, because 502 in red text down a column of attempts is a wall of red
+     that stops reading as anything by the fourth row. -->
+<div data-kui="log/structured"
+     x-data="{
+       open: null,
+       rows: [
+         { id: 1, t: '11:04:02', verb: 'POST', path: '/hooks/grn-posted', code: 202, ms: 184, dot: 'bg-emerald-600', body: '{ &quot;grn&quot;: &quot;GRN-26-0442&quot;, &quot;lines&quot;: 4, &quot;posted_at&quot;: &quot;2026-08-16T11:04:01+05:30&quot; }', note: 'Accepted' },
+         { id: 2, t: '11:06:18', verb: 'POST', path: '/hooks/grn-posted', code: 502, ms: 30012, dot: 'bg-red-600', body: '&lt;html&gt;&lt;head&gt;&lt;title&gt;502 Bad Gateway&lt;/title&gt;&lt;/head&gt;&lt;body&gt;upstream timed out&lt;/body&gt;&lt;/html&gt;', note: 'Attempt 1 of 5 · retrying in 60s' },
+         { id: 3, t: '11:07:19', verb: 'POST', path: '/hooks/grn-posted', code: 502, ms: 30008, dot: 'bg-red-600', body: '&lt;html&gt;&lt;head&gt;&lt;title&gt;502 Bad Gateway&lt;/title&gt;&lt;/head&gt;&lt;body&gt;upstream timed out&lt;/body&gt;&lt;/html&gt;', note: 'Attempt 2 of 5 · retrying in 120s' },
+         { id: 4, t: '11:09:20', verb: 'POST', path: '/hooks/grn-posted', code: 202, ms: 211, dot: 'bg-emerald-600', body: '{ &quot;grn&quot;: &quot;GRN-26-0442&quot;, &quot;lines&quot;: 4, &quot;posted_at&quot;: &quot;2026-08-16T11:04:01+05:30&quot; }', note: 'Accepted on attempt 3' }
+       ]
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Webhook — Sharma Extrusions</span>
+    <span class="shrink-0 text-[11px]/4 tabular-nums text-zinc-400">4 attempts · delivered 11:09:20</span>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="Webhook delivery attempts"
+       class="max-h-80 overflow-y-auto py-1 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="r in rows" :key="r.id">
+      <div>
+        <button type="button" @click="open = open === r.id ? null : r.id" :aria-expanded="open === r.id"
+                :aria-controls="'log-x-' + r.id"
+                class="flex w-full items-center gap-3 px-4 py-1 text-left hover:bg-zinc-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+          <span class="flex shrink-0 transition-transform motion-reduce:transition-none" :class="open === r.id &amp;&amp; 'rotate-90'">
+            <i data-lucide="chevron-right" class="size-3.5 text-zinc-400"></i>
+          </span>
+          <span class="shrink-0 tabular-nums text-zinc-400" x-text="r.t"></span>
+          <span class="shrink-0 font-semibold text-zinc-400" x-text="r.verb"></span>
+          <span class="min-w-0 flex-1 truncate text-zinc-300" x-text="r.path"></span>
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium tabular-nums text-zinc-300 ring-1 ring-inset ring-zinc-700">
+            <span class="size-1.5 rounded-full" :class="r.dot" aria-hidden="true"></span><span x-text="r.code"></span>
+          </span>
+          <span class="hidden shrink-0 tabular-nums text-zinc-400 sm:inline" x-text="(r.ms / 1000).toFixed(2) + 's'"></span>
+        </button>
+        <div :id="'log-x-' + r.id" x-show="open === r.id" x-cloak x-collapse.duration.200ms>
+          <div class="px-4 pt-1 pb-3">
+            <p class="text-[11px]/4 text-zinc-400" x-text="r.note"></p>
+            <pre class="mt-1.5 rounded-lg bg-zinc-800 p-3 text-[12px]/5 whitespace-pre-wrap wrap-anywhere text-zinc-300"><code x-text="r.body"></code></pre>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+    { id: 'actions', name: 'Copy, download, clear', tagNew: true, code:
+`<!-- The three things a reader does with a log that is not the reading of it,
+     and each one has to say what it did. Copy and Download are the same string
+     — the buffer as plain text, timestamps in it — because a log pasted into a
+     ticket without its times is a set of sentences nobody can line up against
+     anything else.
+
+     Clear is the dangerous one, and only because of what people think it means.
+     This panel is the closest thing on screen to the run, so a bare "Clear" is
+     read as destroying the output: it is why some people will not press it, and
+     why the people who do press it file a ticket asking for the run back. The
+     confirmation names where the log still is. There is no Clear on a finished
+     run at all — nothing to gain, everything to lose.
+
+     The status line stays in the DOM whether or not it has anything to say —
+     a live region toggled with x-show is removed from the accessibility tree
+     and announces nothing on the way back in — and takes its padding and its
+     border from a binding, so an empty one collapses instead of drawing a band
+     across the foot of the panel.
+
+     One role="status" carries all three outcomes. Three separate live regions
+     announce in an order nobody can predict, and a button that changes its own
+     label to "Copied" tells the reader the same thing twice while telling a
+     screen reader that the button is now called something else. -->
+<div data-kui="log/actions"
+     x-data="{
+       said: '',
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:09', msg: 'Retrying vendor lookup for VEND-0417 (attempt 2 of 3)' },
+         { id: 3, t: '09:14:18', msg: 'Job grn-4418 failed: vendor VEND-0982 not found' },
+         { id: 4, t: '09:14:19', msg: 'Job grn-4419 completed in 0.6s' },
+         { id: 5, t: '09:14:44', msg: 'Queue drained, 6 jobs, 2 failures' }
+       ],
+       text() { return this.lines.map(l =&gt; l.t + '  ' + l.msg).join('\\n') },
+       announce(s) { this.said = ''; this.$nextTick(() =&gt; { this.said = s }) },
+       copy() {
+         navigator.clipboard?.writeText(this.text());
+         this.announce('Copied ' + this.lines.length + ' lines to the clipboard.');
+       },
+       download() {
+         const a = document.createElement('a');
+         a.href = URL.createObjectURL(new Blob([this.text()], { type: 'text/plain' }));
+         a.download = 'grn-import-4417.log';
+         a.click();
+         URL.revokeObjectURL(a.href);
+         this.announce('Downloaded grn-import-4417.log.');
+       },
+       clear() {
+         this.lines = [];
+         this.announce('Cleared from this view. The full log is still on the run at Jobs, GRN import 4417.');
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">GRN import 4417</span>
+    <div class="flex items-center gap-1">
+      <button type="button" @click="copy()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="clipboard" class="size-3.5"></i>Copy
+      </button>
+      <button type="button" @click="download()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="download" class="size-3.5"></i>Download
+      </button>
+      <button type="button" @click="clear()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <i data-lucide="eraser" class="size-3.5"></i>Clear this view
+      </button>
+    </div>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="GRN import 4417 output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+    <p x-show="!lines.length" x-cloak class="text-zinc-400">
+      Nothing in this view. The full log is still on the run — reload the page to fetch it again.
+    </p>
+  </div>
+
+  <p role="status" class="text-[12px]/4 text-zinc-400" :class="said &amp;&amp; 'border-t border-zinc-800 px-4 py-2'" x-text="said"></p>
+</div>` },
+    { id: 'streaming', name: 'Live, autoscrolling', code:
+`<!-- Four things here are the difference between a log that tails and one that
+     fights the reader.
+
+     pinned is derived from the scroll position on every scroll event, not set
+     once and left true. A flag that only ever goes true drags the viewport back
+     to the bottom every time a line lands, which makes the log unreadable the
+     moment it is longer than a screen.
+
+     The key is a sequence number the producer assigns. The buffer is capped and
+     therefore shifts, and under :key="i" every surviving node's text changes on
+     every append: Alpine rewrites the whole visible list once a second, and any
+     selection the reader had made disappears with it.
+
+     The pill carries the count of what has landed since they scrolled away, so
+     the reader can tell four lines from four hundred before deciding to give up
+     their place. It is a real button with a name, not an arrow.
+
+     The seed fills the box. A stream that starts with three lines in a 320px
+     panel is not tailing at all for its first half minute — nothing overflows,
+     so there is no bottom to be pinned to and no way to reach the pill. Send
+     the last screenful with the page and the log is doing its actual job from
+     the first paint.
+
+     init() and destroy() are the Alpine lifecycle pair, and the second one is
+     not optional: a setInterval started in x-init and never cleared keeps
+     running after the element is gone — after a tab swap, an htmx swap, a
+     dialog close — appending to a component nobody can see, for as long as the
+     page is open. -->
+<div data-kui="log/streaming"
+     x-data="{
+       seq: 14, pinned: true, missed: 0, tick: null,
+       lines: [
+         { id: 1,  t: '14:02:11', msg: 'Deploy 4417 started' },
+         { id: 2,  t: '14:02:12', msg: 'Pulled image registry.internal/orders:4417' },
+         { id: 3,  t: '14:02:19', msg: 'Ran 41 migrations' },
+         { id: 4,  t: '14:02:24', msg: 'Collected 1,204 static files' },
+         { id: 5,  t: '14:02:31', msg: 'Warmed cache for 6 plants' },
+         { id: 6,  t: '14:02:38', msg: 'Instance 1 of 4 accepting traffic' },
+         { id: 7,  t: '14:02:44', msg: 'Health check passed on instance 1' },
+         { id: 8,  t: '14:02:51', msg: 'Instance 2 of 4 accepting traffic' },
+         { id: 9,  t: '14:02:57', msg: 'Health check passed on instance 2' },
+         { id: 10, t: '14:03:04', msg: 'Draining old instances, 12 requests in flight' },
+         { id: 11, t: '14:03:11', msg: 'Old instance 1 drained' },
+         { id: 12, t: '14:03:17', msg: 'Old instance 2 drained' },
+         { id: 13, t: '14:03:22', msg: 'Rotating access log' },
+         { id: 14, t: '14:03:29', msg: 'Instance 3 of 4 accepting traffic' }
+       ],
+       say: ['Uploading build artifact', 'Warming instance 2 of 4', 'Health check passed on instance 1', 'Draining old instances', 'Instance 3 of 4 ready', 'Rotating access log'],
+       init() { this.tick = setInterval(() =&gt; this.append(), 1600) },
+       destroy() { clearInterval(this.tick) },
+       append() {
+         this.seq++;
+         this.lines.push({ id: this.seq, t: new Date().toLocaleTimeString('en-GB'), msg: this.say[this.seq % this.say.length] });
+         if (this.lines.length &gt; 500) this.lines.shift();
+         if (this.pinned) this.$nextTick(() =&gt; this.toBottom()); else this.missed++;
+       },
+       toBottom() { const s = this.$refs.stream; s.scrollTop = s.scrollHeight; this.pinned = true; this.missed = 0 },
+       onScroll() { const s = this.$refs.stream; this.pinned = s.scrollHeight - s.scrollTop - s.clientHeight &lt; 24; if (this.pinned) this.missed = 0 }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — production</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 animate-pulse rounded-full bg-emerald-600 motion-reduce:animate-none" aria-hidden="true"></span>Live
+    </span>
+  </div>
+
+  <div class="relative">
+    <div x-ref="stream" @scroll.passive="onScroll()" role="log" aria-live="polite" tabindex="0" aria-label="Deploy 4417 output, live"
+         class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+      <template x-for="l in lines" :key="l.id">
+        <div class="flex gap-3">
+          <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+          <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+        </div>
+      </template>
+    </div>
+
+    <button type="button" x-show="!pinned" x-cloak @click="toBottom()"
+            class="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-zinc-700 px-3 py-1.5 text-[11px]/4 font-medium text-zinc-100 shadow-lg hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="arrow-down" class="size-3"></i>
+      <span x-text="missed ? 'Jump to latest — ' + missed + (missed === 1 ? ' new line' : ' new lines') : 'Jump to latest'">Jump to latest</span>
+    </button>
+  </div>
+</div>` },
+
+    { id: 'paused', name: 'Paused by the reader', tagNew: true, code:
+`<!-- Pause stops the view, not the process. The lines keep arriving and go into
+     a buffer, the strip says how many are waiting, and Resume appends them all
+     and returns to tailing. A pause that dropped the lines instead would be a
+     hole in the middle of the log with nothing on screen saying so, which is
+     the one thing a log may never do.
+
+     The strip is where the state is written, in words, with the time it started
+     — not a greyed-out stream, which says the lines already drawn are somehow
+     less true than they were a moment ago. They are exactly as true; it is the
+     view that has stopped.
+
+     One button, and its label is the action rather than the state: Pause when
+     it is running, Resume when it is not. A button labelled with the state
+     leaves the reader guessing whether it says what will happen or what is
+     already happening. -->
+<div data-kui="log/paused"
+     x-data="{
+       seq: 3, paused: false, buffer: [], at: '', tick: null,
+       lines: [
+         { id: 1, t: '09:14:02', msg: 'Worker started, pid 4821' },
+         { id: 2, t: '09:14:05', msg: 'Connected to queue grn-imports' },
+         { id: 3, t: '09:14:12', msg: 'Job grn-4417 completed in 1.8s' }
+       ],
+       say: ['Job grn-4418 completed in 0.9s', 'Job grn-4419 completed in 0.6s', 'Prefetching 50 jobs', 'Job grn-4420 completed in 1.2s', 'Heartbeat ok'],
+       init() { this.tick = setInterval(() =&gt; this.append(), 1600) },
+       destroy() { clearInterval(this.tick) },
+       append() {
+         this.seq++;
+         const line = { id: this.seq, t: new Date().toLocaleTimeString('en-GB'), msg: this.say[this.seq % this.say.length] };
+         if (this.paused) { this.buffer.push(line); return }
+         this.lines.push(line);
+         if (this.lines.length &gt; 500) this.lines.shift();
+         this.$nextTick(() =&gt; { const s = this.$refs.stream; s.scrollTop = s.scrollHeight });
+       },
+       pause() { this.paused = true; this.at = new Date().toLocaleTimeString('en-GB') },
+       resume() {
+         this.paused = false;
+         this.lines.push(...this.buffer.splice(0));
+         this.$nextTick(() =&gt; { const s = this.$refs.stream; s.scrollTop = s.scrollHeight });
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Import worker</span>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 rounded-full" :class="paused ? 'bg-amber-500' : 'bg-emerald-600 animate-pulse motion-reduce:animate-none'" aria-hidden="true"></span>
+        <span x-text="paused ? 'Paused' : 'Live'">Live</span>
+      </span>
+      <button type="button" @click="paused ? resume() : pause()"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]/4 font-medium text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+        <span x-show="!paused" class="flex"><i data-lucide="pause" class="size-3.5"></i></span>
+        <span x-show="paused" x-cloak class="flex"><i data-lucide="play" class="size-3.5"></i></span>
+        <span x-text="paused ? 'Resume' : 'Pause'">Pause</span>
+      </button>
+    </div>
+  </div>
+
+  <p x-show="paused" x-cloak role="status"
+     class="border-b border-zinc-800 px-4 py-2 text-[12px]/4 text-zinc-400">
+    Paused at <span class="tabular-nums" x-text="at"></span>. The worker is still running —
+    <span class="tabular-nums text-zinc-200" x-text="buffer.length"></span>
+    <span x-text="buffer.length === 1 ? 'line is' : 'lines are'">lines are</span> waiting, and Resume appends all of them.
+  </p>
+
+  <div x-ref="stream" role="log" aria-live="polite" tabindex="0" aria-label="Import worker output"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <template x-for="l in lines" :key="l.id">
+      <div class="flex gap-3">
+        <span class="shrink-0 tabular-nums text-zinc-400" x-text="l.t"></span>
+        <span class="min-w-0 flex-1 wrap-anywhere text-zinc-300" x-text="l.msg"></span>
+      </div>
+    </template>
+  </div>
+</div>` },
+
+    { id: 'disconnected', name: 'The connection dropped', tagNew: true, code:
+`<!-- A stream that stops because the socket died looks exactly like a stream
+     that stops because the job finished, and the two are opposite facts. So the
+     panel says which, in words, with the time of the last line it actually
+     received — that time is the only thing the reader can trust, and it is what
+     they will quote when they ask why nothing has run since.
+
+     Reconnect is a real button and not a countdown alone. Automatic retry with
+     a timer is right, but a reader watching a stalled deploy will press
+     something, and if the only thing on offer is the browser reload they lose
+     the buffer as well.
+
+     The strip is graphite with the colour in the dot, like every other state in
+     this system. A red band across a console reads as an outage to anybody
+     walking past the screen, and a dropped websocket on one tab is not one. -->
+<div data-kui="log/disconnected" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Deploy 4417 — production</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>Disconnected
+    </span>
+  </div>
+
+  <div role="status" class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 text-zinc-400">
+      The stream stopped at <span class="tabular-nums text-zinc-200">14:03:58</span>, 41 seconds ago. The deploy itself is unaffected — this is the connection to it. Retrying in 4s.
+    </p>
+    <button type="button"
+            class="flex shrink-0 items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 py-1 text-[11px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="refresh-cw" class="size-3.5"></i>Reconnect now
+    </button>
+  </div>
+
+  <div role="log" aria-live="off" tabindex="0" aria-label="Deploy 4417 output, disconnected"
+       class="max-h-80 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:58</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Warming instance 1 of 4</span></div>
+    <p class="mt-2 border-t border-zinc-800 pt-2 text-zinc-400">— stream ends here; anything the deploy wrote after 14:03:58 has not been received —</p>
+  </div>
+</div>` },
+    { id: 'job', name: 'A job, with its progress above it', tagNew: true, code:
+`<!-- The two halves answer different questions and neither one answers the
+     other. The header says how far along it is and how long is left, which is
+     what somebody deciding whether to wait needs and what a log makes them read
+     four hundred lines for. The stream says what it is doing, which is what
+     they need the moment the figure stops moving.
+
+     The figures in the header come from the job record, not from counting the
+     lines on screen. A log is capped and filtered; a header that counted its
+     rows would report a different total to two people looking at the same run.
+
+     The progress rail is role="progressbar" with aria-valuenow, labelled by the
+     heading rather than by a string of its own, so it is announced as "GRN
+     import 4417, 45%" and not as an anonymous bar. On this panel the track is
+     zinc-800 and the fill is zinc-300: the accent inverts with the rest of the
+     scale, and a zinc-700 fill on a zinc-800 track is one step of grey nobody
+     can read across a desk.
+
+     Elapsed and remaining sit together, and remaining is an estimate that says
+     so. A bare "2m left" that turns out to be nine is worse than no figure. -->
+<div data-kui="log/job" class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="border-b border-zinc-800 px-4 py-3">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+      <h3 id="log-job-4417" class="text-[13px]/5 font-medium text-zinc-200">GRN import 4417 — August challans</h3>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 animate-pulse rounded-full bg-emerald-600 motion-reduce:animate-none" aria-hidden="true"></span>Running
+      </span>
+    </div>
+    <div class="mt-2.5 h-1.5 overflow-hidden rounded-full bg-zinc-800"
+         role="progressbar" aria-labelledby="log-job-4417"
+         aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">
+      <div class="h-full min-w-[2px] rounded-full bg-zinc-300 transition-[width] duration-300 motion-reduce:transition-none"
+           style="width: 45%"></div>
+    </div>
+    <p class="mt-1.5 text-[12px]/4 tabular-nums text-zinc-400">
+      4,281 of 9,600 rows · 12 skipped, 1 failed · 3m 12s elapsed, about 4m left
+    </p>
+  </div>
+
+  <div role="log" aria-live="polite" tabindex="0" aria-label="GRN import 4417 output"
+       class="max-h-64 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">11:22:04</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 4,278 — GRN-26-0512 posted, 6 lines</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">11:22:04</span><span class="w-12 shrink-0 font-semibold text-amber-400">SKIP</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 4,279 — duplicate challan 8841/25-26</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">11:22:05</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 4,280 — GRN-26-0513 posted, 2 lines</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">11:22:05</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Row 4,281 — GRN-26-0514 posted, 11 lines</span></div>
+  </div>
+</div>` },
+
+    { id: 'failed', name: 'Ended in failure', tagNew: true, code:
+`<!-- The run failed, and the panel is still a log. Swapping it for an alert
+     takes away the only thing that explains the failure; putting the alert
+     above it and letting the stream scroll underneath is this strip, which
+     names the counts and offers one action.
+
+     The strip does not paraphrase the error. Whatever it said would be a second
+     version of a sentence that is already on screen, and the two drift the
+     first time somebody edits one of them. What it does instead is take the
+     reader to the line, because the error in a four-hundred-line log is the one
+     thing that is hard to find and the reason the page was opened.
+
+     Jump moves the scroll AND the focus. Scrolling alone leaves a keyboard
+     reader where they were, being told nothing happened; the target line takes
+     tabindex="-1" so focus can land on it without adding a stop to the tab
+     order. offsetTop is measured against the stream, which is why the stream
+     carries relative — without it the offset resolves against whatever ancestor
+     happens to be positioned and the jump lands somewhere else entirely.
+
+     The error line is marked with a full-bleed band as well as the word ERROR,
+     because after a jump the reader needs to see where they landed.
+
+     The stream here is deliberately longer than the box. A failure summary over
+     a log that fits on screen is a control with nothing to do, and the run this
+     component is for has four hundred lines under the one that matters. -->
+<div data-kui="log/failed"
+     x-data="{
+       jump() {
+         const s = this.$refs.stream, e = this.$refs.err;
+         s.scrollTop = e.offsetTop - 8;
+         e.focus();
+       }
+     }"
+     class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+    <span class="text-[13px]/5 font-medium text-zinc-200">Build output — deploy 4417</span>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed after 3m 04s
+    </span>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-800 px-4 py-2.5">
+    <p class="min-w-0 flex-1 text-[12px]/4 text-zinc-400">
+      <span class="font-medium text-zinc-200">1 error and 2 warnings.</span>
+      Nothing was deployed and the running instances were left alone.
+    </p>
+    <button type="button" @click="jump()"
+            class="flex shrink-0 items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 py-1 text-[11px]/4 font-medium text-white hover:bg-zinc-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+      <i data-lucide="arrow-down-to-line" class="size-3.5"></i>Jump to the first error
+    </button>
+  </div>
+
+  <div x-ref="stream" role="log" aria-live="polite" tabindex="0" aria-label="Build output for deploy 4417, failed"
+       class="relative max-h-64 overflow-y-auto p-4 font-mono text-[12px]/5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:11</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Installing dependencies…</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:14</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Resolved 214 packages</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:19</span><span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Peer dependency "react" not found, using ^18.2.0</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:26</span><span class="w-12 shrink-0 font-semibold text-amber-400">WARN</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Chunk orders.js is 1.4 MB, above the 1 MB budget</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:34</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/orders.9f4c1ab27d3e5b60c8a4f1d2e7b93c05.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:41</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/vendors.4b17e0c9a2d8f3516b7c04e9d18a2f37.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:49</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Compiling static/dist/reports.7c02e4b1f9a63d85c0142e7bd9384f16.js</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:02:58</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Optimising 1,204 static files</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:06</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Wrote the asset manifest, 41 entries</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:18</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Collected 416 tests across 61 modules</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:19</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_po.py — 88 passed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:20</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">orders/test_grn.py — 41 passed, 1 failed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:21</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">stores/test_issue.py — 63 passed</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div x-ref="err" tabindex="-1" class="-mx-4 flex gap-3 bg-zinc-800 px-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white">
+      <span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span>
+      <span class="w-12 shrink-0 font-semibold text-red-400">ERROR</span>
+      <span class="min-w-0 flex-1 wrap-anywhere text-zinc-100">orders/test_grn.py::test_duplicate_challan_is_rejected — AssertionError: expected ValidationError, got GRN-26-0451</span>
+    </div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:24</span><span aria-hidden="true" class="w-12 shrink-0"></span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Pipeline stopped, deploy step skipped</span></div>
+  </div>
+</div>` },
+
+    { id: 'empty', name: 'Waiting, and nothing to show', tagNew: true, code:
+`<!-- Two blank panels that mean opposite things, and a single empty box for
+     both is how somebody comes to sit watching a job that finished eleven
+     minutes ago.
+
+     Waiting is a live state: the job is alive, it has not written anything yet,
+     and the reader should stay. It keeps the Live pill, it keeps aria-live, and
+     the sentence says what it is waiting for.
+
+     Finished-with-no-output is a dead state and needs somewhere to go. The job
+     did run, it wrote nothing, and the thing the reader actually wants is the
+     job's own result — so the panel says so and links to it. Its stream is
+     aria-live="off", because nothing is coming.
+
+     Neither takes tabindex="0": the region does not scroll, and a focus stop
+     that scrolls nothing is a stop for nothing. The tabindex goes on wherever
+     the stream can overflow, which is every other variant here.
+
+     Neither of them draws a big icon or an illustration. This is a region
+     inside a screen, not the empty-state component, and a graphic in a 320px
+     panel takes the space the sentence needed. -->
+<div data-kui="log/empty" class="grid gap-4 sm:grid-cols-2">
+
+  <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+      <span class="text-[13px]/5 font-medium text-zinc-200">GRN import 4419</span>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 animate-pulse rounded-full bg-emerald-600 motion-reduce:animate-none" aria-hidden="true"></span>Queued
+      </span>
+    </div>
+    <div role="log" aria-live="polite" aria-label="GRN import 4419 output"
+         class="flex min-h-40 items-center justify-center p-6">
+      <p class="max-w-[38ch] text-center text-[13px]/5 text-zinc-400">
+        Waiting for the worker to pick this job up. Lines appear here as it writes them — you can leave the page open.
+      </p>
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-zinc-800 px-4 py-2.5">
+      <span class="text-[13px]/5 font-medium text-zinc-200">Nightly reconciliation</span>
+      <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-300 ring-1 ring-inset ring-zinc-700">
+        <span class="size-1.5 rounded-full bg-emerald-600" aria-hidden="true"></span>Finished 02:00:22
+      </span>
+    </div>
+    <div role="log" aria-live="off" aria-label="Nightly reconciliation output"
+         class="flex min-h-40 items-center justify-center p-6">
+      <p class="max-w-[38ch] text-center text-[13px]/5 text-zinc-400">
+        The run finished in 18 seconds and wrote nothing to its log. It matched 1,284 entries with no variance —
+        <a href="#" class="text-zinc-200 underline underline-offset-2 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">open the run</a>
+        for the figures.
+      </p>
+    </div>
+  </div>
+</div>` },
+
+    { id: 'inline', name: 'An excerpt inside a record', tagNew: true, code:
+`<!-- On a record page the log is not the screen, it is a paragraph of it: the
+     last few lines of the last run, enough to see whether to go and look
+     properly. The card around it is the ordinary white one — the dark panel is
+     the log itself and does not spread to its container.
+
+     Last lines, not first. A run that failed says why at the end, and an
+     excerpt that started at the top would show the same four setup lines for
+     every run on the register.
+
+     The excerpt does not scroll and does not tail. Two scrolling regions on a
+     record page compete for the wheel, and a strip that moves while somebody is
+     reading the fields beside it is worse than one that is a few seconds stale.
+     The link is what takes them to the live one, and it names the run rather
+     than saying "view".
+
+     It keeps role="log" and the aria-live is off, because this is a static
+     excerpt of something that has already happened. Keep the tabindex only if
+     the excerpt can overflow; this one is capped at five lines, so it does
+     not. -->
+<div data-kui="log/inline" class="max-w-lg rounded-xl border border-zinc-300 bg-white p-5">
+  <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+    <h3 class="text-[13px]/5 font-medium">Last run</h3>
+    <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-200 px-2 py-0.5 text-[11px]/4 font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300">
+      <span class="size-1.5 rounded-full bg-red-600" aria-hidden="true"></span>Failed
+    </span>
+  </div>
+  <p class="mt-1 text-[12px]/4 tabular-nums text-zinc-500">Deploy 4417 · 16 Aug 2026, 14:02 · 3m 04s</p>
+
+  <div role="log" aria-live="off" aria-label="Last five lines of deploy 4417"
+       class="mt-3 rounded-lg bg-zinc-900 p-3 font-mono text-[12px]/5">
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:15</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Built 41 chunks, 2.8 MB</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">412 passed, 1 failed, 3 skipped</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:22</span><span class="min-w-0 flex-1 wrap-anywhere text-red-400">AssertionError: expected ValidationError, got GRN-26-0451</span></div>
+    <div class="flex gap-3"><span class="shrink-0 tabular-nums text-zinc-400">14:03:24</span><span class="min-w-0 flex-1 wrap-anywhere text-zinc-300">Pipeline stopped, deploy step skipped</span></div>
+  </div>
+
+  <p class="mt-3 text-[12px]/4">
+    <a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Open the full log for deploy 4417</a>
+    <span class="text-zinc-500">— 1,284 lines</span>
+  </p>
 </div>` }
   ]
 }
