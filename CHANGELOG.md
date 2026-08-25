@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`share-page`**, the layout for an unlisted-link recipient with no account in
+  the system: what was shared, who shared it, the files to open, and the date
+  the link stops working. It is the fifth screen outside `app-shell` — a step
+  further out than `auth-page`/`error-page` (context the shell cannot get) and
+  `portal-page`/`focus-page` (an identity the shell was not built for), because
+  this reader has no identity of any kind, ever. Two variants (`default`,
+  `single`), and rule 2 now names five exceptions rather than four.
+
 ## [0.5.0] - 2026-08-23
 
 ### Added

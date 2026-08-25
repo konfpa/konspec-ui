@@ -78,6 +78,7 @@
   "related": [
     "empty-state",
     "auth-page",
+    "share-page",
     "app-shell",
     "alert"
   ],

@@ -8244,7 +8244,7 @@ register(
       'The countdown on the maintenance screen is plain text and not a live region. A two-hour window announced every thirty seconds buries every other thing on the page.',
       'Every action is a real <a> or <button> with a name that says where it goes — "Back to goods receipts", "Sign in again" — reachable by Tab and wearing focus-visible:outline-3 focus-visible:outline-offset-2. No rings anywhere, because forced-colours mode drops every box-shadow and these users are already having a bad afternoon.'
     ],
-    related: ['empty-state', 'auth-page', 'app-shell', 'alert'],
+    related: ['empty-state', 'auth-page', 'share-page', 'app-shell', 'alert'],
     variants: [
       { id: '404', name: '404 not found', code:
 `<!-- The route resolved to nothing. The single most useful thing on the screen
@@ -41921,7 +41921,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
       'Both renderings of the order list — the table above md and the cards below it — are in the DOM at once, so neither carries a form control with a name. A display:none input still posts, and two renderings of one row post that row twice.',
       'Every action is a real <a> or <button> with a name that says what it does in the supplier\'s words — Acknowledge this order, Send your invoice — and wears focus-visible:outline-3 focus-visible:outline-offset-2. No rings anywhere.'
     ],
-    related: ['auth-page', 'error-page', 'index-page', 'record-page', 'app-shell', 'attachment', 'table', 'badge', 'avatar'],
+    related: ['auth-page', 'error-page', 'share-page', 'index-page', 'record-page', 'app-shell', 'attachment', 'table', 'badge', 'avatar'],
     variants: [
       { id: 'shell', name: 'The portal frame', code:
 `<!-- The whole chrome of the portal is this header, and that is the decision the
@@ -43504,6 +43504,179 @@ logic. The internal get_status_display() never reaches these templates: it says
 Approved, which does not tell a supplier who approved what or what they now
 owe us.
 {% endcomment %}` }
+    ]
+  },
+  {
+    id: 'share-page', name: 'Share page', category: 'layout',
+    description: 'The one screen a recipient with no account in the system ever reaches: what was shared, who shared it, the file or files to open, and the date the link stops working. No sign-in, one destination, and nothing behind it to navigate to.',
+    when: 'An unlisted URL handed to someone outside the company — pasted into an email, a chat message, a support ticket — so whoever holds it can reach a run\'s output or a shared record without an account. It is not portal-page: a portal is a standing account, signed into repeatedly, with destinations that persist across visits and a relationship that outlives any one order; this is one link, opened however many times it is opened, that was never signed into in the first place and stops working on a clock rather than a sign-out. Reach for portal-page the moment the outside party needs a second, different thing from the system — an invoice next month as well as an order today — because that is a relationship and this is a single handoff. It is not error-page\'s job to draw the failure case either: a link that is expired, revoked, unknown, or was minted against a run whose files have since been pruned answers with the ordinary 404, on purpose, so nothing on this path tells a stranger which of those four is true. This entry draws the one case left over — the case where the link still works, and the recipient has something to do here at all.',
+    notes: [
+      'It is a fifth exception to app-shell, and the other four do not quite cover why. auth-page and error-page are named because the shell cannot get the context it needs from a signed-out visitor or a failed request; portal-page and focus-page are named because the reader has an identity the shell was not built for. A share link recipient has no identity of any kind, ever — not expired, not external, just never issued one — which puts this reader a step further out than any of the four rather than inside one of them, and it is why this gets its own entry rather than borrowing portal-page\'s header or error-page\'s frame outright. What it does borrow is the shape both of those already settled: no shell, a real <main>, and a skip link doing the job app-shell would otherwise have done.',
+      'Nothing here writes anything. No form, and no button that is not a plain download link, because this page is reachable by anyone who has the URL and by no session that could carry a CSRF token honestly — the moment a share page grows a control that changes state, it has grown the one thing this layout cannot have. Revoking a link or minting a new one is a screen behind app-shell that the person who shared it uses, never this one.',
+      'The file list is its own shape and not attachment/readonly copied in. attachment/readonly is a panel beside other content in a signed-in record, so each row keeps a plain underlined link and the row itself does nothing; here the file list is the entire reason the page exists, so the whole row is the target — no underline, because the hover fill is what says the row can be pressed — and the download glyph trails rather than a file glyph leading alone, because the icon that matters is what pressing the row does. Two implementations of one row would drift, so where a page needs both — a record with an attachment panel and a link that shares one of the same files — they still describe that file two different ways on purpose: one is being browsed, the other has left the building.',
+      'The provenance line says who shared it and when it was produced, in one sentence under the h1, and it is not repeated in the file list below — the sender\'s name is stated once and read once. Where the recipient\'s own reference for the underlying record exists — their PO number, their claim number — it belongs in this sentence too, for the reason portal-page prints it on every row of its own screens: their number is what they will quote back on the phone, and a reply that only carries ours costs a call at both ends.',
+      'The expiry line states a date, not a duration. Thirty days forces the reader into arithmetic against whatever day they happen to be reading it, and a link opened three weeks after it was sent has no fixed point left to count from; a stated date is true regardless of when it is read. It says the link can be withdrawn earlier still, because it can be, so a recipient who returns to a link that worked yesterday and gets the 404 today does not conclude the system is broken.',
+      'One person to ask, named, with an email address — never a support alias and never a form. Somebody holding a file they did not expect, or a total that looks wrong, is not about to open a ticket with a company they have no login for; they are going to reply to whichever name is on the page, and the page should have put one there.',
+      'The document carries meta name="robots" content="noindex, nofollow", because the link\'s only real protection is that nobody but its recipient has the URL, and a share page that gets crawled and cached defeats that the first time a search engine visits it. This has nothing to do with who reads the page once they hold the link — noindex keeps it out of a stranger\'s search results, not out of the recipient\'s inbox — and it sits in the document head of the real page alongside a <title> that states what was shared rather than the brand that shared it, neither of which is part of the fragment below.',
+      'There is no client-side state on this page, and no Alpine for that reason. Every action a recipient takes is a browser download of a real href, so there is nothing to keep, toggle or restore between one file and the next, and a script tag on a screen that only links out is the defect rule 1 exists to stop, aimed at a <script> instead of a component.',
+      'Each root here is a bounded preview — h-[640px] with a rounded-xl border — so a whole screen renders in a box on this page; as a real page, drop the wrapper height and border, put bg-zinc-100 on <body>, and let the header and footer sit at the top and bottom of the viewport rather than of a scrolling frame.'
+    ],
+    anatomy: [
+      ['Brand mark', 'The sender\'s name and mark alone, unlinked and carrying no destinations under it. Not portal-page\'s destination bar, because there is nowhere else on this domain the recipient is entitled to go — a stranger who clicks it hoping for a way in has found the one page in the system built to keep giving them the same page back.'],
+      ['Heading', 'The h1 names the thing that was shared, not the sender — the sender is already in the mark above it. It is the string a recipient searches their inbox for months later, so it is the run\'s or record\'s own title, never "Shared files".'],
+      ['Provenance line', 'One sentence under the h1: who shared it, when it was produced, and the recipient\'s own reference for the record where one exists. Stated once, never repeated in the list below.'],
+      ['File list', 'A heading giving the count and total size, and a list of rows under it — the whole row is the link, no underline, a file-type glyph leading and a download glyph trailing.'],
+      ['Expiry line', 'The date the link stops working, stated as a date rather than a duration, and the sentence that it can be withdrawn earlier still.'],
+      ['Contact footer', 'A named person and an email address, the one way to ask a question about what is on this page. Never a support alias, never a form.']
+    ],
+    behaviour: [
+      'Every file row is a real anchor to a streamed download, not a client-side fetch, so the browser\'s own download handling, "open in a new tab" and "save link as" all work without a line of script.',
+      'There is no Alpine and nothing that persists across a reload, because there is nothing on the page to remember — a recipient who leaves and comes back finds the same list in the same state, for as long as the link still works.',
+      'Below sm the file rows keep the same shape — glyph, name, size, download glyph, one line, the name truncating rather than wrapping — because the row is already a single 44px target and reflowing it into two lines only makes it a taller one.',
+      'The list never paginates and is never searched, filtered or sorted. Whatever one run or record produced is small enough to read in a single pass, and a filter band over three rows teaches a recipient this is a register when it is a handoff.',
+      'Nothing on the page revalidates itself, polls, or updates in place. A link that is revoked or expires while the tab is still open goes on showing the same list until the recipient reloads or presses a row, at which point the 404 arrives instead of the file.'
+    ],
+    a11y: [
+      'The skip link is first in the DOM and <main> carries tabindex="-1", exactly as portal-page and error-page already do, because app-shell normally supplies both and this layout renders without it.',
+      'One <main> and one <h1>, and the h1 names what was shared rather than the sender — the sender is in the header landmark, read once, and repeating it as the heading spends the one landmark heading a screen-reader user navigates by on information already given.',
+      'The <title> leads with the same string as the h1, because a share link is very often opened straight from an email client\'s preview pane, and a tab reading only the brand name tells a recipient with six tabs open nothing about which one this is.',
+      'Every file row is a real <a href>, never a <div> with a click handler standing in for one — that is what makes it reachable by Tab, readable as "link, quotation-sharma-extrusions-aug.pdf, 248 KB", and openable in a new tab with the keyboard alone.',
+      'The file-type glyph and the download glyph are both aria-hidden. Neither carries information a sighted user has that a screen reader user does not already get from the link text and the fact that it is a link.',
+      'Focus is a visible outline on every row and on the contact link — focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15 — and never a ring, for the same reason it is never a ring anywhere else in this system: forced-colours mode drops every box-shadow.'
+    ],
+    related: ['portal-page', 'error-page', 'auth-page', 'attachment', 'app-shell'],
+    variants: [
+      { id: 'default', name: 'Several files', code:
+`<!-- Fifth exception to app-shell, and it sits a step further out than the
+     other four: those readers had an identity the shell either could not
+     read (auth-page, error-page) or was not built for (portal-page,
+     focus-page). This reader was never issued one at all — not expired,
+     not external, just never asked to sign in — so the page borrows the
+     shape those four already settled (no shell, a real <main>, a skip link
+     doing the job app-shell would otherwise do) rather than either of their
+     headers outright.
+
+     The three files below are the same three attachment/readonly shows
+     inside the record it sits beside — this is what they look like once
+     they have left the building. The row is a different shape from that one
+     on purpose: attachment/readonly's rows sit beside other content and stay
+     a plain underlined link, because the row itself does nothing; here the
+     file list is the entire reason the page exists, so the whole row is the
+     target and the download glyph trails rather than a file glyph standing
+     alone, because the icon that matters is what pressing the row does.
+
+     No Alpine anywhere on this page. Every action a recipient takes is a
+     browser download of a real href — there is nothing here to keep,
+     toggle or restore between one file and the next, and a script tag on a
+     screen that only links out is the defect rule 1 exists to stop, aimed at
+     a <script> instead of a component. -->
+<div data-kui="share-page/default" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#sp-df-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="flex items-center gap-2.5 border-b border-zinc-200 bg-white px-5 py-4">
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="text-[14px]/5 font-semibold">Konspec Industries</span>
+  </header>
+
+  <main id="sp-df-main" tabindex="-1" class="mx-auto w-full max-w-xl px-5 py-8">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Vendor rate comparison — Q3 2026</h1>
+    <p class="mt-1.5 text-[13px]/5 text-zinc-600">
+      Shared with you by Ritu Deshpande, Konspec Industries. Produced on 21 Aug 2026.
+    </p>
+
+    <div class="mt-6 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+        <h2 id="sp-df-files" class="text-[13px]/5 font-medium">Files</h2>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 files · 2.4 MB</span>
+      </div>
+      <ul aria-labelledby="sp-df-files" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">248 KB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="sheet" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">rate-comparison-q3.xlsx</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">54 KB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="image" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">2.1 MB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-500">
+      This link stops working on 18 Sep 2026, and can be withdrawn before then by whoever shared it.
+    </p>
+  </main>
+
+  <footer class="border-t border-zinc-200 px-5 py-4 text-center text-[11px]/4 text-zinc-500">
+    Questions about this file ·
+    <a href="mailto:ritu.deshpande@konspec.com" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">ritu.deshpande@konspec.com</a>
+  </footer>
+</div>` },
+
+      { id: 'single', name: 'One file', code:
+`<!-- Even one file gets the full list treatment rather than a straight
+     redirect to it: the page is what says who sent it and by when it must
+     be opened, and a link that skips to the file throws both away. Nothing
+     else changes shape between one file and several — the same Files
+     heading, the same count-and-size line, the same row — because a
+     recipient who gets three of these over a year should not have to learn
+     two different pages depending on how many files are in one. -->
+<div data-kui="share-page/single" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#sp-sg-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="flex items-center gap-2.5 border-b border-zinc-200 bg-white px-5 py-4">
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="text-[14px]/5 font-semibold">Konspec Industries</span>
+  </header>
+
+  <main id="sp-sg-main" tabindex="-1" class="mx-auto w-full max-w-xl px-5 py-8">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Delivery gate photo — GRN-24-0912</h1>
+    <p class="mt-1.5 text-[13px]/5 text-zinc-600">
+      Shared with you by Ritu Deshpande, Konspec Industries. Produced on 9 Aug 2026.
+    </p>
+
+    <div class="mt-6 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+        <h2 id="sp-sg-files" class="text-[13px]/5 font-medium">Files</h2>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">1 file · 2.1 MB</span>
+      </div>
+      <ul aria-labelledby="sp-sg-files" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="image" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">2.1 MB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-500">
+      This link stops working on 6 Sep 2026, and can be withdrawn before then by whoever shared it.
+    </p>
+  </main>
+
+  <footer class="border-t border-zinc-200 px-5 py-4 text-center text-[11px]/4 text-zinc-500">
+    Questions about this file ·
+    <a href="mailto:ritu.deshpande@konspec.com" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">ritu.deshpande@konspec.com</a>
+  </footer>
+</div>` }
     ]
   }
 );

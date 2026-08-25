@@ -1,0 +1,80 @@
+<!-- Fifth exception to app-shell, and it sits a step further out than the
+     other four: those readers had an identity the shell either could not
+     read (auth-page, error-page) or was not built for (portal-page,
+     focus-page). This reader was never issued one at all — not expired,
+     not external, just never asked to sign in — so the page borrows the
+     shape those four already settled (no shell, a real <main>, a skip link
+     doing the job app-shell would otherwise do) rather than either of their
+     headers outright.
+
+     The three files below are the same three attachment/readonly shows
+     inside the record it sits beside — this is what they look like once
+     they have left the building. The row is a different shape from that one
+     on purpose: attachment/readonly's rows sit beside other content and stay
+     a plain underlined link, because the row itself does nothing; here the
+     file list is the entire reason the page exists, so the whole row is the
+     target and the download glyph trails rather than a file glyph standing
+     alone, because the icon that matters is what pressing the row does.
+
+     No Alpine anywhere on this page. Every action a recipient takes is a
+     browser download of a real href — there is nothing here to keep,
+     toggle or restore between one file and the next, and a script tag on a
+     screen that only links out is the defect rule 1 exists to stop, aimed at
+     a <script> instead of a component. -->
+<div data-kui="share-page/default" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+  <a href="#sp-df-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
+
+  <header class="flex items-center gap-2.5 border-b border-zinc-200 bg-white px-5 py-4">
+    <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-700 text-[13px]/5 font-semibold text-white">K</span>
+    <span class="text-[14px]/5 font-semibold">Konspec Industries</span>
+  </header>
+
+  <main id="sp-df-main" tabindex="-1" class="mx-auto w-full max-w-xl px-5 py-8">
+    <h1 class="text-[20px]/7 font-semibold tracking-tight">Vendor rate comparison — Q3 2026</h1>
+    <p class="mt-1.5 text-[13px]/5 text-zinc-600">
+      Shared with you by Ritu Deshpande, Konspec Industries. Produced on 21 Aug 2026.
+    </p>
+
+    <div class="mt-6 overflow-hidden rounded-xl border border-zinc-300 bg-white">
+      <div class="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+        <h2 id="sp-df-files" class="text-[13px]/5 font-medium">Files</h2>
+        <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">3 files · 2.4 MB</span>
+      </div>
+      <ul aria-labelledby="sp-df-files" class="divide-y divide-zinc-100">
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="file-text" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">quotation-sharma-extrusions-aug.pdf</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">248 KB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="sheet" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">rate-comparison-q3.xlsx</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">54 KB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-100 focus-visible:outline-3 focus-visible:-outline-offset-2 focus-visible:outline-zinc-700/15">
+            <i data-lucide="image" class="size-4 shrink-0 text-zinc-500"></i>
+            <span class="min-w-0 flex-1 truncate text-[13px]/5 font-medium">delivery-gate-photo.jpg</span>
+            <span class="shrink-0 text-[12px]/4 tabular-nums text-zinc-500">2.1 MB</span>
+            <i data-lucide="download" class="size-4 shrink-0 text-zinc-500"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <p class="mt-4 text-[12px]/4 text-zinc-500">
+      This link stops working on 18 Sep 2026, and can be withdrawn before then by whoever shared it.
+    </p>
+  </main>
+
+  <footer class="border-t border-zinc-200 px-5 py-4 text-center text-[11px]/4 text-zinc-500">
+    Questions about this file ·
+    <a href="mailto:ritu.deshpande@konspec.com" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">ritu.deshpande@konspec.com</a>
+  </footer>
+</div>

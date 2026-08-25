@@ -89,6 +89,7 @@
   "related": [
     "auth-page",
     "error-page",
+    "share-page",
     "index-page",
     "record-page",
     "app-shell",

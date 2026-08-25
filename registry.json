@@ -4,7 +4,7 @@
   "version": "0.5.0",
   "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
   "generated_by": "node tools/build.js",
-  "moved": "This file no longer contains the registry. It was 7.9 MB — about 2,297,423 tokens, or 11x a 200k context window — so every agent that fetched it received a silently truncated file. The same data is at the endpoints below, in pieces sized to be read.",
+  "moved": "This file no longer contains the registry. It was 7.9 MB — about 2,303,014 tokens, or 12x a 200k context window — so every agent that fetched it received a silently truncated file. The same data is at the endpoints below, in pieces sized to be read.",
   "read_first": "llms.txt",
   "endpoints": {
     "read_first": "/llms.txt — the rules, the tokens and every component with its variant ids. Short, and written to be read whole.",
@@ -14,6 +14,6 @@
     "variant": "/r/<id>/<variant>.html — the markup, raw, ready to paste",
     "component_full": "/r/<id>.full.json — the pre-split shape, component prose and every variant's html in one file. Back-compat; prefer the two above."
   },
-  "components": 79,
-  "variants": 932
+  "components": 80,
+  "variants": 934
 }

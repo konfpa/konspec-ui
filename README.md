@@ -49,7 +49,7 @@ Do not recreate a component from a prose description or invent an undocumented v
 <!-- components:start -->
 ## Components
 
-**79 components · 932 variants · 79 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
+**80 components · 934 variants · 80 written up.** Every one of them is at `/r/<id>/<variant>.html`, written up or not — a page is documentation, not a precondition for using the markup. The [index](https://konfpa.github.io/konspec-ui/r/index.json) lists them all with their variant ids.
 
 ### Actions
 
@@ -159,6 +159,7 @@ Do not recreate a component from a prose description or invent an undocumented v
 | Document page | `document-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/document-page.html) |
 | Label sheet | `label-sheet` | 9 | [open](https://konfpa.github.io/konspec-ui/components/label-sheet.html) |
 | Portal page | `portal-page` | 9 | [open](https://konfpa.github.io/konspec-ui/components/portal-page.html) |
+| Share page | `share-page` | 2 | [open](https://konfpa.github.io/konspec-ui/components/share-page.html) |
 
 <!-- components:end -->
 
