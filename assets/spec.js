@@ -7,7 +7,7 @@ window.SPEC = {
 
   meta: {
     name: 'Konspec UI',
-    version: '0.5.0',
+    version: '0.6.0',
     tagline: 'A component library written for the agent building your app.',
     purpose: 'Copy-paste HTML components for internal data applications. Light theme only.',
     audience: 'AI coding agents first, humans second.'

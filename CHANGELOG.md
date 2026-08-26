@@ -5,7 +5,7 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.0] - 2026-08-26
 
 ### Added
 
@@ -16,6 +16,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `portal-page`/`focus-page` (an identity the shell was not built for), because
   this reader has no identity of any kind, ever. Two variants (`default`,
   `single`), and rule 2 now names five exceptions rather than four.
+- **`log`**, the scrolling monospace stream a process writes and nobody edits:
+  build output, a job's stdout, a webhook's delivery attempts. Sixteen variants,
+  because the component is mostly its states rather than its shape — streaming
+  and paused, wrapped and unwrapped, filtered by level, following the tail or
+  pinned where the reader scrolled to, a run that failed and a run still going.
+  It is the counterpart to `audit-page`, which is the searchable record of what
+  people did; `log` is the unedited transcript of what a machine said, so it
+  carries no row actions, no selection and no sort. The two additions take the
+  library from 78 components to 80 and from 916 variants to 934.
+
+### Changed
+
+- **The page canvas is warm.** It was `bg-zinc-100`, the same cool grey as a
+  selected row and a highlighted menu option, so the page read as a lighter
+  shade of the chrome rather than as the paper behind it. The page is now
+  `bg-stone-100` and every other tinted surface stays on zinc: one ramp for the
+  shapes, one for the ground under them, and the separation is a hue instead of
+  another step of lightness. Anything that hard-codes the old page fill still
+  renders, it just no longer matches the shell it sits in. The account menu in
+  `dropdown/account`, `topbar/account`, `topbar/django`, `topbar/assembled`,
+  `sidebar/blocks` and `app-shell/default` gained a Canvas control, two swatches
+  that switch the ground between warm and cool and remember the choice, so a
+  deployment that wants the old page keeps it without a rebuild. The hover lint
+  in `tools/build.js` learned stone by name: `stone-100` and `zinc-100` are
+  different ramps at nearly the same value, so a white button hovering to
+  `zinc-100` on the page still dissolves and the lint could no longer catch it
+  by comparing fills for equality.
+- **The four top-level documents are shorter and lead with the instruction.**
+  README, CONTRIBUTING, CODE_OF_CONDUCT and SECURITY had each grown into an
+  essay that paired every rule with the incident behind it, so a first-time
+  reader worked through the argument before finding what to do. The reasoning
+  now lives where it is actually read in full, in `llms.txt`, and README carries
+  a repository guide table in place of the badge row.
 
 ## [0.5.0] - 2026-08-23
 
@@ -416,6 +449,7 @@ remove yet.
   a tinted pill, so a column of twelve rows still means something at the
   twelfth.
 
+[0.6.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.6.0
 [0.5.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.5.0
 [0.4.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.4.0
 [0.3.0]: https://github.com/konfpa/konspec-ui/releases/tag/v0.3.0

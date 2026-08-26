@@ -9,7 +9,7 @@
     "component_full": "/r/<id>.full.json — the pre-split shape, component prose and every variant's html in one file. Back-compat; prefer the two above."
   },
   "name": "Konspec UI",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
   "generated_by": "node tools/build.js",
   "read_first": "llms.txt",

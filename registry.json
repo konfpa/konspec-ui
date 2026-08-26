@@ -1,7 +1,7 @@
 {
   "$schema": "https://konspec.internal/ui/registry.schema.json",
   "name": "Konspec UI",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "purpose": "Copy-paste HTML components for internal data applications. Light theme only.",
   "generated_by": "node tools/build.js",
   "moved": "This file no longer contains the registry. It was 7.9 MB — about 2,305,836 tokens, or 12x a 200k context window — so every agent that fetched it received a silently truncated file. The same data is at the endpoints below, in pieces sized to be read.",
