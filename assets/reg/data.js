@@ -10407,7 +10407,7 @@ register(
      Below lg the rail drops under the main column and every card keeps its
      full width — the skeleton restacks exactly where the loaded page does, or
      the phone gets a promise the laptop keeps. -->
-<div data-kui="skeleton/record" class="bg-zinc-100 p-4 sm:p-6">
+<div data-kui="skeleton/record" class="bg-stone-100 p-4 sm:p-6">
   <nav aria-label="Breadcrumb" class="mb-3">
     <ol class="flex flex-wrap items-center gap-1.5 text-[12px]/4 text-zinc-600">
       <li><a href="#" class="text-zinc-900 underline underline-offset-2 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">Purchasing</a></li>
@@ -17932,7 +17932,7 @@ register(
      The row is min-h-11 and grows to two lines rather than changing height
      between open and shut. A row that gets taller when it opens moves the row
      under it out from under the thumb that is about to tap it. -->
-<div data-kui="tree-view/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 p-3 text-zinc-900"
+<div data-kui="tree-view/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 p-3 text-zinc-900"
      x-data="{ open: { vas: true, sta: true, r11: true } }">
   <div class="mb-2">
     <h2 class="text-[16px]/6 font-semibold">Stock by location</h2>

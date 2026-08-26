@@ -27,7 +27,7 @@
      panel x-show is about to unhide is still display:none, and .focus() on it
      is a silent no-op that measures as correct and leaves the keyboard where it
      was. -->
-<div data-kui="onboarding-page/optional" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="onboarding-page/optional" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        asking: false, reason: '',
        open() { this.asking = true; this.$nextTick(() => requestAnimationFrame(() => this.$refs.why.focus())) },

@@ -556,13 +556,14 @@ for (const c of R.components) for (const v of c.variants) {
    it cannot fight the selected fill. Detected here rather than exempted by
    hand, so a tile that does NOT mark selection still has to obey the model. */
 const STEP = { 'bg-white': 'bg-zinc-100', 'bg-zinc-50': 'bg-zinc-100',
+               'bg-stone-100': 'bg-zinc-200',
                'bg-zinc-100': 'bg-zinc-200', 'bg-zinc-200': 'bg-zinc-300',
                'bg-zinc-300': 'bg-zinc-400', 'bg-zinc-700': 'bg-zinc-800',
                'bg-zinc-800': 'bg-zinc-900', 'bg-zinc-900': 'bg-zinc-800',
                'bg-red-600': 'bg-red-700' };
 const wantHover = (surface, resting, isShape) => {
   if (resting && resting !== 'bg-white') return STEP[resting] || null;
-  if (!isShape) return STEP[surface || 'bg-zinc-100'] || null;
+  if (!isShape) return STEP[surface || 'bg-stone-100'] || null;
   if (resting === 'bg-white')
     return surface === 'bg-white' ? 'bg-zinc-100' : (STEP[surface] || 'bg-zinc-200');
   if (surface === 'bg-zinc-200') return 'bg-zinc-300';
@@ -583,13 +584,13 @@ for (const c of R.components) for (const v of c.variants) {
     const [, close, tag, attrs, self] = m;
     if (close) { stack.pop(); ctx.pop(); continue; }
     const cls = (attrs.match(/(?<![:\w-])class="([^"]*)"/) || [])[1] || '';
-    const resting = (cls.match(/(?:^|\s)(bg-(?:white|zinc-\d+|red-\d+))(?:\s|$)/) || [])[1] || null;
+    const resting = (cls.match(/(?:^|\s)(bg-(?:white|zinc-\d+|stone-\d+|red-\d+))(?:\s|$)/) || [])[1] || null;
     /* the boundary is whitespace OR a colon: a hover written inside an arbitrary
        variant — [&:not(:has(:checked))]:hover:bg-zinc-50 — is still a hover, and
        for a long time this lint could not see one. group-hover: and peer-hover:
        stay excluded, because the character before hover: there is a hyphen. */
-    const hov = (cls.match(/(?:^|\s|:)(?:enabled:)?hover:(bg-(?:white|zinc-\d+|red-\d+))/) || [])[1];
-    const surface = [...stack].reverse().find(Boolean) || 'bg-zinc-100';
+    const hov = (cls.match(/(?:^|\s|:)(?:enabled:)?hover:(bg-(?:white|zinc-\d+|stone-\d+|red-\d+))/) || [])[1];
+    const surface = [...stack].reverse().find(Boolean) || 'bg-stone-100';
     /* rounded on one side only means the other corners belong to a wrapper */
     const partial = /\brounded-[lrtbse]-/.test(cls) || /\brounded-[lrtb][lrtb]-/.test(cls);
     const isShape = /\brounded-/.test(cls) && !partial && !/\bw-full\b/.test(cls)

@@ -75,7 +75,7 @@ register(
      This renders inside app-shell's main column. The wrapper is standing in for
      that column so the band has something to run across; drop it, and make
      <main> the shell's own child. -->
-<div data-kui="container/page" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/page" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -208,7 +208,7 @@ register(
      the cards on the page outside. A card has a border doing its grouping; a
      field is three lines of unbordered text and the whitespace is the only
      thing saying where one ends. -->
-<div data-kui="container/narrow" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/narrow" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
 
     <h1 class="text-[24px]/7 font-semibold tracking-tight">New vendor</h1>
@@ -304,7 +304,7 @@ register(
      Both renderings are in the DOM at once. Give either of them a form control
      with a name and it posts even while display:none, so the same record is
      submitted twice. -->
-<div data-kui="container/wide" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/wide" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -427,7 +427,7 @@ register(
      Inside a field the label and the message are mb-1.5 and mt-1.5 written on
      the parts, not a space-y on the field, because the message paragraph keeps
      its id and its place whether or not it has anything in it. -->
-<div data-kui="container/stack" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/stack" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main class="mx-auto max-w-4xl space-y-4 p-4 pb-6 lg:p-6">
 
     <h1 class="text-[24px]/7 font-semibold tracking-tight">MS-4821 · Material issue</h1>
@@ -545,7 +545,7 @@ register(
      its intrinsic minimum, so one long vendor name — or a <select> as wide as
      its longest option — pushes its own track past the card and takes the
      column beside it along. -->
-<div data-kui="container/grid" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/grid" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
 
     <h1 class="text-[24px]/7 font-semibold tracking-tight">Procurement — August 2026</h1>
@@ -767,7 +767,7 @@ register(
      list, z-30 for a band sticking across the page, z-40 for menus and
      backdrops, z-50 for dialogs and toasts, and one z-60 in the registry, on
      app-shell's skip link. -->
-<div data-kui="container/sticky" class="h-[520px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/sticky" class="h-[520px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main>
 
     <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white">
@@ -884,7 +884,7 @@ register(
      child will not shrink below its intrinsic minimum, so without it a vendor
      name that ran long widens the row, then the card, then the page — and that
      is what a sideways scrollbar on the page usually turns out to be. -->
-<div data-kui="container/overflow" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/overflow" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
 
     <h1 class="text-[24px]/7 font-semibold tracking-tight">Rate comparison</h1>
@@ -990,7 +990,7 @@ register(
      The band's actions take their own line rather than sitting beside the
      title: side by side at this width the h1 is squeezed to a third of the
      column and wraps under them. -->
-<div data-kui="container/phone" class="mx-auto h-[560px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="container/phone" class="mx-auto h-[560px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <main>
 
     <header class="sticky top-0 z-30 border-b border-zinc-200 bg-white px-4 py-3">
@@ -1122,7 +1122,7 @@ register(
     related: ['sidebar', 'topbar', 'command-palette', 'dropdown', 'page-header'],
     variants: [
       { id: 'default', name: 'Default', code:
-`<div data-kui="app-shell/default" class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+`<div data-kui="app-shell/default" class="relative flex h-[720px] overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 [.canvas-zinc_&]:bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{
        sidebar: true, nav: false, wide: false,
        init() {
@@ -1420,7 +1420,9 @@ register(
         <div class="relative"
              x-data="{
                open: false,
-               items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+               canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+               setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
+               items() { return [...this.$refs.menu.querySelectorAll('[role^=menuitem]')] },
                show(last = false) {
                  this.open = true;
                  this.$nextTick(() => requestAnimationFrame(() => {
@@ -1486,6 +1488,20 @@ register(
 
               <div role="separator" class="my-1 h-px bg-zinc-100"></div>
 
+              <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+                <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+                <span class="flex items-center gap-1.5">
+                  <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                          :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                          class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                          :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+                  <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                          :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                          class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                          :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+                </span>
+              </div>
+              <div role="separator" class="my-1 h-px bg-zinc-100"></div>
               <button type="button" role="menuitem" tabindex="-1" @click="close()"
                       class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
                 <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
@@ -1791,7 +1807,7 @@ register(
      A top-level register has no parent, so there is no trail. Two actions, and
      only the last is filled — the primary is last in the DOM as well as last on
      the right, so it is announced in the order it is drawn. -->
-<div data-kui="page-header/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/default" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto flex max-w-[1600px] flex-wrap items-start justify-between gap-x-6 gap-y-3 px-4 py-4 lg:px-6">
       <div class="min-w-0">
@@ -1821,7 +1837,7 @@ register(
      Render this here only if the topbar does not carry a trail. One of the two,
      decided once for the application; on screen twice, the second one is the one
      that goes stale. -->
-<div data-kui="page-header/trail" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/trail" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <nav aria-label="Breadcrumb">
@@ -1865,7 +1881,7 @@ register(
      string; as a definition list each value has a name that survives being read
      out on its own. Every figure is tabular-nums so the band does not reflow
      when the order is amended and the value changes width. -->
-<div data-kui="page-header/record" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/record" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <nav aria-label="Breadcrumb">
@@ -1947,7 +1963,7 @@ register(
      four tabs do not fit 390px and a second line of tabs reads as a different
      control. Its scrollbar is hidden and the focus outline takes a negative
      offset, because a positive one is clipped by the scroller. -->
-<div data-kui="page-header/tabs" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/tabs" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100"
      x-id="['ph-tab', 'ph-panel']"
      x-data="{
        tab: 'orders',
@@ -2061,7 +2077,7 @@ register(
      called Remove is what a screen reader reads out otherwise. The count is
      plain text and not a live region — it changes on a page of results, not on
      a keystroke. -->
-<div data-kui="page-header/filters" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/filters" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100"
      x-data="{ q: '' }">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -2153,7 +2169,7 @@ register(
      Its arrows carry names that say what they step through, because Previous
      and Next on their own are the same two words as every other pager on the
      screen. -->
-<div data-kui="page-header/back" class="overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/back" class="overflow-hidden rounded-xl border border-zinc-300 bg-stone-100">
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <a href="#" class="inline-flex items-center gap-1.5 rounded text-[13px]/5 text-zinc-600 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -2221,7 +2237,7 @@ register(
      To ship it: keep the <header> as written, drop the wrapper's height,
      overflow, rounding and border, and move @scroll onto whichever element
      scrolls on that page. -->
-<div data-kui="page-header/sticky" class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100"
+<div data-kui="page-header/sticky" class="h-[420px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100"
      x-data="{ shrunk: false }"
      @scroll.self="shrunk = $event.target.scrollTop > 56">
   <header class="sticky top-0 z-20 border-b border-transparent bg-white transition-colors"
@@ -2296,7 +2312,7 @@ register(
      clip: the rounded-t-xl on the <header> and the deep bottom padding are the
      frame giving the menu somewhere to open, and both come off on a real page.
      The destructive item is last, under a real role="separator". -->
-<div data-kui="page-header/overflow" class="rounded-xl border border-zinc-300 bg-zinc-100">
+<div data-kui="page-header/overflow" class="rounded-xl border border-zinc-300 bg-stone-100">
   <header class="rounded-t-xl border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
       <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
@@ -5485,7 +5501,7 @@ register(
      ignores any string you return, so there is nothing to write there — the
      preventDefault is the whole handler, and it only prompts because a person
      actually typed something. -->
-<div data-kui="form-page/two-column" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/two-column" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        dirty: false, leaving: false,
        arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
@@ -5741,7 +5757,7 @@ register(
      The commitment total is an <output>, not a disabled input: nobody was ever
      going to edit it. aria-live="off" because it recomputes on every keystroke,
      and an <output> is a live region by default. -->
-<div data-kui="form-page/side-rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/side-rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        qty: 45000, rate: 118.40, freight: 0.85,
        get goods() { return Number(this.qty) * Number(this.rate) },
@@ -5981,7 +5997,7 @@ register(
      own it; the section headings and the scroll are the navigation, and a rail
      folded into a sideways strip above the form is the one thing this system
      does not allow. -->
-<div data-kui="form-page/sections" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/sections" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        active: 'sec-identity',
        spy() {
@@ -6257,7 +6273,7 @@ register(
      Errors are recomputed live once submitted, and not before. Telling somebody
      their half-typed GSTIN is fourteen characters while they are on the ninth
      is noise. -->
-<div data-kui="form-page/invalid" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/invalid" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        submitted: false, saved: false, ordered: '2026-08-16',
        // focus after a reveal needs a frame as well as a tick: at
@@ -6520,7 +6536,7 @@ register(
 
      Below sm the three buttons go full width and stack, in DOM order. Two 36px
      buttons side by side at 390px is a thumb-sized problem. -->
-<div data-kui="form-page/sticky-actions" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/sticky-actions" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        busy: false, t: null,
        save() {
@@ -6763,7 +6779,7 @@ register(
 
      The totals are <output>, not disabled inputs: nobody was ever going to edit
      them. aria-live="off" because they recompute on every keystroke. -->
-<div data-kui="form-page/line-items" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/line-items" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        seq: 3,
        lines: [
@@ -6992,7 +7008,7 @@ register(
 
      Below sm the labelled steps do not fit, so they collapse to a rail and a
      line of text. They never scroll sideways. -->
-<div data-kui="form-page/wizard" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/wizard" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        step: 1, last: 4,
        // focus after a reveal needs a frame as well as a tick: at
@@ -7234,7 +7250,7 @@ register(
 
      Attachments in read mode keep Download and lose Remove. A control that
      cannot act is a control that should not be drawn. -->
-<div data-kui="form-page/readonly" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="form-page/readonly" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        mode: 'view', dirty: false, leaving: false,
        // focus after a reveal needs a frame as well as a tick: at
@@ -7548,7 +7564,7 @@ register(
      No sign-up link. Konspec accounts are created by IT, so the dead end is the
      support address rather than a register page that would 403 anyone who
      reached it. -->
-<div data-kui="auth-page/signin" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/signin" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ show: false, busy: false }">
   <main class="w-full max-w-sm">
 
@@ -7641,7 +7657,7 @@ register(
      happened. Bind the mark to a string — written once by the server it
      survives the correction, and the field then announces as invalid all
      session while its border is grey again. -->
-<div data-kui="auth-page/failed" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/failed" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{
        failed: true, edited: false, show: false,
        get bad() { return this.failed &amp;&amp; !this.edited },
@@ -7733,7 +7749,7 @@ register(
      about the domain, not about the address. Somebody who signs in through SSO
      has no password to reset, and without this line they type their address,
      get the confirmation screen, and wait for an email that will never come. -->
-<div data-kui="auth-page/forgot" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/forgot" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -7803,7 +7819,7 @@ register(
      plain text. Making it a live region announces one fact sixty times. The
      button is disabled while it runs, which is only acceptable because the
      figure beside it says exactly what it is waiting for. -->
-<div data-kui="auth-page/sent" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/sent" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ left: 45 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -7882,7 +7898,7 @@ register(
      The submit stays enabled. A disabled button with no explanation is a dead
      end for anybody who cannot see which rule is still grey; the form validates
      and says so. -->
-<div data-kui="auth-page/reset" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/reset" class="flex min-h-[560px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{
        pw: '', pw2: '', show: false, touched: false,
        get long() { return this.pw.length &gt;= 12 },
@@ -7999,7 +8015,7 @@ register(
 
      Naming the factor is safe here — the password already proved who this is —
      and it is what stops the user hunting through three apps for a code. -->
-<div data-kui="auth-page/otp" class="flex min-h-[520px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/otp" class="flex min-h-[520px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ code: '', left: 28 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -8075,7 +8091,7 @@ register(
      The vendor portal line is the escape hatch. Contractors and vendors are not
      in Entra, so without it every one of them mails IT to ask why the password
      box has gone. One primary action, one route out, nothing else. -->
-<div data-kui="auth-page/sso" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/sso" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ busy: false }">
   <main class="w-full max-w-sm">
 
@@ -8151,7 +8167,7 @@ register(
      The reference is selectable text. Somebody stuck here cannot raise a ticket
      in the app, so the one identifier support will ask for has to be copyable
      off this page. -->
-<div data-kui="auth-page/locked" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-10 text-[14px]/5 text-zinc-900"
+<div data-kui="auth-page/locked" class="flex min-h-[480px] items-center justify-center rounded-xl border border-zinc-300 bg-stone-100 px-4 py-10 text-[14px]/5 text-zinc-900"
      x-data="{ left: 822 }"
      x-init="setInterval(() => { if (left &gt; 0) left-- }, 1000)">
   <main class="w-full max-w-sm">
@@ -8262,7 +8278,7 @@ register(
      No shell, so the wordmark is the only navigation and it is a real link. No
      search box: the register the button lands on has one, and it has the
      filters that go with it. -->
-<div data-kui="error-page/404" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/404" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center justify-between gap-3">
     <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -8326,7 +8342,7 @@ register(
      shared terminal in QC the commonest cause of a 403 is that the last person
      never signed out, and the way out of that is the second link, not the
      first. -->
-<div data-kui="error-page/403" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/403" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center justify-between gap-3">
     <a href="/" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -8396,7 +8412,7 @@ register(
 
      The well is graphite and the tone is the glyph alone. A red screen for a
      failure that changed nothing makes a two-minute fault look like data loss. -->
-<div data-kui="error-page/500" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/500" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ done: false, t: null,
                copy() { navigator.clipboard?.writeText(this.$refs.ref.textContent.trim());
                         this.done = true;
@@ -8481,7 +8497,7 @@ register(
 
      The countdown is not a live region. Announcing a two-hour window every
      thirty seconds buries everything else on the screen. -->
-<div data-kui="error-page/maintenance" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/maintenance" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{
        until: 0, left: '', late: false, checking: false,
        tick() {
@@ -8574,7 +8590,7 @@ register(
      role="alert" and x-init moves focus to the h1, which has tabindex="-1", so
      the heading is spoken and Tab restarts at the top of the message instead of
      wherever the abandoned page left it. -->
-<div data-kui="error-page/offline" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/offline" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{
        state: 'offline', tries: 2, last: '14:07',
        retry() {
@@ -8666,7 +8682,7 @@ register(
      The second link is the shared-terminal case, and on a plant floor it is the
      common one: the address in the message is not always the address of the
      person now standing at the screen. -->
-<div data-kui="error-page/expired" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900"
+<div data-kui="error-page/expired" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900"
      x-data="{ next: '/grn/GRN-24-0912/?tab=lines' }">
 
   <header class="flex items-center justify-between gap-3">
@@ -8739,7 +8755,7 @@ register(
 
      And none of them render at all until DEBUG is False, which is why they are
      the templates that ship broken. -->
-<div data-kui="error-page/django" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-5 text-[14px]/5 text-zinc-900">
+<div data-kui="error-page/django" class="flex min-h-[560px] flex-col rounded-xl border border-zinc-300 bg-stone-100 px-4 py-5 text-[14px]/5 text-zinc-900">
 
   <header class="flex items-center gap-2.5">
     <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -8869,7 +8885,7 @@ register(
      The greeting is not the h1. An outline whose top entry is "Good morning,
      Akshay" is the same on every dashboard the application will ever have. The
      as-of time is written once, on the head, and on none of the four tiles. -->
-<div data-kui="dashboard/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -9175,7 +9191,7 @@ register(
      actionable; the vendor and the figure are how it is recognised. A queue of
      document numbers with no reason attached is a register with its useful
      column removed. -->
-<div data-kui="dashboard/queues" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/queues" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -9345,7 +9361,7 @@ register(
      genuinely overdue orders further down it. No role="alert" either — this is
      static markup rendered on every load, and a live region that fires whether
      or not anything just happened announces nothing the second time. -->
-<div data-kui="dashboard/alerts" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/alerts" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -9526,7 +9542,7 @@ register(
      No live region over the strip: the radiogroup's aria-checked is the
      announcement, and four figures read out on every press is a control nobody
      uses twice. -->
-<div data-kui="dashboard/period" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="dashboard/period" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        chart: null, gone: false,
        p: '30d',
@@ -9792,7 +9808,7 @@ register(
      A failed region says what still works. "The orders themselves are
      unaffected" stops a chart outage being escalated as data loss. No
      role="alert" here: static markup fires it on first paint regardless. -->
-<div data-kui="dashboard/regions" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/regions" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -10049,7 +10065,7 @@ register(
      a delta printed because the other tiles have one is a number invented to
      fill a slot. Where there is no comparable previous period the slot takes
      the qualifying fact: how long the oldest one has been waiting. -->
-<div data-kui="dashboard/role" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/role" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -10264,7 +10280,7 @@ register(
      The plot keeps its box and its legend and draws no axes. Chart.js given an
      empty dataset renders a real scale from 0 to 1, which is a picture of
      figures nobody has read and looks answered rather than pending. -->
-<div data-kui="dashboard/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -10412,7 +10428,7 @@ register(
 
      Queues before the plot, the same order as every other width, three rows
      each rather than five. Nothing scrolls sideways. -->
-<div data-kui="dashboard/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="space-y-3 p-4 pb-16">
 
     <div class="min-w-0">
@@ -10655,7 +10671,7 @@ register(
 {% endcomment %}
 {{ committed_by_month|json_script:"dbj-committed" }}
 
-<div data-kui="dashboard/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="dashboard/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-16 lg:p-6">
 
     <div class="min-w-0">
@@ -10953,7 +10969,7 @@ register(
      header row, so it is offered again as a select in the filter band — without
      it the register a phone gets is sorted by whatever the server chose last
      and there is no way to change it. -->
-<div data-kui="index-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        q: '', status: '', col: 'po', dir: 'asc', page: 1, size: 5,
        rows: [
@@ -11186,7 +11202,7 @@ register(
      Reset restores every filter the view holds, not just the one that was
      touched, because a view is one query and half of it is not a state anybody
      asked for. -->
-<div data-kui="index-page/saved-views" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/saved-views" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        view: 'mine',
        status: 'Open', buyer: 'me',
@@ -11355,7 +11371,7 @@ register(
 
      The drawer is absolute inset-0 against this preview frame; as a real page
      it is fixed inset-0. -->
-<div data-kui="index-page/filters" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/filters" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        open: false,
        status: 'Overdue', vendor: 'deccan', plant: 'Silvassa', period: '',
@@ -11636,7 +11652,7 @@ register(
      reads as a different control. Its scrollbar is hidden and the focus outline
      takes a negative offset, because a positive one is clipped by the
      scroller. -->
-<div data-kui="index-page/tabs" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/tabs" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-id="['ix-tb-tab', 'ix-tb-panel']"
      x-data="{
        tab: 'pending', page: 1, size: 4,
@@ -11823,7 +11839,7 @@ register(
      Ticking every row on the page is not selecting the query — that is the
      second line, and it is a deliberate act with its own count and its own way
      back out. -->
-<div data-kui="index-page/bulk" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/bulk" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        page: 1, size: 4, sel: ['PO-2026-0411', 'PO-2026-0418'], all: false,
        rows: [
@@ -12012,7 +12028,7 @@ register(
      page 15 so Next never slides out from under the pointer between two
      clicks. Below md the slot row is display:none and "Page n of m" stands in
      its place. -->
-<div data-kui="index-page/dense" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/dense" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        dense: true, page: 4, size: 10, total: 148,
        cols: { plant: true, buyer: true, status: true, due: true },
@@ -12225,7 +12241,7 @@ register(
      The scope control is button-group's segmented radiogroup copied rather than
      reinvented: one Tab stop, a roving tabindex and aria-checked, so which
      plant is showing is announced and not only tinted. -->
-<div data-kui="index-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="index-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        plant: 'daman', status: 'Overdue',
        book: {
@@ -12404,7 +12420,7 @@ register(
      This is the first paint and nothing here is worth keeping. Once rows are up,
      a later page in flight keeps them and marks them inert; the register never
      comes back to this state. -->
-<div data-kui="index-page/loading" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="index-page/loading" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
     <header class="border-b border-zinc-200 bg-white">
       <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -12919,7 +12935,7 @@ shape is written once here and only the dot changes.
      two-column grid divide-x puts a rule down the left edge of the third cell,
      which is the first cell of the second row and sits against the panel
      edge. -->
-<div data-kui="record-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <!-- page-header/record, unchanged. Never overflow-hidden: the action menu
@@ -13302,7 +13318,7 @@ shape is written once here and only the dot changes.
      lg:sticky needs lg:self-start. Without it the aside stretches to the row
      height and sticky has nothing to travel inside, which measures as correct
      and never moves. -->
-<div data-kui="record-page/rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/rail" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -13559,7 +13575,7 @@ shape is written once here and only the dot changes.
      loaded; the reader is at the top of the document because that is where the
      browser put them, and pulling focus into the panel at boot skips the band
      that says which record this is. Focus moves on a tab somebody pressed. -->
-<div data-kui="record-page/tabs" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="record-page/tabs" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-id="['rt-tab', 'rt-panel']"
      x-data="{
        tab: 'items',
@@ -13858,7 +13874,7 @@ shape is written once here and only the dot changes.
      why it sits under both rather than inside either — one control, one id, and
      the requirement stated in its help line rather than switched under the
      reader as they choose. -->
-<div data-kui="record-page/approvals" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/approvals" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -14074,7 +14090,7 @@ shape is written once here and only the dot changes.
      The window is bounded and says so. A record page is not the place to scroll
      four years of entries — the older ones are a link to the archive, where
      they can be searched rather than walked. -->
-<div data-kui="record-page/activity" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/activity" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -14283,7 +14299,7 @@ shape is written once here and only the dot changes.
      record is over, and emerald would say it finished well while zinc-500 would
      say it is still live. Both are in the status table now; this entry predates
      them and reached the same two answers on its own. -->
-<div data-kui="record-page/states" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="record-page/states" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ state: 'cancelled' }">
 
   <div class="flex flex-wrap items-center gap-3 border-b border-zinc-300 bg-white px-4 py-2 lg:px-6">
@@ -14513,7 +14529,7 @@ shape is written once here and only the dot changes.
 
      The server enforces this and the template only draws it. A page that hides
      a column while the API still returns the number has hidden nothing. -->
-<div data-kui="record-page/permissions" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/permissions" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -14765,7 +14781,7 @@ shape is written once here and only the dot changes.
      icon button with a real name up in the band, because an action missing from
      the phone build is a job the phone cannot do, and nobody finds that out
      until somebody is standing at a weighbridge. -->
-<div data-kui="record-page/phone" class="mx-auto h-[680px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="record-page/phone" class="mx-auto h-[680px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ section: 'items' }">
   <main>
 
@@ -15043,7 +15059,7 @@ shape is written once here and only the dot changes.
      walks a table of zero rows and is never told why. -->
 {% load humanize money ui %}
 
-<div data-kui="record-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
+<div data-kui="record-page/django" class="min-h-[560px] bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-6xl px-4 py-4 lg:px-6">
@@ -17862,7 +17878,7 @@ here and only the dot changes.
      mutation tears down the x-for iteration the handler was called from, and it
      restores focus a frame after the tick, when the destination column has
      actually been painted. Both are silent failures. -->
-<main data-kui="board/default" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/default" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: '', open: null,
         stages: [
@@ -18014,7 +18030,7 @@ here and only the dot changes.
 
      The Released cards keep the same 36px control even though they are one line
      tall: a card that is cheap to read is not one that is cheap to move back. -->
-<main data-kui="board/card" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<main data-kui="board/card" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
 
   <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
     <h1 class="text-[20px]/7 font-semibold tracking-tight">QC holds</h1>
@@ -18167,7 +18183,7 @@ here and only the dot changes.
      Values are formatted with en-IN, so the grouping is 18,42,000 and not
      1,842,000. Everything numeric takes tabular-nums, so the column of figures
      down the board lines up. -->
-<main data-kui="board/totals" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/totals" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: '', open: null,
         stages: [
@@ -18297,7 +18313,7 @@ here and only the dot changes.
      board that has stopped working, and the next thing that happens on a shop
      floor is somebody pressing it eleven more times. The limit itself is the
      plant\'s, and it is checked again on the server. -->
-<main data-kui="board/wip" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/wip" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: '',  open: null,
         stages: [
@@ -18437,7 +18453,7 @@ here and only the dot changes.
      Dismissing it is a real button — a card wearing a rejection from an hour
      ago is worse than one wearing nothing — and focus does not move on the
      rejection itself, because the user is on another card by then. -->
-<main data-kui="board/pending" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/pending" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: 'PO-2026-0402 was refused by finance and is back in With buyer.',
         stages: [
@@ -18548,7 +18564,7 @@ here and only the dot changes.
 
      over is one stage id on the root and not a boolean per column: dragleave
      fires on every child element, which is what makes them flicker. -->
-<main data-kui="board/drag" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/drag" class="flex h-[560px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: '', over: null, open: null,
         stages: [
@@ -18668,7 +18684,7 @@ here and only the dot changes.
      Under a filter it is the create-under-a-filter defect and somebody raises
      the order they raised last week, which is why the filters variant has no
      such button on it. -->
-<main data-kui="board/empty" class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<main data-kui="board/empty" class="flex h-[600px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
 
   <div class="shrink-0 border-b border-zinc-300 bg-white px-4 py-3">
     <h1 class="text-[20px]/7 font-semibold tracking-tight">Order approvals</h1>
@@ -18758,7 +18774,7 @@ here and only the dot changes.
      No create button on a filtered board: the records exist and the filter is
      hiding them. Filtering never moves a card and never changes a stage — a
      card the filter excludes is not at another stage, it is not on the screen. -->
-<main data-kui="board/filters" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/filters" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         chips: ['Silvassa', 'Buyer: Meera Joshi'],
         stages: [
@@ -18880,7 +18896,7 @@ here and only the dot changes.
      than wrap — wrapping from QC hands somebody Planned. The columns are bound
      with :class in the object form and never x-show: an inline display:none
      beats sm:flex, and they would never come back on a wide screen. -->
-<main data-kui="board/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<main data-kui="board/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
       x-data="{
         said: '', open: null, stage: 'welded',
         stages: [
@@ -19027,7 +19043,7 @@ here and only the dot changes.
      and survives the swap, and humanize has to be loaded in this same file or
      intcomma raises. -->
 {% load humanize %}
-<main data-kui="board/django" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<main data-kui="board/django" class="flex h-[620px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
 
   <p id="dj-said" role="status" class="sr-only">{{ move_message|default:"" }}</p>
 
@@ -19198,7 +19214,7 @@ here and only the dot changes.
      a grid cell is clipped by whatever scrolls the grid, which is board\'s
      reason for putting its stage list in normal flow, and at 390px there is
      nothing to anchor one to. The week row grows, which is honest. -->
-<main data-kui="schedule-page/month" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<main data-kui="schedule-page/month" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
       x-data="{ more: null }">
 
   <header class="border-b border-zinc-200 bg-white">
@@ -19613,7 +19629,7 @@ here and only the dot changes.
      Below md the grid is gone: seven columns of forty-pixel blocks is nothing
      anybody can read, and the honest answer at that width is the agenda in the
      phone variant. Here it is one line per day with the times written out. -->
-<main data-kui="schedule-page/week" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/week" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -19886,7 +19902,7 @@ here and only the dot changes.
      that runs past 22:00 is clipped at the lane edge with its right corners
      squared and says by how much in its own text. A clipped block that does not
      say so is a block that looks like it ends at ten. -->
-<main data-kui="schedule-page/resource" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/resource" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -20137,7 +20153,7 @@ here and only the dot changes.
      Below lg the rail comes after the lane in the DOM as well as beside it, so
      it stacks under the day rather than above it and the tab order is the day
      and then what is still loose. -->
-<main data-kui="schedule-page/day" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/day" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -20344,7 +20360,7 @@ here and only the dot changes.
      The edges are the other truncation and they are not the same problem. A
      block clipped by the lane says so in words and squares the corners on the
      side that was cut, because a rounded end reads as a real end. -->
-<main data-kui="schedule-page/block" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/block" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <div class="mx-auto max-w-4xl px-4 py-5 lg:px-6">
     <h1 class="text-[24px]/7 font-semibold tracking-tight">The scheduled block</h1>
@@ -20505,7 +20521,7 @@ here and only the dot changes.
      Colour is in the dot and in the icon and nowhere else. Forty blocks are
      visible here and a red fill on two of them would be the only thing on the
      screen; alert's rule holds hardest where the density is highest. -->
-<main data-kui="schedule-page/conflict" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/conflict" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -20736,7 +20752,7 @@ here and only the dot changes.
      than a different cell: a plant that has never had a schedule at all. That
      is empty-state's nothing-yet, and it is the only one of the four that
      offers to create something. -->
-<main data-kui="schedule-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<main data-kui="schedule-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto max-w-[1600px] px-4 py-4 lg:px-6">
@@ -20888,7 +20904,7 @@ here and only the dot changes.
      bar plus seven columns at 390px is the width where a table stops reflowing
      and starts scrolling. Two columns on a phone, four at sm, seven at lg, and
      nothing moves sideways at any of them. -->
-<main data-kui="schedule-page/filters" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<main data-kui="schedule-page/filters" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
       x-data="{
         chips: ['Silvassa', 'Gujarat Polymers Ltd'],
         days: [
@@ -21055,7 +21071,7 @@ here and only the dot changes.
      The rail from the day view comes last rather than being dropped. Four
      orders promised today with no slot booked is the fact that decides whether
      the morning is quiet, and it is the first thing that gets cut for width. -->
-<main data-kui="schedule-page/phone" class="mx-auto flex h-[640px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<main data-kui="schedule-page/phone" class="mx-auto flex h-[640px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
       x-data="{ day: 'tue' }">
 
   <div class="shrink-0 border-b border-zinc-300 bg-white px-3 py-3">
@@ -21558,7 +21574,7 @@ here and only the dot changes.
 
      No mark on any figure here. This is the matrix before anyone has done
      arithmetic on it. -->
-<div data-kui="compare-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        vendors: [
          { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417', on: '04 Sep 2026' },
@@ -21735,7 +21751,7 @@ here and only the dot changes.
      the only thing that makes a narrow window usable at all — but a real phone
      gets a different arrangement rather than a smaller grid, and that is what
      the phone variant is. -->
-<div data-kui="compare-page/sticky" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/sticky" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        vendors: [
          { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
@@ -21868,7 +21884,7 @@ here and only the dot changes.
      Ties are marked on both cells rather than on the first. L1 is a rate, not
      a rank, and marking whichever quotation arrived first makes the award look
      decided by the post. -->
-<div data-kui="compare-page/lowest" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/lowest" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        vendors: [
          { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
@@ -22028,7 +22044,7 @@ here and only the dot changes.
      the body. Every rate the vendors actually quoted stays on screen under
      both bases, because a comparison that hides the quoted rate the moment you
      ask about landed cost cannot be checked against the quotation itself. -->
-<div data-kui="compare-page/landed" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/landed" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        basis: 'landed',
        opts: [{ id: 'basic', label: 'Basic rate' }, { id: 'landed', label: 'Landed cost' }],
@@ -22237,7 +22253,7 @@ here and only the dot changes.
      no on-time figure at all, because it has never been given an order: that
      is an em dash for the eye and a sentence for the accessibility tree,
      never a zero and never a low percentage. -->
-<div data-kui="compare-page/terms" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="compare-page/terms" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-7xl p-4 pb-6 lg:p-6">
 
     <div class="min-w-0">
@@ -22414,7 +22430,7 @@ here and only the dot changes.
      Both exclusions are stated in the foot in the units of the decision. A
      comparison that quietly drops a column is worse than one that draws it
      with a reason attached. -->
-<div data-kui="compare-page/partial" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/partial" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        vendors: [
          { id: 'v-0288', name: 'Sharma Steel &amp; Alloys', quote: 'QT-4417' },
@@ -22599,7 +22615,7 @@ here and only the dot changes.
 
      The summary is an <output>, which is a live region by default, so the
      restatement is heard as it changes rather than only seen. -->
-<div data-kui="compare-page/award" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/award" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        shape: 'whole',
        vendor: 'v-0219',
@@ -22816,7 +22832,7 @@ here and only the dot changes.
      The totals and the award action are on the phone in full. A phone user is
      not given a reduced version of the thing the screen exists for. Nothing
      scrolls sideways. -->
-<div data-kui="compare-page/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="compare-page/phone" class="mx-auto h-[720px] max-w-[390px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        pick: 'v-0219',
        vendors: [
@@ -22986,7 +23002,7 @@ here and only the dot changes.
      figures rather than as an error. -->
 {% load humanize money ui %}
 
-<div data-kui="compare-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
+<div data-kui="compare-page/django" class="min-h-[560px] bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-7xl px-4 py-5 lg:px-6">
 
@@ -23266,7 +23282,7 @@ here and only the dot changes.
 
      Nothing on this page posts. The verdict column says what each line is;
      committing is reconcile-page/post and it is a separate act. -->
-<div data-kui="reconcile-page/three-way" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/three-way" class="bg-stone-100 text-zinc-900"
      x-data="{
        lines: [
          { item: 'HDPE granules — natural', po: 'PO-2026-0418', grn: 'GRN-4821', line: 'line 1',
@@ -23504,7 +23520,7 @@ here and only the dot changes.
      The reason field is field's shape and nothing hand-rolled: label, bordered
      wrapper drawing one outline, one message paragraph whose id never changes,
      and the free-text box appearing only for the answer that needs it. -->
-<div data-kui="reconcile-page/tolerance" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/tolerance" class="bg-stone-100 text-zinc-900"
      x-data="{ reason: '', other: '' }">
 
   <main class="mx-auto max-w-5xl space-y-4 p-4 pb-6 lg:p-6">
@@ -23719,7 +23735,7 @@ here and only the dot changes.
      reconcile-page/match: two records on opposite sides that look like the same
      transaction, named, with one route to the screen that pairs them. It is one
      action, not two — a second button here turns a notice into a decision. -->
-<div data-kui="reconcile-page/unmatched" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/unmatched" class="bg-stone-100 text-zinc-900"
      x-data="{
        left: [
          { id: 'GRN-4821', who: 'Gujarat Polymers Ltd', on: '04 Sep 2026', ref: 'PO-2026-0418', val: 2254240, days: 6 },
@@ -23879,7 +23895,7 @@ here and only the dot changes.
      exists and focus would otherwise fall to the body — a restore that only
      deletes the pair and announces that the record is back is a sentence the
      code does not honour. Posting is reconcile-page/post. -->
-<div data-kui="reconcile-page/match" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/match" class="bg-stone-100 text-zinc-900"
      x-data="{
        sel: 0, choice: '', pairs: [], said: '',
        left: [
@@ -24160,7 +24176,7 @@ here and only the dot changes.
      receipt has been invoiced. It is not a decoration on a full panel: the two
      panels differ by 0.8% and the rail is what makes that visible before the
      figures are read. -->
-<div data-kui="reconcile-page/partial" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/partial" class="bg-stone-100 text-zinc-900"
      x-id="['pt']"
      x-data="{
        said: '',
@@ -24401,7 +24417,7 @@ here and only the dot changes.
      reason it will not: it is aria-disabled and focusable rather than disabled,
      so the control somebody is hunting for is still there with an explanation
      attached to it. -->
-<div data-kui="reconcile-page/ledger" class="bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/ledger" class="bg-stone-100 text-zinc-900"
      x-data="{
        rows: [
          { on: '01 Sep 2026', narr: 'NEFT to Sharma Steel &amp; Alloys', amt: '−₹18,42,000',
@@ -24637,7 +24653,7 @@ here and only the dot changes.
 
      Nothing scrolls sideways. As a real page this is app-shell's main column at
      the same width; the w-[390px] frame is only so it previews as a phone. -->
-<div data-kui="reconcile-page/phone" class="mx-auto flex h-[680px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/phone" class="mx-auto flex h-[680px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        tab: 'work',
        opts: [ { id: 'work', label: 'Needs work 4' }, { id: 'agree', label: 'Agree 12' } ],
@@ -24822,7 +24838,7 @@ here and only the dot changes.
      The frame is bounded — h-[680px] — so the sticky bar and the dialog preview
      in a box. As a real page, drop the height and the border, let the bar stick
      to the shell's scrolling column, and make the dialog fixed inset-0. -->
-<div data-kui="reconcile-page/post" class="relative h-[680px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="reconcile-page/post" class="relative h-[680px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ asking: false, posting: false, said: '',
        run() { if (this.posting) return; this.posting = true; this.asking = false; this.said = 'Posting 14 matched lines for ₹59,41,636.' } }">
 
@@ -25005,7 +25021,7 @@ here and only the dot changes.
      queue back into a problem; October is none of those. It is the only thing
      anybody does from this screen, and hiding it behind the breadcrumb costs a
      navigation every month. -->
-<div data-kui="reconcile-page/clean" class="bg-zinc-100 text-zinc-900">
+<div data-kui="reconcile-page/clean" class="bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-4xl space-y-4 p-4 pb-6 lg:p-6">
 
     <div class="min-w-0">
@@ -25126,7 +25142,7 @@ here and only the dot changes.
 {% load humanize money %}
 
 {% block main %}
-<div data-kui="reconcile-page/django" class="bg-zinc-100 text-zinc-900">
+<div data-kui="reconcile-page/django" class="bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-[1600px] space-y-4 p-4 pb-6 lg:p-6">
 
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
@@ -25510,7 +25526,7 @@ and the foot of the table cannot disagree about which population they describe.
      the label as its peer carrying the focus outline, both drag handlers
      prevented, and the depth counted rather than flagged so the highlight does
      not flicker as the pointer crosses the icon. -->
-<div data-kui="import-page/upload" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/upload" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ depth: 0 }">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
@@ -25720,7 +25736,7 @@ and the foot of the table cannot disagree about which population they describe.
      The rows take no hover fill. Nothing happens when the row is clicked — the
      select in it is what responds — and a band that lights up under a cursor
      that can do nothing with it is a promise the row does not keep. -->
-<div data-kui="import-page/mapping" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/mapping" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        fields: [
          { key: 'code', label: 'Item code', req: true },
@@ -25954,7 +25970,7 @@ and the foot of the table cannot disagree about which population they describe.
      The identifiers wrap and do not truncate. ITM-1042 cut off at a column edge
      is not a shortened value, it is a different one, and somebody will read it
      into an email. Only the description truncates. -->
-<div data-kui="import-page/preview" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="import-page/preview" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-6xl p-4 pb-6 lg:p-6">
 
@@ -26221,7 +26237,7 @@ and the foot of the table cannot disagree about which population they describe.
      The primary follows the radio and says what it will do. A button reading
      Commit under a screen full of failures is a button whose meaning the user
      has to reconstruct; Post 1,203 rows is not. -->
-<div data-kui="import-page/errors" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/errors" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ kind: 'all', mode: 'none' }">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
@@ -26523,7 +26539,7 @@ and the foot of the table cannot disagree about which population they describe.
      The mapping selects carry an aria-label naming the value they translate,
      because a column of five boxes all labelled Unit of measure is five
      controls nobody can tell apart. -->
-<div data-kui="import-page/fix" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/fix" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ done: false }">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
@@ -26763,7 +26779,7 @@ and the foot of the table cannot disagree about which population they describe.
      stops, finished or failed. A panel left at aria-busy="true" after an import
      fell over tells a screen reader that everything in it is mid-update, and no
      later event arrives to correct that. -->
-<div data-kui="import-page/committing" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/committing" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ stopping: false }">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
@@ -26924,7 +26940,7 @@ and the foot of the table cannot disagree about which population they describe.
      rows exist, and index-page is where somebody goes to look at them — the
      primary is a link into a filtered register rather than another button on
      this page. -->
-<div data-kui="import-page/result" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="import-page/result" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
 
@@ -27104,7 +27120,7 @@ and the foot of the table cannot disagree about which population they describe.
      The sample value truncates and the source header does not. A column called
      Effective From Date wrapping to two lines is fine; a sample of a 60-character
      description pushing the card sideways is not. -->
-<div data-kui="import-page/phone" class="mx-auto h-[640px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="import-page/phone" class="mx-auto h-[640px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        cols: [
          { id: 'p1', head: 'Item Code', sample: 'ITM-1042', field: 'code' },
@@ -27783,7 +27799,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      palette and why the palette has to link here — nothing inside an option may
      be focusable, so a palette row has no middle-click and no new tab, and a
      search result is a thing people open in six tabs. -->
-<div data-kui="search-page/results" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/results" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ q: 'MS-4821' }">
 
   <main>
@@ -28025,7 +28041,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      about a kind. The kind rides on each row as a word, which is exactly what
      the palette does for the same reason: a 16px document glyph is the same
      glyph for a receipt and an invoice, and it is not an accessible name. -->
-<div data-kui="search-page/exact" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/exact" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ q: 'PO-2026-0418' }">
 
   <main>
@@ -28214,7 +28230,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      GET form; the django variant is the one to copy. What must not ship either
      way is facet state that lives only in the browser — a narrowed result
      nobody can send to the person who asked about it is the defect. -->
-<div data-kui="search-page/facets" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/facets" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        type: ['order'], plant: 'silvassa', status: '', raised: '', band: '',
        types: [
@@ -28522,7 +28538,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      moment they know the answer is an order: it keeps the saved views, the
      column chooser and the density they set. This page is where somebody lands
      when they did not know; it is not where they should stay. -->
-<div data-kui="search-page/scoped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="search-page/scoped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main>
     <header class="border-b border-zinc-200 bg-white">
@@ -28783,7 +28799,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      item master's descriptions and the register's own full-text filter — and
      they carry the query in their own labels, so each says what it will do with
      the words already typed. -->
-<div data-kui="search-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ q: 'MS 4821' }">
 
   <main>
@@ -28919,7 +28935,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      aria-busy goes on the results column and survives the swap, aria-hidden
      goes on the pulse wrapper so one attribute hides every block, and the
      status sits outside both. Three jobs, and collapsing any two loses one. -->
-<div data-kui="search-page/loading" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="search-page/loading" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main>
     <header class="border-b border-zinc-200 bg-white">
@@ -29092,7 +29108,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      Forgetting a search is a per-row control and not only a Clear all, because
      the thing people want gone is usually one query with a customer's name in
      it rather than the whole list. -->
-<div data-kui="search-page/recent" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="search-page/recent" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main>
     <header class="border-b border-zinc-200 bg-white">
@@ -29263,7 +29279,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      screen at exactly that moment. The placeholder carries no syntax at all: a
      placeholder disappears the moment somebody types, which is the moment they
      need it. -->
-<div data-kui="search-page/syntax" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/syntax" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        q: 'vendor:sharma status:open valu:high ms angle',
        help: false,
@@ -29442,7 +29458,7 @@ happens in Excel and a list on a web page cannot be pasted back into one.
      dragged while the sheet is open, and the trigger gets focus back when it
      closes. The sheet is absolute inset-0 against this preview frame; as a real
      page it is fixed inset-0. -->
-<div data-kui="search-page/phone" class="relative mx-auto h-[700px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="search-page/phone" class="relative mx-auto h-[700px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ open: false, type: 'order', plant: 'Silvassa', status: '' }">
 
   <main>
@@ -30062,7 +30078,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The tablet is at arm\'s length under a work light and the operator is
      wearing gloves — 11px labels and 36px buttons measure as accessible and
      cannot be read or hit. -->
-<div data-kui="focus-page/scan" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/scan" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        code: '', typed: '', manual: false, done: 27, target: 40, fresh: [],
        keep(e) {
@@ -30234,7 +30250,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      because the operator is holding the label and comparing two strings of
      digits. Naming the fault without printing both leaves them to work out
      which of fourteen characters was wrong. -->
-<div data-kui="focus-page/unknown" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/unknown" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        code: '', rejected: true, done: 27, target: 40,
        head: 'Not on this order',
@@ -30374,7 +30390,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      touch screen posts a second GRN, and there is no keyboard focus to lose. It
      keeps its width with button/states\' grid overlay, because a label that
      grows under a thumb moves the target mid-press. -->
-<div data-kui="focus-page/confirm" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/confirm" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ posting: false }">
 
   <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
@@ -30489,7 +30505,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      "I looked and it was empty" are the same absence at the server, and a stock
      count that cannot tell them apart cannot be reconciled — so Nothing here is
      a key that enters 0 rather than a way past the question. -->
-<div data-kui="focus-page/count" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/count" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        entered: '', committed: false, system: 184,
        get counted() { return parseInt(this.entered || '0', 10) },
@@ -30636,7 +30652,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      and a display:none input is still in the form and still posts, so a reason
      typed and then hidden by a change of verdict would travel with a POST that
      says the sample passed. -->
-<div data-kui="focus-page/inspect" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/inspect" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ verdict: '' }">
 
   <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
@@ -30772,7 +30788,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      are the two 64px targets on this screen and one of them undoes the other.
      Nothing on a moving trolley should have to distinguish between adjacent
      ones by reading them. -->
-<div data-kui="focus-page/progress" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/progress" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        total: 40, at: 11, qty: '',
        racks: Array.from({ length: 40 }, (_, n) => n > 10 ? null : 88 + n),
@@ -30912,7 +30928,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The queue here is in memory and the sentence on screen says so. Where a
      deployment persists it — IndexedDB, a service worker — that one sentence
      changes and nothing else about this screen does. -->
-<div data-kui="focus-page/offline" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/offline" class="flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        code: '', queued: 17,
        keep(e) {
@@ -31061,7 +31077,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      three shifts is how work is actually lost. The browser ignores any string
      returned, so preventDefault is the whole handler — and it fires only
      because a real scan happened. -->
-<div data-kui="focus-page/exit" class="relative flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="focus-page/exit" class="relative flex h-[640px] flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        held: 17, leaving: false,
        ask() { if (this.held > 0) { this.leaving = true } else { this.go() } },
@@ -31193,7 +31209,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 {% load humanize %}
 
 {% block station %}
-<div data-kui="focus-page/django" class="flex h-dvh flex-col overflow-hidden bg-zinc-100 text-zinc-900">
+<div data-kui="focus-page/django" class="flex h-dvh flex-col overflow-hidden bg-stone-100 text-zinc-900">
 
   <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-zinc-300 bg-white px-4 py-3 sm:px-6">
     <p class="min-w-0 text-[16px]/6 font-medium">
@@ -31412,7 +31428,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      to travel inside. Below lg the nav stacks above the pane in DOM order,
      which is honest for nine sections; the phone variant carries the answer
      for a screen where it is not. -->
-<div data-kui="settings-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="settings-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
 
@@ -31585,7 +31601,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      state the record is in, and the mark has to survive being the only thing
      that says so. Alpine binds the wrapping span, never the Lucide <i> —
      createIcons() replaces that element and takes the binding with it. -->
-<div data-kui="settings-page/dirty" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="settings-page/dirty" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        dirty: true, leaving: false, target: '',
        arm(e) { if (e.target.matches('input, select, textarea')) this.dirty = true },
@@ -31778,7 +31794,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      do not need four status lines. want is captured before the request, so the
      revert puts back the value the server still holds rather than the one the
      user just asked for. -->
-<div data-kui="settings-page/immediate" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="settings-page/immediate" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
 
@@ -31972,7 +31988,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      Escape clears the box and leaves focus in it. Blurring on Escape hands the
      keyboard back to the top of the document. -->
-<div data-kui="settings-page/grouped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="settings-page/grouped" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        q: '', hits: 0,
        hit(s) { return !this.q.trim() || s.toLowerCase().includes(this.q.trim().toLowerCase()) },
@@ -32138,7 +32154,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Changing the running number down is refused rather than warned about — the
      numbers between are already on paper. That check belongs on the server as
      well; this is the half that stops the round trip. -->
-<div data-kui="settings-page/series" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="settings-page/series" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        prefix: 'PO', sep: '-', fy: true, width: 4, next: 419, ack: false,
        get fyLabel() { return '2026' },
@@ -32310,7 +32326,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      A matrix saves, it does not write on change. Twenty-four boxes each posting
      on change is twenty-four requests nobody can reconcile and no record of
      what the state was before. -->
-<div data-kui="settings-page/roles" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="settings-page/roles" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
 
@@ -32479,7 +32495,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Deactivating is not deleting, and the row says which one it is. A plant
      with ledger history against it can never be removed, and offering a Delete
      that will always fail is worse than not offering one. -->
-<div data-kui="settings-page/danger" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="settings-page/danger" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ open: false, typed: '', target: 'VAPI-02' }">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
@@ -32636,7 +32652,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The section's own Save is a full-width pair at the foot of the card rather
      than two 36px buttons side by side, which is a thumb-sized problem at this
      width. -->
-<div data-kui="settings-page/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="settings-page/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        open: false, name: '',
        show(n) { this.name = n; this.open = true; this.$nextTick(() => this.$refs.head.focus()) },
@@ -32805,7 +32821,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      {% load humanize %} is in this file because |intcomma is used in this file.
      A load in the base template does not carry into the include. -->
 {% load humanize %}
-<div data-kui="settings-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="settings-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-5xl p-4 pb-6 lg:p-6">
 
@@ -33074,7 +33090,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      person who has not answered is amber-700, because it will not clear unless
      somebody rings them. One mark for both and the screen cannot say which of
      the stalled tasks a phone call would fix. -->
-<div data-kui="onboarding-page/checklist" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/checklist" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
 
@@ -33405,7 +33421,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      the item import. Its completion is detected from the import posting, so
      there is no Mark done button on it at all: a manual tick over a fact the
      server can read goes stale the first time somebody empties the table. -->
-<div data-kui="onboarding-page/task" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="onboarding-page/task" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        prefix: 'PO', width: 4, next: 1,
        get preview() { return this.prefix + '-2026-' + String(this.next).padStart(Number(this.width) || 1, '0') }
@@ -33559,7 +33575,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The waiting cards carry the date it was asked and how long ago in words,
      because "waiting on Nilesh" without a date is a state nobody can judge. Six
      days is a nudge; six weeks is somebody else's job now. -->
-<div data-kui="onboarding-page/blocked" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/blocked" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
 
@@ -33751,7 +33767,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The progress line at the top of the card is the reading that actually
      answers "how far did they get" — two figures, then and now, not a
      percentage that has moved. -->
-<div data-kui="onboarding-page/resume" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/resume" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
 
@@ -33904,7 +33920,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The filter is a real radiogroup with one Tab stop and arrow keys, copied
      from button-group's segmented shape. Two options, because a third — one per
      team — is the team cards again in a control. -->
-<div data-kui="onboarding-page/assigned" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="onboarding-page/assigned" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        v: 'Everyone', opts: ['Everyone', 'Only mine'],
        move(step) {
@@ -34120,7 +34136,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      panel x-show is about to unhide is still display:none, and .focus() on it
      is a silent no-op that measures as correct and leaves the keyboard where it
      was. -->
-<div data-kui="onboarding-page/optional" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="onboarding-page/optional" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        asking: false, reason: '',
        open() { this.asking = true; this.$nextTick(() => requestAnimationFrame(() => this.$refs.why.focus())) },
@@ -34312,7 +34328,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The record is a list and not a table. Three short facts per task, nothing
      to sort and no column to compare down — a table here is a grid that has to
      restack at 390px to say what a list says at any width. -->
-<div data-kui="onboarding-page/complete" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/complete" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
 
@@ -34477,7 +34493,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The header does not scroll. The progress figures are what tells somebody
      opening this on a phone whether it is worth doing anything, and they are
      two lines from the top of a list that is six screens long. -->
-<div data-kui="onboarding-page/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/phone" class="mx-auto flex h-[600px] w-[390px] max-w-full flex-col overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <div class="shrink-0 border-b border-zinc-200 bg-white px-4 py-3">
     <h1 class="text-[16px]/6 font-semibold">Set up Konspec</h1>
@@ -34666,7 +34682,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The humanize load is in this file because naturaltime and intcomma are used
      in this file. A load in the base template does not carry into an include. -->
 {% load humanize %}
-<div data-kui="onboarding-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="onboarding-page/django" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
 
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
 
@@ -34939,7 +34955,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      Paged rather than appended. A numbered page is a URL an auditor can cite;
      the appending arrangement is in the more variant, and it gives that up. -->
-<div data-kui="audit-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="audit-page/default" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -35174,7 +35190,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The strike-through is decoration and so is the arrow. The sr-only "changed
      to" closes the old value, so the pair is announced as one fact with a
      direction in it rather than as two figures. -->
-<div data-kui="audit-page/diff" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+<div data-kui="audit-page/diff" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <main class="mx-auto max-w-3xl">
     <h1 class="text-[20px]/7 font-semibold tracking-tight">Changes</h1>
     <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Four entries · 04 Sep 2026 · the shapes a diff comes in</p>
@@ -35353,7 +35369,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      is a row in a group somebody can look up. The reason for the refusal being
      an entry at all is that a run of them by one account in one afternoon is
      the pattern, and a single one is noise. -->
-<div data-kui="audit-page/events" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+<div data-kui="audit-page/events" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <main class="mx-auto max-w-3xl">
     <h1 class="text-[20px]/7 font-semibold tracking-tight">Events</h1>
     <p class="mt-1 text-[13px]/5 tabular-nums text-zinc-600">Entries that changed no field · 03 Sep 2026 · 6 of 71</p>
@@ -35480,7 +35496,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Below sm the four controls stack two to a row rather than folding into a
      drawer. That is index-page/django’s grid arrangement, and the drawer is in
      the phone variant, where the entries need the rest of the work anyway. -->
-<div data-kui="audit-page/filters" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="audit-page/filters" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        actor: '', kind: '', field: 'rate', range: 'aug-sep', after: true,
        entries: [
@@ -35681,7 +35697,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The count line counts inside the scope. "11 of 1,284" would be a figure
      about a trail this reader is not looking at; the denominator is the
      record’s own 34 entries. -->
-<div data-kui="audit-page/record" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="audit-page/record" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main>
 
     <header class="border-b border-zinc-200 bg-white">
@@ -35851,7 +35867,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      write findings. That is why the default variant is paged and this one is
      the alternative rather than the reference: reach for it when the trail is
      being skimmed, and for the pager when it is being quoted. -->
-<div data-kui="audit-page/more" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="audit-page/more" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        shown: 3, step: 3, total: 9, busy: false,
        entries: [
@@ -35958,7 +35974,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      The dialog is dialog/form’s panel unchanged, and it is the only control on
      this whole page that causes a write. Everything else is a GET. -->
-<div data-kui="audit-page/export" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="audit-page/export" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ open: false, format: 'csv' }">
   <main>
 
@@ -36113,7 +36129,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      There is nothing to create — an audit entry is written by something else
      happening — and a disabled button is a dead tab stop that explains nothing.
      empty-state’s shapes, unchanged. -->
-<div data-kui="audit-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+<div data-kui="audit-page/empty" class="h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <main class="mx-auto max-w-3xl space-y-4">
     <h1 class="text-[20px]/7 font-semibold tracking-tight">Audit trail · nothing to show</h1>
 
@@ -36209,7 +36225,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      The timestamp moves above the sentence rather than beside it. A 56px gutter
      against a 302px text column wraps every entry to four lines. -->
-<div data-kui="audit-page/phone" class="relative mx-auto h-[720px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="audit-page/phone" class="relative mx-auto h-[720px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ drawer: false, open: false, filters: 3 }">
   <main>
 
@@ -36782,7 +36798,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      inherited from the ul. If Alpine never boots, the rail is a plain list of
      links with no marker, which is the correct thing for it to fall back to. -->
 
-<div data-kui="docs-page/article" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="docs-page/article" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ here: 'dp-a-raise' }"
      x-init="const seen = new IntersectionObserver(
                rows => rows.forEach(r => { if (r.isIntersecting) here = r.target.id }),
@@ -37063,7 +37079,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      No italic type exists in this system, so the quotation earns its shape from
      a 2px rule and the secondary colour, and its source is a line underneath
      rather than a <cite>, which browsers italicise by default. -->
-<div data-kui="docs-page/prose" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+<div data-kui="docs-page/prose" class="bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <main class="mx-auto max-w-3xl">
     <article class="rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6">
       <h1 class="text-[24px]/7 font-semibold tracking-tight">QC hold and release</h1>
@@ -37233,7 +37249,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      What may sit inside a step is the thing the step is about: the control that
      opens the screen, a figure of the field being described, one callout. What
      may not is a copy of the form. -->
-<div data-kui="docs-page/procedure" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="docs-page/procedure" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ here: 'dp-pc-4' }"
      x-init="const seen = new IntersectionObserver(
                rows => rows.forEach(r => { if (r.isIntersecting) here = r.target.id }),
@@ -37573,7 +37589,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The history table is three columns, which is the cap this entry puts on a
      table in prose. A fourth column is a register and belongs on a screen of
      its own with a link to it from here. -->
-<div data-kui="docs-page/controlled" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="docs-page/controlled" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-4xl p-4 pb-6 lg:p-6">
 
     <div class="min-w-0">
@@ -37754,7 +37770,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      They sit at the measure with the paragraphs, mt-4 above and mt-4 on the
      paragraph after, so a callout reads as a block in the flow rather than as
      furniture the text has to get around. -->
-<div data-kui="docs-page/callouts" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+<div data-kui="docs-page/callouts" class="bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <main class="mx-auto max-w-3xl">
     <article class="rounded-xl border border-zinc-300 bg-white px-5 py-5 sm:px-6">
       <h1 class="text-[24px]/7 font-semibold tracking-tight">Closing an order short</h1>
@@ -37858,7 +37874,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      aria-expanded is written twice, once as a literal matching the seed and
      once bound, so a reader arriving mid-load is told the truth. -->
-<div data-kui="docs-page/nav" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="docs-page/nav" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        open: { procurement: true, stores: false, quality: false, reference: false },
        q: '', shown: 0, total: 0,
@@ -38065,7 +38081,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      The count goes in a live region and the empty case names what was typed;
      the shape for that is empty-state/no-results and it is not redrawn here. -->
-<div data-kui="docs-page/search" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="docs-page/search" class="h-[720px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="mx-auto max-w-3xl p-4 pb-6 lg:p-6">
 
     <div class="min-w-0">
@@ -38202,7 +38218,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      table in prose at three. Anything wider is a register and belongs on an
      index-page with a link to it from here, not in a sideways scroller nobody
      can drive with a thumb. -->
-<div data-kui="docs-page/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="docs-page/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <main class="p-4 pb-6">
 
     <nav aria-label="Breadcrumb">
@@ -38349,7 +38365,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      Cross references print as document numbers. A link is gone on paper, so
      "see SOP-QA-011" survives the photocopier and "see this page" does not. -->
-<div data-kui="docs-page/print" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="docs-page/print" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
 
   <div class="sticky top-0 z-10 mx-auto mb-4 w-full max-w-[210mm] print:hidden">
     <div class="rounded-xl border border-zinc-300 bg-white px-4 py-3">
@@ -38794,7 +38810,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      min-h-[297mm] is the screen preview of A4. print:min-h-0, or the printable
      area — 297mm less the @page margin — pushes a blank second sheet out of
      every one-page order. -->
-<div data-kui="document-page/purchase-order" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/purchase-order" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -39012,7 +39028,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      No status pill anywhere. The dot that carries the state is a background
      circle, and on paper the pill is an empty ring around a word. A document
      says its state in words or does not say it. -->
-<div data-kui="document-page/invoice" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/invoice" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -39254,7 +39270,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      the head, and the foot of a challan belongs to whoever receives it. Two
      signature blocks facing each other on a challan is a form that has been
      copied from an invoice without being read. -->
-<div data-kui="document-page/challan" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/challan" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -39435,7 +39451,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      No amount in words and no tax block. A GRN is an internal record of what
      arrived; the money is settled on the invoice, and a GRN that totals like a
      bill gets used as one. -->
-<div data-kui="document-page/grn" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/grn" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -39653,7 +39669,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The tax block still prints in full. A draft is not an estimate — the
      figures are the ones the order will carry if it is approved unchanged, and
      hiding them makes the sheet useless for the approval it is asking for. -->
-<div data-kui="document-page/draft" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/draft" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -39816,7 +39832,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The selector is chrome and carries print:hidden. It adds hidden to a copy
      rather than filtering the array, so the count in the toolbar and the sheets
      under it are reading the same state and cannot disagree. -->
-<div data-kui="document-page/copies" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="document-page/copies" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{
        copies: [
          { id: 'original',   mark: 'Original for recipient',   note: 'Goes to Deccan Fasteners with the invoice.', on: true },
@@ -39996,7 +40012,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The h1 is on sheet 1. Sheets 2 and 3 carry a compact continuation head at
      h2, which is how a paper continuation sheet has always been headed and what
      stops the outline claiming three documents. -->
-<div data-kui="document-page/multi-page" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/multi-page" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm] space-y-4 print:space-y-0">
 
     <section aria-label="Tax invoice INV-2026-0774, page 1 of 3"
@@ -40338,7 +40354,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The strip under the toolbar says what will come out — how many sheets, what
      size, which copy. It is the answer to the question the user is about to
      find out the expensive way. -->
-<div data-kui="document-page/preview" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="document-page/preview" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{ copy: 'original' }">
 
   <div class="sticky top-0 z-10 mx-auto mb-4 w-full max-w-[210mm] print:hidden">
@@ -40538,7 +40554,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 {% load humanize money %}
 
 {% block document %}
-<div data-kui="document-page/django" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="document-page/django" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
     <article class="min-h-[297mm] rounded-xl border border-zinc-300 bg-white p-5 sm:p-6 print:min-h-0 print:rounded-none print:border-0 print:p-0">
 
@@ -40798,7 +40814,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Nothing on the stock is zinc-600. A thermal printer is one bit deep and
      dithers grey into a checkerboard, so the item code and the description are
      separated by size and weight and by nothing else. -->
-<div data-kui="label-sheet/sheet" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="label-sheet/sheet" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{
        labels: [
          { loc: 'B-04-01', code: 'ITM-1042', desc: 'MS angle 50 × 50 × 6 mm' },
@@ -40885,7 +40901,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      100 × 50 mm is 378 × 189 px at 96dpi and does not fit a 390px viewport once
      the page gutter is on it, so the roll sits in the same scroller the sheet
      does. -->
-<div data-kui="label-sheet/roll" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="label-sheet/roll" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
 
     <div class="mb-4 print:hidden">
@@ -40971,7 +40987,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      the job wants. That is also why these three keep their outlines on paper
      where every other variant drops them with print:border-0 — here the outline
      is the thing being compared, not a stand-in for a die-cut. -->
-<div data-kui="label-sheet/sizes" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="label-sheet/sizes" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
 
     <div class="mb-4 print:hidden">
@@ -41054,7 +41070,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 
      Every one of these is one page on the roll, so every one takes
      break-after-page except the last. -->
-<div data-kui="label-sheet/content" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="label-sheet/content" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
 
     <div class="mb-4 print:hidden">
@@ -41168,7 +41184,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      than drawn — a preview that grows a ninth row is a preview of a sheet of
      stock nobody sells, and it is exactly the arrangement the operator is here
      to check against the sheet in their hand. -->
-<div data-kui="label-sheet/start-position" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="label-sheet/start-position" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{
        start: 9,
        labels: [
@@ -41283,7 +41299,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      thing it is registering is testing nothing. The bottom 15.15 mm is backing
      paper with no label on it, which is the one place on the sheet where a
      caption costs nothing. -->
-<div data-kui="label-sheet/align" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="label-sheet/align" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{
        dx: 0, dy: 0,
        nudge(axis, d) { const v = Math.round((this[axis] + d) * 2) / 2;
@@ -41400,7 +41416,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The toolbar is sticky on screen and print:hidden on paper. Nothing inside
      the stock is sticky at all — a sticky element prints on the first sheet and
      leaves a gap on the rest, and on label stock the gap is a blank label. -->
-<div data-kui="label-sheet/preview" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
+<div data-kui="label-sheet/preview" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0"
      x-data="{
        qty: 100, start: 9, perSheet: 21,
        set(n) { const v = Math.round(Number(n));
@@ -41626,7 +41642,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      device is a field and the answer is a queue confirmation rather than a
      dialog. -->
 <form data-kui="label-sheet/phone" action="/stores/labels/print/" method="post"
-      class="bg-zinc-100 p-4 text-zinc-900 lg:p-6">
+      class="bg-stone-100 p-4 text-zinc-900 lg:p-6">
   <input type="hidden" name="location" value="B-04-01">
   <main class="mx-auto w-full max-w-md space-y-4">
 
@@ -41750,7 +41766,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 {% load humanize %}
 
 {% block sheet %}
-<div data-kui="label-sheet/django" class="bg-zinc-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
+<div data-kui="label-sheet/django" class="bg-stone-100 p-4 text-zinc-900 lg:p-6 print:bg-white print:p-0">
   <main class="mx-auto w-full max-w-[210mm]">
 
     <div class="mb-4 print:hidden">
@@ -41949,7 +41965,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      The skip link and the <main> landmark are drawn here because app-shell
      normally provides them and this page does not have it. They are the two
      parts of the shell a portal still needs. -->
-<div data-kui="portal-page/shell" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/shell" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-sh-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -42073,7 +42089,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      the word — amber is waiting on them, zinc is running normally, red is past
      the date we asked for, emerald is finished. Approved would be the internal
      word and it says nothing to a supplier about what they owe us. -->
-<div data-kui="portal-page/orders" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/orders" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-or-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -42279,7 +42295,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      and nothing else. A destination bar over a half-answered form is four ways
      to lose what was typed, offered to somebody who has not finished the one
      thing the screen exists for. -->
-<div data-kui="portal-page/acknowledge" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="portal-page/acknowledge" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{ answer: 'accept' }">
   <a href="#pp-ak-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
@@ -42478,7 +42494,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Like the acknowledgement, this is a task rather than a destination, so the
      header keeps both names and drops the four links. Cancel is the way out and
      it goes back to the list. -->
-<div data-kui="portal-page/upload" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900"
+<div data-kui="portal-page/upload" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900"
      x-data="{
        expected: 1065600, amount: 1089600, depth: 0,
        get diff() { return Number(this.amount || 0) - this.expected },
@@ -42683,7 +42699,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      No pager and no filters. Four rows again — a supplier's payment history at
      Konspec is short, and if it ever is not, the answer is a year selector and
      not a register. -->
-<div data-kui="portal-page/payments" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/payments" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-pm-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -42874,7 +42890,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      GSTIN is what our tax return has to match; a supplier whose registration
      lapses finds out here rather than in a rejected return, so each row says
      what it is for rather than only what it is. -->
-<div data-kui="portal-page/profile" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/profile" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-pr-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -43052,7 +43068,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      primary route back and one human to ask. No role="alert" — this arrives as
      a document load, the <title> states it first, and a live region present at
      first paint announces nothing. -->
-<div data-kui="portal-page/restricted" class="relative flex h-[640px] flex-col overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/restricted" class="relative flex h-[640px] flex-col overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-rs-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -43143,7 +43159,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
      Sign out stays visible as an icon button with a real name rather than
      moving into a menu, because a portal used on a shared phone at a works
      office needs it to be one tap from anywhere. -->
-<div data-kui="portal-page/phone" class="relative mx-auto h-[680px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/phone" class="relative mx-auto h-[680px] w-[390px] max-w-full overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#pp-ph-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="border-b border-zinc-200 bg-white">
@@ -43308,7 +43324,7 @@ page 6 of a 3-page result otherwise shows nothing and reads as a broken filter.
 {% load humanize %}
 
 {% block main %}
-<div data-kui="portal-page/django" class="min-h-[560px] bg-zinc-100 text-zinc-900">
+<div data-kui="portal-page/django" class="min-h-[560px] bg-stone-100 text-zinc-900">
 
   <header class="border-b border-zinc-200 bg-white">
     <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5">
@@ -43570,7 +43586,7 @@ owe us.
      toggle or restore between one file and the next, and a script tag on a
      screen that only links out is the defect rule 1 exists to stop, aimed at
      a <script> instead of a component. -->
-<div data-kui="share-page/default" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="share-page/default" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#sp-df-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="flex items-center gap-2.5 border-b border-zinc-200 bg-white px-5 py-4">
@@ -43636,7 +43652,7 @@ owe us.
      heading, the same count-and-size line, the same row — because a
      recipient who gets three of these over a year should not have to learn
      two different pages depending on how many files are in one. -->
-<div data-kui="share-page/single" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-zinc-100 text-zinc-900">
+<div data-kui="share-page/single" class="relative h-[640px] overflow-y-auto rounded-xl border border-zinc-300 bg-stone-100 text-zinc-900">
   <a href="#sp-sg-main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="flex items-center gap-2.5 border-b border-zinc-200 bg-white px-5 py-4">

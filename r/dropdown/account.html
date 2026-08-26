@@ -32,7 +32,9 @@
   <div class="relative"
        x-data="{
          open: false,
-         items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+         canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+         setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
+         items() { return [...this.$refs.menu.querySelectorAll('[role^=menuitem]')] },
          show(last = false) {
            this.open = true;
            this.$nextTick(() => requestAnimationFrame(() => {
@@ -105,6 +107,20 @@
 
         <div role="separator" class="my-1 h-px bg-zinc-100"></div>
 
+        <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+          <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+          <span class="flex items-center gap-1.5">
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                    :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                    class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                    :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                    class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+          </span>
+        </div>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
         <button type="button" role="menuitem" tabindex="-1" @click="close()"
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out

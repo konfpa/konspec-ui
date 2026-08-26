@@ -7197,7 +7197,7 @@ register(
      The overlay is absolute inside this preview box. In app-shell it is fixed
      inset-0 — the shell is the thing that owns the viewport, and a fixed overlay
      rendered here would escape the docs frame and cover the page around it. -->
-<div data-kui="sidebar/mobile" class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="sidebar/mobile" class="relative h-[560px] overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @htmx:after-swap.camel.window="nav = false">
 
   <header class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3">
@@ -7342,6 +7342,8 @@ register(
 <div data-kui="sidebar/blocks" class="relative flex h-[560px] w-64 flex-col rounded-xl border border-zinc-300 bg-white text-[14px]/5 text-zinc-900"
      x-data="{
        menu: '',
+       canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+       setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
        items() { return this.menu ? [...this.$refs[this.menu].querySelectorAll('[role^=menuitem]')] : [] },
        show(name) { this.menu = name; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
        close(toTrigger = true) { const m = this.menu; if (!m) return; this.menu = ''; if (toTrigger) this.$refs[m + '-trigger'].focus() },
@@ -7445,6 +7447,20 @@ register(
            class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="sliders-horizontal" class="size-4 shrink-0"></i>Preferences</a>
         <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
            class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="stamp" class="size-4 shrink-0"></i>Approval limits · ₹5,00,000</a>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+          <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+          <span class="flex items-center gap-1.5">
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                    :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                    class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                    :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                    class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+          </span>
+        </div>
         <div role="separator" class="my-1 h-px bg-zinc-100"></div>
         <a href="#" role="menuitem" tabindex="-1" @click="close(false)"
            class="flex items-center gap-2.5 px-3 py-2 text-[13px]/5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700"><i data-lucide="log-out" class="size-4 shrink-0"></i>Sign out</a>
@@ -7816,7 +7832,7 @@ register(
        [id] { scroll-margin-top: 88px }
      Without it, following #line-14 out of an error summary scrolls the row to
      the top of the viewport, which is underneath this bar. -->
-<div data-kui="topbar/default" class="relative min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="topbar/default" class="relative min-h-64 bg-stone-100 text-[14px]/5 text-zinc-900">
   <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-zinc-900 focus:px-3 focus:py-2 focus:text-[13px]/5 focus:font-medium focus:text-white">Skip to main content</a>
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 sm:px-4">
@@ -7936,7 +7952,9 @@ register(
 <header data-kui="topbar/account" class="flex h-14 items-center gap-3 border-b border-zinc-200 bg-white px-3 text-[14px]/5 text-zinc-900 sm:px-4"
         x-data="{
           open: '',
-          items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+          canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+          setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
+          items() { return [...this.$refs.menu.querySelectorAll('[role^=menuitem]')] },
           show() {
             this.open = 'account';
             this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus()));
@@ -8033,6 +8051,20 @@ register(
           <i data-lucide="sliders-horizontal" class="size-4 text-zinc-600"></i>Preferences
         </button>
         <div role="separator" class="my-1 h-px bg-zinc-100"></div>
+        <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+          <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+          <span class="flex items-center gap-1.5">
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                    :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                    class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+            <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                    :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                    class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                    :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+          </span>
+        </div>
+        <div role="separator" class="my-1 h-px bg-zinc-100"></div>
         <button type="button" role="menuitem" tabindex="-1" @click="close()"
                 class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
           <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
@@ -8116,7 +8148,7 @@ register(
      Inside app-shell this header does not scroll, so it needs no sticky and no
      z-index. The overlay is absolute here because the preview box owns the
      frame; in the real shell it is fixed inset-0. -->
-<div data-kui="topbar/toggle" class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/toggle" class="relative flex h-[420px] overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
      x-data="{ nav: false }" @keydown.escape.window="nav = false">
 
   <aside class="hidden w-64 shrink-0 flex-col border-r border-zinc-200 bg-white lg:flex">
@@ -8319,7 +8351,7 @@ register(
        [id] { scroll-margin-top: 128px }
      56px of bar plus 40px of band plus the gap. Leave it at 88 and every anchor
      target lands under the band that was added to keep people safe. -->
-<div data-kui="topbar/impersonation" class="min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="topbar/impersonation" class="min-h-64 bg-stone-100 text-[14px]/5 text-zinc-900">
   <div class="sticky top-0 z-30">
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 bg-zinc-900 px-3 py-2 text-white sm:px-4">
       <i data-lucide="user-check" class="size-4 shrink-0 text-zinc-400" aria-hidden="true"></i>
@@ -8390,7 +8422,7 @@ register(
      it. Staying signed in keeps the session; it does not keep what is typed
      into the form below, and a bar that says only "session expiring" gets read
      as a promise that it does. -->
-<div data-kui="topbar/session" class="min-h-64 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/session" class="min-h-64 bg-stone-100 text-[14px]/5 text-zinc-900"
      x-data="{
        secs: 296,
        said: '',
@@ -8618,7 +8650,7 @@ register(
      #line-14 out of an error summary lands on a row underneath this header and
      the link reads as broken. One rule on [id] rather than scroll-mt-22 on the
      elements that happen to be targets today. -->
-<div data-kui="topbar/sticky" class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/sticky" class="h-[420px] overflow-y-auto overscroll-contain rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900"
      x-data="{ scrolled: false }" @scroll="scrolled = $el.scrollTop > 0">
 
   <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-transparent bg-white px-3 backdrop-blur transition-colors supports-[backdrop-filter]:bg-white/80 sm:px-4"
@@ -8686,7 +8718,7 @@ register(
      The hamburger has aria-expanded and no aria-controls: the sheet it opens is
      the sidebar's and is not in this block, and an aria-controls naming an id
      that is not on the page is a broken reference rather than a hint. -->
-<div data-kui="topbar/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 text-[14px]/5 text-zinc-900">
+<div data-kui="topbar/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 text-[14px]/5 text-zinc-900">
   <header class="flex h-14 items-center gap-2 border-b border-zinc-200 bg-white px-2">
     <button type="button" aria-label="Open navigation" aria-expanded="false"
             class="flex size-10 shrink-0 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15">
@@ -8768,10 +8800,12 @@ register(
 
      Add to the page around it:
        [id] { scroll-margin-top: 88px } -->
-<div data-kui="topbar/assembled" class="relative bg-zinc-100 text-[14px]/5 text-zinc-900"
+<div data-kui="topbar/assembled" class="relative bg-stone-100 [.canvas-zinc_&]:bg-zinc-100 text-[14px]/5 text-zinc-900"
      x-data="{
        open: '',
-       items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+       canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+       setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
+       items() { return [...this.$refs.menu.querySelectorAll('[role^=menuitem]')] },
        show() { this.open = 'account'; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
        close(toTrigger = true) { if (!this.open) return; this.open = ''; if (toTrigger) this.$refs.account.focus() },
        move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
@@ -8843,6 +8877,20 @@ register(
                   class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
             <i data-lucide="user" class="size-4 text-zinc-600"></i>Your profile
           </button>
+          <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+            <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+            <span class="flex items-center gap-1.5">
+              <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                      :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                      class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                      :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+              <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                      :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                      class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                      :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+            </span>
+          </div>
+          <div role="separator" class="my-1 h-px bg-zinc-100"></div>
           <button type="button" role="menuitem" tabindex="-1" @click="close()"
                   class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
             <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
@@ -8979,7 +9027,9 @@ register(
     <div class="relative shrink-0"
          x-data="{
            open: false,
-           items() { return [...this.$refs.menu.querySelectorAll('[role=menuitem]')] },
+           canvas: document.documentElement.classList.contains('canvas-zinc') ? 'zinc' : 'stone',
+           setCanvas(v) { this.canvas = v; document.documentElement.classList.toggle('canvas-zinc', v === 'zinc'); localStorage.setItem('kon-canvas', v) },
+           items() { return [...this.$refs.menu.querySelectorAll('[role^=menuitem]')] },
            show() { this.open = true; this.$nextTick(() => requestAnimationFrame(() => this.items()[0]?.focus())) },
            close(toTrigger = true) { if (!this.open) return; this.open = false; if (toTrigger) this.$refs.trigger.focus() },
            move(step) { const i = this.items(), at = i.indexOf(document.activeElement); i[(at + step + i.length) % i.length]?.focus() }
@@ -9007,6 +9057,20 @@ register(
           </a>
           <form method="post" action="{% url 'logout' %}" role="none">
             {% csrf_token %}
+            <div role="group" aria-label="Canvas" class="flex items-center justify-between gap-3 px-3 py-2">
+              <span aria-hidden="true" class="text-[13px]/5">Canvas</span>
+              <span class="flex items-center gap-1.5">
+                <button type="button" role="menuitemradio" tabindex="-1" aria-label="Warm"
+                        :aria-checked="canvas === 'stone'" @click="setCanvas('stone')"
+                        class="size-5 rounded-full bg-stone-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                        :class="canvas === 'stone' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+                <button type="button" role="menuitemradio" tabindex="-1" aria-label="Cool"
+                        :aria-checked="canvas === 'zinc'" @click="setCanvas('zinc')"
+                        class="size-5 rounded-full bg-zinc-100 ring-inset transition focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-zinc-700/15"
+                        :class="canvas === 'zinc' ? 'ring-2 ring-zinc-700' : 'ring-1 ring-zinc-300 hover:ring-zinc-400'"></button>
+              </span>
+            </div>
+            <div role="separator" class="my-1 h-px bg-zinc-100"></div>
             <button type="submit" role="menuitem" tabindex="-1"
                     class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px]/5 hover:bg-zinc-100 focus:bg-zinc-100 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-700">
               <i data-lucide="log-out" class="size-4 text-zinc-600"></i>Sign out
@@ -9789,7 +9853,7 @@ register(
      become stacked rows rather than a table. Nothing scrolls sideways: the item
      name truncates, and the quantity and the amount sit under it where there is
      room for both. -->
-<div data-kui="accordion/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-zinc-100 p-3 text-zinc-900">
+<div data-kui="accordion/phone" class="mx-auto w-[390px] max-w-full overflow-hidden rounded-xl border border-zinc-300 bg-stone-100 p-3 text-zinc-900">
   <div class="mb-2">
     <h2 class="text-[16px]/6 font-semibold tabular-nums">GRN-3391</h2>
     <p class="mt-0.5 text-[12px]/4 tabular-nums text-zinc-600">Gujarat Polymers Ltd · 11 Aug 2026</p>
